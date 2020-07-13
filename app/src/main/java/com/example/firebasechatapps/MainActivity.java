@@ -26,6 +26,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private ViewPager myViewPager;
@@ -182,10 +184,13 @@ public class MainActivity extends AppCompatActivity {
                     {
                         if (task.isSuccessful())
                         {
+                            RootRef.child("Groups").child(groupName).child("DelayMessage").setValue("");
+                            RootRef.child("Groups").child(groupName).child("Message").setValue("");
                             Toast.makeText(MainActivity.this, groupName + " group is Created Successfully...", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+
     }
 
 }

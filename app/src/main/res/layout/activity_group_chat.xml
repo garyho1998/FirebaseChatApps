@@ -55,12 +55,11 @@
 
         <EditText
             android:id="@+id/input_group_message"
-            android:layout_width="370dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:hint="write your message here..."
             android:padding="17dp"
             />
-
         <ImageButton
             android:id="@+id/send_message_button"
             android:layout_width="50dp"
@@ -68,6 +67,12 @@
             android:src="@drawable/send_message"
             />
 
+        <ImageButton
+            android:id="@+id/send_delay_button"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/send_message"
+            />
     </LinearLayout>
 
 
