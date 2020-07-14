@@ -13,6 +13,8 @@
         android:theme="@style/AppTheme">
         <activity android:name=".ProfileActivity"></activity>
         <activity android:name=".GroupChatActivity" />
+        <receiver android:name="AlarmReceiver" >
+        </receiver>
         <activity android:name=".SettingsActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />
