@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void VerifyUserExistance()
     {
-        String currentUserID = mAuth.getCurrentUser().getUid();
+        currentUserID = mAuth.getCurrentUser().getUid();
 
         RootRef.child("Users").child(currentUserID).addValueEventListener(new ValueEventListener() {
             @Override
@@ -186,11 +186,11 @@ public class MainActivity extends AppCompatActivity {
                         {
                             RootRef.child("Groups").child(groupName).child("DelayMessage").setValue("");
                             RootRef.child("Groups").child(groupName).child("Message").setValue("");
+                            RootRef.child("Groups").child(groupName).child("GroupAdmin").setValue(currentUserID);
                             Toast.makeText(MainActivity.this, groupName + " group is Created Successfully...", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
-
     }
 
 }
