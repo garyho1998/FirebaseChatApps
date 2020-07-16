@@ -1,5 +1,6 @@
 package com.example.firebasechatapps;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -12,6 +13,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -270,6 +273,22 @@ public class GroupChatActivity extends AppCompatActivity {
                 GroupMessageKeyRef.updateChildren(messageObject);
             }
         }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.group_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        super.onOptionsItemSelected(item);
+        if(item.getItemId()== R.id.group_add_members_option){
+//            Intent intent = new Intent(GroupChatActivity.this, AddMemberActivity.class);
+//            startActivity(intent);
+        }
+        return true;
     }
 }
 

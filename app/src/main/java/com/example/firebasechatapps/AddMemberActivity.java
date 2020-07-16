@@ -1,46 +1,47 @@
 package com.example.firebasechatapps;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FindFriendsActivity extends AppCompatActivity {
+public class AddMemberActivity extends AppCompatActivity {
     private Toolbar mToolbar;
-    private RecyclerView FindFriendsRecyclerList;
+    private RecyclerView AddMembersRecyclerList;
     private DatabaseReference UsersRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_find_friends);
+        setContentView(R.layout.activity_add_member);
 
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
-        FindFriendsRecyclerList = (RecyclerView) findViewById(R.id.find_friends_recycler_list);
-        FindFriendsRecyclerList.setLayoutManager(new LinearLayoutManager(this));
-
-        mToolbar = (Toolbar) findViewById(R.id.find_friends_toolbar);
+        AddMembersRecyclerList = (RecyclerView) findViewById(R.id.add_members_recycler_list);
+        AddMembersRecyclerList.setLayoutManager(new LinearLayoutManager(this));
+        
+        mToolbar = (Toolbar) findViewById(R.id.add_members_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("Find Friends");
+        getSupportActionBar().setTitle("Add Members");
     }
 
     @Override
@@ -58,15 +59,14 @@ public class FindFriendsActivity extends AppCompatActivity {
                         holder.userName.setText(model.getName());
                         holder.userStatus.setText(model.getStatus());
                         //Picasso.get().load(model.getImage()).placeholder(R.drawable.profile_image).into(holder.profileImage);
-
-
+                        
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view)
                             {
                                 String visit_user_id = getRef(position).getKey();
 
-                                Intent profileIntent = new Intent(FindFriendsActivity.this, ProfileActivity.class);
+                                Intent profileIntent = new Intent(AddMemberActivity.this, ProfileActivity.class);
                                 profileIntent.putExtra("visit_user_id", visit_user_id);
                                 startActivity(profileIntent);
                             }
@@ -83,7 +83,7 @@ public class FindFriendsActivity extends AppCompatActivity {
                     }
                 };
 
-        FindFriendsRecyclerList.setAdapter(adapter);
+        AddMembersRecyclerList.setAdapter(adapter);
 
         adapter.startListening();
     }
@@ -103,4 +103,5 @@ public class FindFriendsActivity extends AppCompatActivity {
             profileImage = itemView.findViewById(R.id.users_profile_image);
         }
     }
+
 }

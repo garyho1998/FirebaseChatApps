@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,7 +38,9 @@ public class GroupsFragment extends Fragment {
     private ArrayList<String> list_of_groups = new ArrayList<>();
     private FloatingActionButton mcalendarButton;
 
-    private DatabaseReference GroupRef;
+    private DatabaseReference GroupRef, UserRef;
+    private FirebaseAuth mAuth;
+    private String currentUserId;
     public GroupsFragment() {
         // Required empty public constructor
     }
@@ -48,9 +51,11 @@ public class GroupsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         GroupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
-
         groupFragmentView = inflater.inflate(R.layout.fragment_group, container, false);
 
+        mAuth = FirebaseAuth.getInstance();
+        currentUserId = mAuth.getCurrentUser().getUid();
+        UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId);
         IntializeFields();
         RetrieveAndDisplayGroups();
 
@@ -90,7 +95,7 @@ public class GroupsFragment extends Fragment {
 
     private void RetrieveAndDisplayGroups()
     {
-        GroupRef.addValueEventListener(new ValueEventListener() {
+        UserRef.child("groups").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {

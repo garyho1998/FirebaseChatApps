@@ -74,6 +74,4 @@
             android:src="@drawable/send_message"
             />
     </LinearLayout>
-
-
 </RelativeLayout>
