@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,6 +35,7 @@ public class GroupsFragment extends Fragment {
     private ListView list_view;
     private ArrayAdapter<String> arrayAdapter;
     private ArrayList<String> list_of_groups = new ArrayList<>();
+    private FloatingActionButton mcalendarButton;
 
     private DatabaseReference GroupRef;
     public GroupsFragment() {
@@ -61,6 +63,18 @@ public class GroupsFragment extends Fragment {
                 Intent groupChatIntent = new Intent(getContext(), GroupChatActivity.class);
                 groupChatIntent.putExtra("groupName" , currentGroupName);
                 startActivity(groupChatIntent);
+            }
+        });
+
+
+        mcalendarButton = (FloatingActionButton) groupFragmentView.findViewById(R.id.calendarButton);
+
+        mcalendarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent calendarIntent = new Intent(getContext(), CalendarActivity.class);
+//                calendarIntent.putExtra("type" , valueToPass);
+                startActivity(calendarIntent);
             }
         });
 

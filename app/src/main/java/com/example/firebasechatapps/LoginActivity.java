@@ -23,10 +23,14 @@ import com.google.firebase.iid.FirebaseInstanceId;
 public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
-    private Button LoginButton, PhoneLoginButton;
+    private Button LoginButton;
+//            , PhoneLoginButton;
     private EditText UserEmail, UserPassword;
     private TextView NeedNewAccountLink, ForgetPasswordLink;
     private ProgressDialog loadingBar;
+
+    private TextView phoneRegister;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +52,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 AllowUserToLogin();
+            }
+        });
+
+        phoneRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent phoneLoginIntent = new Intent(LoginActivity.this, PhoneLoginActivity.class);
+                startActivity(phoneLoginIntent);
             }
         });
     }
@@ -90,12 +102,14 @@ public class LoginActivity extends AppCompatActivity {
 
     private void InitializeFields(){
         LoginButton = (Button) findViewById(R.id.login_button);
-        PhoneLoginButton = (Button) findViewById(R.id.phone_login_button);
+//        PhoneLoginButton = (Button) findViewById(R.id.phone_login_button);
         UserEmail = (EditText) findViewById(R.id.login_email);
         UserPassword = (EditText) findViewById(R.id.login_password);
         NeedNewAccountLink = (TextView) findViewById(R.id.need_new_account_link);
         ForgetPasswordLink = (TextView) findViewById(R.id.forget_password_link);
         loadingBar = new ProgressDialog(this);
+        phoneRegister = (TextView) findViewById(R.id.phone_register_link);
+
     }
 
     private void SendUserToMainActivity()
