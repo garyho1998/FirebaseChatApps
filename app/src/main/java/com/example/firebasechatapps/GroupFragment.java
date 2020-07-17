@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class GroupsFragment extends Fragment {
+public class GroupFragment extends Fragment {
 
     private View groupFragmentView;
     private ListView list_view;
@@ -41,7 +41,7 @@ public class GroupsFragment extends Fragment {
     private DatabaseReference GroupRef, UserRef;
     private FirebaseAuth mAuth;
     private String currentUserId;
-    public GroupsFragment() {
+    public GroupFragment() {
         // Required empty public constructor
     }
 
