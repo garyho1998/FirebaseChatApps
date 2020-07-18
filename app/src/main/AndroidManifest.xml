@@ -3,6 +3,8 @@
     package="com.example.firebasechatapps">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -17,8 +19,9 @@
             android:parentActivityName=".MainActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".GroupChatActivity" />
-        <receiver android:name="AlarmReceiver" >
-        </receiver>
+
+        <receiver android:name="AlarmReceiver"></receiver>
+
         <activity android:name=".SettingsActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />
@@ -32,5 +35,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ChatActivity"
+            android:parentActivityName=".MainActivity"
+            />
     </application>
 </manifest>
