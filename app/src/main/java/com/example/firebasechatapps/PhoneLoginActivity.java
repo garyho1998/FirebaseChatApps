@@ -160,9 +160,9 @@ public class PhoneLoginActivity extends AppCompatActivity {
                             String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
                             String currentUserID = mAuth.getCurrentUser().getUid();
-                            RootRef.child("Users").child(currentUserID).setValue("");
+                            //RootRef.child("Users").child(currentUserID).setValue("");
                             RootRef.child("Users").child(currentUserID).child("deviceToken").setValue(deviceToken);
-                            RootRef.child("Users").child(currentUserID).child("groups").setValue("");
+                            //RootRef.child("Users").child(currentUserID).child("groups").setValue("");
                             Log.i(TAG, "phoneNumer:" + phoneNumber);
                             RootRef.child("Users").child(currentUserID).child("phoneNumber").setValue(phoneNumber);
                             loadingBar.dismiss();
