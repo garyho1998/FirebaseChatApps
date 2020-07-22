@@ -99,9 +99,7 @@ public class GroupChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent calendarIntent = new Intent(GroupChatActivity.this, CalendarActivity.class);
-//                calendarIntent.putExtra("type" , valueToPass);
                 calendarIntent.putExtra("groupName", currentGroupName);
-                finish();
                 startActivity(calendarIntent);
 
 

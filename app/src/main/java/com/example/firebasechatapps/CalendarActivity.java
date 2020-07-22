@@ -36,6 +36,7 @@ import sun.bob.mcalendarview.MCalendarView;
 import sun.bob.mcalendarview.MarkStyle;
 import sun.bob.mcalendarview.listeners.OnDateClickListener;
 import sun.bob.mcalendarview.vo.DateData;
+import sun.bob.mcalendarview.vo.MarkedDates;
 
 public class CalendarActivity extends AppCompatActivity {
 
@@ -63,13 +64,11 @@ public class CalendarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
 
-
         // to be removed...
         mDelayView = (TextView) findViewById(R.id.delayView);
 
-        mCalendarView = new MCalendarView(CalendarActivity.this);
+        //mCalendarView = new MCalendarView(CalendarActivity.this);
         mCalendarView = (MCalendarView) findViewById(R.id.calendarView);
-
 
         mdateView = (TextView) findViewById(R.id.dateView);
 
@@ -88,30 +87,22 @@ public class CalendarActivity extends AppCompatActivity {
 
         Toast.makeText(CalendarActivity.this, "Calendar of " + currentGroupName, Toast.LENGTH_SHORT).show();
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MarkedDates markedDates = mCalendarView.getMarkedDates();
+        ArrayList markData = markedDates.getAll();
+        for (int k=0; k<markData.size();k++){
+            mCalendarView.unMarkDate((DateData)markData.get(k));
+        }
 
+    }
     @Override
     protected void onStart()
     {
         super.onStart();
+        RetrieveAndMarkDelayDate();
 
-//        Activity mActivity;
-//        mActivity = CalendarActivity.this;
-//        mActivity.recreate();
-
-//        mCalendarView = new MCalendarView(CalendarActivity.this);
-
-
-//        mCalendarView.markDate(new DateData(2020, 7, 17).setMarkStyle(new MarkStyle(MarkStyle.DOT, Color.GREEN)));
-//        mCalendarView.unMarkDate(new DateData(2020, 7, 17));
-
-//        date_list = RetrieveAndMarkDelayDate();
-//        RetrieveAndMarkDelayDate()
-
-        for (DateData date: RetrieveAndMarkDelayDate()) {
-            //
-            mDelayView.setText("Unmarking " + date.getDay() + date.getMonth() + date.getYear());
-            mCalendarView.unMarkDate(date);
-        }
 
         mCalendarView.setOnDateClickListener(new OnDateClickListener() {
             @Override
@@ -120,7 +111,6 @@ public class CalendarActivity extends AppCompatActivity {
                 final String selectedDate = TransferMonth(date.getMonth()) + " " + date.getDay() + ", " + date.getYear();
                 mdateView.setText(selectedDate);
 
-                //---
                 Toast.makeText(CalendarActivity.this, "Retrieving " + DelayMsgRef.toString(), Toast.LENGTH_SHORT).show();
 
                 query = DelayMsgRef.orderByChild("displayDate").equalTo(selectedDate);
@@ -169,18 +159,14 @@ public class CalendarActivity extends AppCompatActivity {
     }
 
     private ArrayList<DateData> RetrieveAndMarkDelayDate() {
-        //
+        MarkedDates markedDates = mCalendarView.getMarkedDates();
+        ArrayList markData = markedDates.getAll();
+        for (int k=0; k<markData.size();k++){
+            mCalendarView.unMarkDate((DateData)markData.get(k));
+        }
+
         final ArrayList<DateData> marked_date_list = new ArrayList<DateData>();
-//        mCalendarView = new MCalendarView(CalendarActivity.this);
-//        mCalendarView.unMarkDate();
         mCalendarView.invalidate();
-//        mCalendarView.clearAnimation();
-//        mCalendarView.clearFocus();
-//        mCalendarView.postInvalidate();
-//        mCalendarView.removeAllViews();
-//        mCalendarView.onStartTemporaryDetach();
-//        mCalendarView.onFinishTemporaryDetach();
-//        mCalendarView.refreshDrawableState();
 
         GroupNameRef.child("DelayMessage").addValueEventListener(new ValueEventListener() {
             @Override
@@ -208,7 +194,6 @@ public class CalendarActivity extends AppCompatActivity {
                         for (DateData date: marked_date_list) {
                             mDelayView.setText("element of mark date list: "+ Integer.toString(date.getYear()) + Integer.toString(date.getMonth()) + Integer.toString(date.getDay()));
                         }
-
                     }
                     catch (Exception e)
                     {
@@ -224,7 +209,11 @@ public class CalendarActivity extends AppCompatActivity {
             }
 
         });
-        //
+        markedDates = mCalendarView.getMarkedDates();
+        markData = markedDates.getAll();
+        for (int k=0; k<markData.size();k++){
+            mCalendarView.unMarkDate((DateData)markData.get(k));
+        }
         return marked_date_list;
 
     }
@@ -260,25 +249,4 @@ public class CalendarActivity extends AppCompatActivity {
         }
 
     }
-
-
-    /*
-
-    mCalendarView = (CalendarView) findViewById(R.id.calendarView);
-        mdateView = (TextView) findViewById(R.id.dateView);
-
-        mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(CalendarView CalendarView, int year, int month, int dayOfMonth) {
-                String date = year + "/" + (++month) + "/"+ dayOfMonth ;
-                mdateView.setText(date);
-
-//                Log.d(TAG, "onSelectedDayChange: yyyy/mm/dd:" + date);
-//                Intent intent = new Intent(CalendarActivity.this,MainActivity.class);
-//                intent.putExtra("date",date);
-//                startActivity(intent);
-
-            }
-        });
-    }*/
 }
