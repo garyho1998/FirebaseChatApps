@@ -74,4 +74,15 @@
             android:src="@drawable/send_message"
             />
     </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/calendarButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="65dp"
+        android:clickable="true"
+        android:src="@drawable/calendar" />
 </RelativeLayout>

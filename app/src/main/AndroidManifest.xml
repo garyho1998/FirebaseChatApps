@@ -38,5 +38,7 @@
         <activity android:name=".ChatActivity"
             android:parentActivityName=".MainActivity"
             />
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
     </application>
 </manifest>

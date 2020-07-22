@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.example.firebasechatapps.AlarmController;
 import com.example.firebasechatapps.R;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -48,6 +49,8 @@ public class GroupChatActivity extends AppCompatActivity {
     private EditText userMessageInput;
     private ScrollView mScrollView;
     private TextView displayTextMessages;
+    private FloatingActionButton mcalendarButton;
+
 
     private FirebaseAuth mAuth;
     private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef;
@@ -89,6 +92,19 @@ public class GroupChatActivity extends AppCompatActivity {
                     showDateTimeDialogAndSend();
                     mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
                 }
+            }
+        });
+
+        mcalendarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent calendarIntent = new Intent(GroupChatActivity.this, CalendarActivity.class);
+//                calendarIntent.putExtra("type" , valueToPass);
+                calendarIntent.putExtra("groupName", currentGroupName);
+                finish();
+                startActivity(calendarIntent);
+
+
             }
         });
     }
@@ -174,6 +190,8 @@ public class GroupChatActivity extends AppCompatActivity {
         userMessageInput = (EditText) findViewById(R.id.input_group_message);
         displayTextMessages = (TextView) findViewById(R.id.group_chat_text_display);
         mScrollView = (ScrollView) findViewById(R.id.my_scroll_view);
+        mcalendarButton = (FloatingActionButton) findViewById(R.id.calendarButton);
+
     }
 
     private void DisplayMessages(DataSnapshot dataSnapshot) {
