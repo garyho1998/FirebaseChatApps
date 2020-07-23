@@ -13,15 +13,4 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/calendarButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="19dp"
-        android:layout_marginBottom="23dp"
-        android:clickable="true"
-        android:src="@drawable/calendar" />
-
 </RelativeLayout>
