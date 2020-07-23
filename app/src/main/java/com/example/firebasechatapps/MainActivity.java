@@ -186,7 +186,8 @@ public class MainActivity extends AppCompatActivity {
                         {
                             RootRef.child("Groups").child(groupName).child("DelayMessage").setValue("");
                             RootRef.child("Groups").child(groupName).child("Message").setValue("");
-                            RootRef.child("Groups").child(groupName).child("GroupAdmin").setValue(currentUserID);
+                            RootRef.child("Groups").child(groupName).child("GroupAdmin").child(currentUserID).setValue("");
+                            RootRef.child("Groups").child(groupName).child("Member").child(currentUserID).setValue("");
                             RootRef.child("Users").child(currentUserID).child("groups").child(groupName).setValue("");
                             Toast.makeText(MainActivity.this, groupName + " group is Created Successfully...", Toast.LENGTH_SHORT).show();
                         }

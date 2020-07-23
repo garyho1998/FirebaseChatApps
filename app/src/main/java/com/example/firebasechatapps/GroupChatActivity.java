@@ -288,6 +288,7 @@ public class GroupChatActivity extends AppCompatActivity {
         super.onOptionsItemSelected(item);
         if(item.getItemId()== R.id.group_add_members_option){
             Intent intent = new Intent(GroupChatActivity.this, AddMemberActivity.class);
+            intent.putExtra("groupName", currentGroupName);
             startActivity(intent);
         }
         return true;

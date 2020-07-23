@@ -41,7 +41,7 @@ public class ContactFragment extends Fragment
     private View ContactsView;
     private RecyclerView myContactsList;
 
-    private DatabaseReference ContacsRef, UsersRef;
+    private DatabaseReference ContacsRef, UsersRef, GroupNameRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
 
@@ -57,17 +57,15 @@ public class ContactFragment extends Fragment
         // Inflate the layout for this fragment
         ContactsView = inflater.inflate(R.layout.fragment_contact, container, false);
 
-
         myContactsList = (RecyclerView) ContactsView.findViewById(R.id.contacts_list);
         myContactsList.setLayoutManager(new LinearLayoutManager(getContext()));
-
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
 
-
         ContacsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+
 
 
         return ContactsView;

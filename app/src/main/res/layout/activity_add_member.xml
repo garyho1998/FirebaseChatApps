@@ -14,7 +14,7 @@
     </include>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/add_members_recycler_list"
+        android:id="@+id/contacts_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/add_members_toolbar"
