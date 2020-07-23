@@ -13,6 +13,48 @@
     </include>
 
 
+    <Button
+        android:id="@+id/monthView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/calendar_toolbar"
+        android:layout_marginTop="55dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="6dp"
+        android:text="month displayed"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/prev_button"
+        android:layout_width="75dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="55dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="2dp"
+        android:text="Prev"
+        android:textAllCaps="false"
+        android:textColor="@android:color/background_light"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/next_button"
+        android:layout_width="75dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="55dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="2dp"
+        android:text="Next"
+        android:textAllCaps="false"
+        android:textColor="@android:color/background_light"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/monthView"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:layout_width="409dp"
         android:layout_height="0dp"
@@ -40,19 +82,11 @@
             android:text="date selected"
             android:textSize="24sp" />
 
-        <TextView
-            android:id="@+id/delayView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/calendarView"
-            android:text="default"
-            android:textSize="24sp" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/msgView"
             android:layout_width="409dp"
-            android:layout_height="303dp"
-            android:layout_below="@+id/linearLayout2"
+            android:layout_height="250dp"
+            android:layout_below="@+id/dateView"
             android:background="@android:color/darker_gray"/>
 
 

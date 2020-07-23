@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -142,7 +143,8 @@ public class SettingsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
 
-        if (requestCode==GalleryPick && requestCode==RESULT_OK && data!=null)
+
+        if (requestCode==GalleryPick && resultCode==RESULT_OK && data!=null && data.getData()!=null)
         {
             Uri ImageUri = data.getData();
 
@@ -150,12 +152,17 @@ public class SettingsActivity extends AppCompatActivity {
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .setAspectRatio(1, 1)
                     .start(this);
+
+            /*
+            Picasso.get().load(ImageUri).into(userProfileImage);
+            Toast.makeText(SettingsActivity.this, "picture picked", Toast.LENGTH_SHORT).show();
+            */
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
-            if (requestCode == RESULT_OK)
+            if (resultCode == RESULT_OK)
             {
                 loadingBar.setTitle("Set Profile Image");
                 loadingBar.setMessage("Please wait, your image is uploading...");
@@ -164,7 +171,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 Uri resultUri = result.getUri();
 
-                StorageReference filePath = UserProfileImagesRef.child(currentUserID + "jpg");
+                StorageReference filePath = UserProfileImagesRef.child(currentUserID + ".jpg");
 
                 filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -198,6 +205,7 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             }
         }
+
     }
 
 
