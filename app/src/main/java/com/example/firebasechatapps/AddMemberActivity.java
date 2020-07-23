@@ -19,13 +19,14 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AddMemberActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private RecyclerView AddMembersRecyclerList;
-    private DatabaseReference UsersRef;
+    private DatabaseReference UsersRef, ContactRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +49,7 @@ public class AddMemberActivity extends AppCompatActivity {
     protected void onStart()
     {
         super.onStart();
-
+        ContactRef = FirebaseDatabase.getInstance().getReference().child("Contact");
         FirebaseRecyclerOptions<Contacts> options = new FirebaseRecyclerOptions.Builder<Contacts>().setQuery(UsersRef, Contacts.class).build();
 
         FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder> adapter =
@@ -58,7 +59,7 @@ public class AddMemberActivity extends AppCompatActivity {
                     {
                         holder.userName.setText(model.getName());
                         holder.userStatus.setText(model.getStatus());
-                        //Picasso.get().load(model.getImage()).placeholder(R.drawable.profile_image).into(holder.profileImage);
+                        Picasso.get().load(model.getImage()).placeholder(R.drawable.profile_image).into(holder.profileImage);
                         
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
