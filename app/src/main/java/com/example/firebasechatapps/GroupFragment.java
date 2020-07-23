@@ -37,7 +37,7 @@ public class GroupFragment extends Fragment {
     private ListView list_view;
     private ArrayAdapter<String> arrayAdapter;
     private ArrayList<String> list_of_groups = new ArrayList<>();
-    private FloatingActionButton mcalendarButton;
+//    private FloatingActionButton mcalendarButton;
 
     private DatabaseReference GroupRef, UserRef;
     private FirebaseAuth mAuth;
@@ -73,6 +73,7 @@ public class GroupFragment extends Fragment {
         });
 
 
+        /*
         mcalendarButton = (FloatingActionButton) groupFragmentView.findViewById(R.id.calendarButton);
 
         mcalendarButton.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +83,7 @@ public class GroupFragment extends Fragment {
 //                calendarIntent.putExtra("type" , valueToPass);
                 startActivity(calendarIntent);
             }
-        });
+        });*/
 
         return groupFragmentView;
     }
