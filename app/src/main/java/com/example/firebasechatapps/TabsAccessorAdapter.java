@@ -31,10 +31,6 @@ public class TabsAccessorAdapter extends FragmentPagerAdapter
                 return contactsFragment;
 
             case 3:
-                RequestFragment requestsFragment = new RequestFragment();
-                return requestsFragment;
-
-            case 4:
                 CalendarFragment calendarFragment = new CalendarFragment();
                 return calendarFragment;
 
@@ -47,7 +43,7 @@ public class TabsAccessorAdapter extends FragmentPagerAdapter
     @Override
     public int getCount()
     {
-        return 5;
+        return 4;
     }
 
 
@@ -67,9 +63,6 @@ public class TabsAccessorAdapter extends FragmentPagerAdapter
                 return "Contacts";
 
             case 3:
-                return "Requests";
-
-            case 4:
                 return "Calendar";
 
             default:
