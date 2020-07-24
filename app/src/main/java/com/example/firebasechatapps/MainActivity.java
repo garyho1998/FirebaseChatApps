@@ -135,7 +135,15 @@ public class MainActivity extends AppCompatActivity {
         if(item.getItemId()== R.id.main_create_group_option){
             RequestNewGroup();
         }
+        if(item.getItemId()== R.id.main_fd_option){
+            SendUserToFindFirendActivity();
+        }
         return true;
+    }
+
+    private void SendUserToFindFirendActivity() {
+        Intent intent = new Intent(MainActivity.this, FindFdActivity.class);
+        startActivity(intent);
     }
 
     private void RequestNewGroup()

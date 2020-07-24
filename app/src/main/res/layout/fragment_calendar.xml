@@ -7,6 +7,42 @@
     tools:context=".CalendarFragment">
 
 
+    <Button
+        android:id="@+id/monthView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="6dp"
+        android:text="month displayed"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/prev_button"
+        android:layout_width="75dp"
+        android:layout_height="40dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="2dp"
+        android:text="Prev"
+        android:textAllCaps="false"
+        android:textColor="@android:color/background_light"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/next_button"
+        android:layout_width="75dp"
+        android:layout_height="40dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="2dp"
+        android:text="Next"
+        android:textAllCaps="false"
+        android:textColor="@android:color/background_light"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/monthView" />
+
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
@@ -23,9 +59,13 @@
         <sun.bob.mcalendarview.MCalendarView
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="wrap_content"
             tools:context=".MainActivity"
-            />
+            >
+
+
+
+        </sun.bob.mcalendarview.MCalendarView>
 
         <TextView
             android:id="@+id/dateView"

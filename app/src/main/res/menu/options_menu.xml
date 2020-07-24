@@ -6,6 +6,11 @@
     app:showAsAction="never"
     >
     </item>
+    <item android:title="Find Friend via Phone"
+        android:id="@+id/main_fd_option"
+        app:showAsAction="never"
+        >
+    </item>
     <item android:title="Create Groups"
         android:id="@+id/main_create_group_option"
         app:showAsAction="never"
