@@ -80,21 +80,16 @@ public class CalendarActivity extends AppCompatActivity {
         mMonthTextView.setText(Integer.toString(yyyy) + "-" + Integer.toString(++(mm)));
         mCalendarView.travelTo(new DateData(yyyy, mm, dd));
 
-
-
         currentGroupName = getIntent().getExtras().get("groupName").toString();
         GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupName);
         DelayMsgRef = GroupNameRef.child("DelayMessage");
 
         mToolbar = (Toolbar) findViewById(R.id.calendar_toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Calendar");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("Calendar of " + currentGroupName);
 
         mDelayMsgRecyclerList = (RecyclerView) findViewById(R.id.msgView);
         mDelayMsgRecyclerList.setLayoutManager(new LinearLayoutManager(this));
-
     }
 
     @Override
@@ -146,8 +141,6 @@ public class CalendarActivity extends AppCompatActivity {
                 final String selectedDate = TransferMonth(date.getMonth()) + " " + date.getDay() + ", " + date.getYear();
                 mdateView.setText(selectedDate);
 
-                Toast.makeText(CalendarActivity.this, "Retrieving " + DelayMsgRef.toString(), Toast.LENGTH_SHORT).show();
-
                 query = DelayMsgRef.orderByChild("displayDate").equalTo(selectedDate);
                 FirebaseRecyclerOptions<DelayMsg> options = new FirebaseRecyclerOptions.Builder<DelayMsg>().setQuery(query, DelayMsg.class).build();
 
@@ -192,7 +185,6 @@ public class CalendarActivity extends AppCompatActivity {
 
         }
     }
-
 
     private void RetrieveAndMarkDelayDate() {
         MarkedDates markedDates = mCalendarView.getMarkedDates();

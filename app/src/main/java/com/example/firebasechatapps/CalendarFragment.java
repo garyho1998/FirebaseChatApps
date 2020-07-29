@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,7 +58,7 @@ import sun.bob.mcalendarview.vo.MarkedDates;
 public class CalendarFragment extends Fragment {
 
     private static final String TAG = "CalendarFragment";
-
+    private ArrayList<String> GroupsList = new ArrayList<String>();
     private Calendar today;
     private DateData selectedDate;
     private View calendarFragmentView;
@@ -66,7 +67,9 @@ public class CalendarFragment extends Fragment {
     private Button mMonthTextView, mPrevBtn, mNextBtn;
     private RecyclerView mDelayMsgRecyclerList;
 
-    private DatabaseReference GroupRef, GroupNameRef, DelayMsgRef;
+    private String userID;
+    private FirebaseAuth mAuth;
+    private DatabaseReference GroupRef, GroupNameRef, DelayMsgRef, UserRef;
     private Query query;
 
     public CalendarFragment() {
@@ -90,7 +93,6 @@ public class CalendarFragment extends Fragment {
 
         GroupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
 
-
         today = Calendar.getInstance();
         int dd = today.get(Calendar.DAY_OF_MONTH);
         int mm = today.get(Calendar.MONTH);
@@ -100,7 +102,7 @@ public class CalendarFragment extends Fragment {
         mMonthTextView.setText(Integer.toString(yyyy) + "-" + Integer.toString(++(mm)));
         mCalendarView.travelTo(new DateData(yyyy, mm, dd));
 
-
+        RetrieveGroupsList();
         return calendarFragmentView;
     }
 
@@ -115,7 +117,6 @@ public class CalendarFragment extends Fragment {
             mCalendarView.unMarkDate((DateData)markData.get(k));
         }
     }*/
-
 
     @Override
     public void onResume() {
@@ -228,11 +229,81 @@ public class CalendarFragment extends Fragment {
 //                        Log.e("!_@@@_ERROR_>>", "onCancelled", firebaseError.toException());
                     }
                 });
-
+                RetrieveAndDisplayDelayMsg(selectedDate);
 
             }
         });
     }
+    private void RetrieveAndDisplayDelayMsg(final String selectedDate) {
+        GroupRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                FirebaseRecyclerOptions<DelayMsg> options;
+                FirebaseRecyclerAdapter<DelayMsg, DelayMsgViewHolder> adapter = null;
+                Iterator<DataSnapshot> items = dataSnapshot.getChildren().iterator();
+
+                while (items.hasNext()) {
+                    DataSnapshot item = items.next();
+                    GroupNameRef = item.getRef();
+                    String GroupName = GroupNameRef.getKey();
+
+                    if (GroupsList.contains(GroupName)) {
+                        Toast.makeText(getContext(), "Retrieving from " + GroupName, Toast.LENGTH_SHORT).show();
+                        DelayMsgRef = GroupNameRef.child("DelayMessage");
+
+
+                        query = DelayMsgRef.orderByChild("displayDate").equalTo(selectedDate);
+//                        query = DelayMsgRef.orderByChild("displayDate").equalTo(selectedDate);
+
+//                        FirebaseRecyclerOptions<DelayMsg> options;
+//                        FirebaseRecyclerAdapter<DelayMsg, DelayMsgViewHolder> adapter = null;
+                        options = new FirebaseRecyclerOptions.Builder<DelayMsg>().setQuery(query, DelayMsg.class).build();
+                        //---
+                        Toast.makeText(getContext(), "Querying: the options are" + options.toString(), Toast.LENGTH_SHORT).show();
+
+                        adapter =
+                                new FirebaseRecyclerAdapter<DelayMsg, DelayMsgViewHolder>(options) {
+                                    @Override
+                                    protected void onBindViewHolder(@NonNull final DelayMsgViewHolder delayMsgViewHolder, int i, @NonNull final DelayMsg delayMsg) {
+                                        delayMsgViewHolder.delayMsg.setText(delayMsg.getMessage());
+                                        delayMsgViewHolder.displayTime.setText("Scheduled to send at " + delayMsg.getDisplayTime() + " to " + DelayMsgRef.getParent().getKey());
+                                        //--
+                                        Toast.makeText(getContext(), "Binding " + delayMsg.getMessage() + "\n==========" + selectedDate, Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @NonNull
+                                    @Override
+                                    public DelayMsgViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                                        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.delay_msg_display_layout, parent, false);
+                                        // create a new layout
+                                        DelayMsgViewHolder viewHolder = new DelayMsgViewHolder(view);
+                                        //---
+                                        Toast.makeText(getContext(), "CreatingViewHolder: ", Toast.LENGTH_SHORT).show();
+                                        return viewHolder;
+                                    }
+                                };
+                        //---
+                        Toast.makeText(getContext(), "Adapter: " + adapter.toString(), Toast.LENGTH_SHORT).show();
+
+                        mDelayMsgRecyclerList.setAdapter(adapter);
+//                        adapter.startListening();
+                    }
+
+                }
+//                mDelayMsgRecyclerList.setAdapter(adapter);
+                adapter.startListening();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+//                        Log.e("!_@@@_ERROR_>>", "onCancelled", firebaseError.toException());
+            }
+        });
+
+    }
+
 
     public static class DelayMsgViewHolder extends RecyclerView.ViewHolder
     {
@@ -246,6 +317,38 @@ public class CalendarFragment extends Fragment {
         }
     }
 
+    private void RetrieveGroupsList() {
+//        ArrayList<String> groupsList = new ArrayList<String>();
+        mAuth = FirebaseAuth.getInstance();
+        userID = mAuth.getCurrentUser().getUid();
+        UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(userID);
+        DatabaseReference ChatGpRef = UserRef.child("groups");
+
+        ChatGpRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> items = dataSnapshot.getChildren().iterator();
+
+                while (items.hasNext()) {
+                    DataSnapshot item = items.next();
+                    GroupNameRef = item.getRef();
+                    String name = GroupNameRef.getKey();
+                    GroupsList.add(name);
+//                    groupsList.add(name);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+//        return GroupsList.contains(GroupName);
+
+    }
+
+
     private void RetrieveAndMarkDelayMsg() {
 
         MarkedDates markedDates = mCalendarView.getMarkedDates();
@@ -253,71 +356,6 @@ public class CalendarFragment extends Fragment {
         for (int k=0; k<markData.size();k++){
             mCalendarView.unMarkDate((DateData)markData.get(k));
         }
-
-
-        /*
-        GroupRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                final Iterator<DataSnapshot> groupItems = dataSnapshot.getChildren().iterator();
-
-                while (groupItems.hasNext()) {
-                    DataSnapshot groupItem = groupItems.next();
-                    String groupName = groupItem.getChildren().toString();
-                    //--
-                    Toast.makeText(getContext(), "groupName: " + groupName, Toast.LENGTH_SHORT).show();
-                    GroupNameRef = GroupRef.child(groupName);
-
-                    GroupNameRef.child("DelayMessage").addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Iterator<DataSnapshot> delayMsgItems = dataSnapshot.getChildren().iterator();
-                            while (delayMsgItems.hasNext()) {
-                                DataSnapshot delayMsgItem = groupItems.next();
-                                String sDate = delayMsgItem.child("displayDate").toString();
-                                try {
-                                    Date dDate=new SimpleDateFormat("MMM dd, yyyy").parse(sDate);
-
-                                    Calendar cal = Calendar.getInstance();
-                                    cal.setTime(dDate);
-                                    int month = cal.get(Calendar.MONTH);
-                                    month++;
-                                    int day = cal.get(Calendar.DAY_OF_MONTH);
-                                    int year = cal.get(Calendar.YEAR);
-
-                                    mCalendarView.markDate(new DateData(year, month, day).setMarkStyle(new MarkStyle(MarkStyle.DOT, Color.RED)));
-
-                                } catch (Exception e) {
-                                    //error handling code
-                                }
-
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-//                Log.e("!_@@@_ERROR_>>", "onCancelled", firebaseError.toException());
-            }
-
-        });*/
-
-        markedDates = mCalendarView.getMarkedDates();
-        markData = markedDates.getAll();
-        for (int k=0; k<markData.size();k++){
-            mCalendarView.unMarkDate((DateData)markData.get(k));
-        }
-
     }
 
     private String TransferMonth(int month) {
