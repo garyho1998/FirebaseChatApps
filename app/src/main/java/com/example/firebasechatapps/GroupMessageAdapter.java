@@ -2,11 +2,13 @@ package com.example.firebasechatapps;
 
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,16 +25,21 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>
+public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapter.MessageViewHolder>
 {
+    private String groupID, currentUserID;
+    //--
+    private String currentUserName = "phone1";
     private List<Messages> userMessagesList;
     private FirebaseAuth mAuth;
-    private DatabaseReference usersRef;
+    private DatabaseReference msgRef;
 
 
-    public MessageAdapter (List<Messages> userMessagesList)
+    public GroupMessageAdapter (String groupID, List<Messages> userMessagesList)
     {
+        this.groupID = groupID;
         this.userMessagesList = userMessagesList;
+
     }
 
 
@@ -40,6 +47,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public class MessageViewHolder extends RecyclerView.ViewHolder
     {
         public TextView senderMessageText, sndTimeText, receiverMessageText, rcvTimeText, sndPicTime, rcvPicTime;
+        public TextView rcvIDText;
         public CircleImageView receiverProfileImage;
         public ImageView messageSenderPicture, messageReceiverPicture;
 
@@ -48,19 +56,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         {
             super(itemView);
 
+            rcvIDText = (TextView) itemView.findViewById(R.id.rcv_id);
             senderMessageText = (TextView) itemView.findViewById(R.id.sender_messsage_text);
             sndTimeText = (TextView) itemView.findViewById(R.id.snd_time);
             receiverMessageText = (TextView) itemView.findViewById(R.id.receiver_message_text);
             rcvTimeText = (TextView) itemView.findViewById(R.id.rcv_time);
             receiverProfileImage = (CircleImageView) itemView.findViewById(R.id.message_profile_image);
             messageReceiverPicture = (ImageView) itemView.findViewById(R.id.message_receiver_image_view);
-            sndPicTime = (TextView) itemView.findViewById(R.id.snd_time_pic);
             messageSenderPicture = (ImageView) itemView.findViewById(R.id.message_sender_image_view);
+            sndPicTime = (TextView) itemView.findViewById(R.id.snd_time_pic);
             rcvPicTime = (TextView) itemView.findViewById(R.id.rcv_time_pic);
 
         }
     }
-
 
 
 
@@ -69,9 +77,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.custom_messages_layout, viewGroup, false);
+                .inflate(R.layout.group_messages_layout, viewGroup, false);
 
         mAuth = FirebaseAuth.getInstance();
+        currentUserID = mAuth.getCurrentUser().getUid();
 
         return new MessageViewHolder(view);
     }
@@ -81,15 +90,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, int i)
     {
-        String messageSenderId = mAuth.getCurrentUser().getUid();
         Messages messages = userMessagesList.get(i);
 
-        String fromUserID = messages.getFrom();
-        String fromMessageType = messages.getType();
+        String fromUserID = messages.getName();
+        String fromMessageType ="";
+        if (messages.getType()!=null) {
+            fromMessageType = messages.getType();
+        }
 
-        usersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(fromUserID);
 
-        usersRef.addValueEventListener(new ValueEventListener() {
+        msgRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupID).child("Message");
+
+        msgRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
@@ -109,8 +121,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
 
 
-
-
+        messageViewHolder.rcvIDText.setVisibility(View.GONE);
         messageViewHolder.receiverMessageText.setVisibility(View.GONE);
         messageViewHolder.rcvTimeText.setVisibility(View.GONE);
         messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
@@ -122,9 +133,28 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         messageViewHolder.rcvPicTime.setVisibility(View.GONE);
 
 
-        if (fromMessageType.equals("text"))
-        {
-            if (fromUserID.equals(messageSenderId))
+
+        if (fromMessageType.equals("image")) {
+            //currentUserID -> currentUserName
+            if (fromUserID.equals(currentUserName) || fromUserID.equals(currentUserID)) {
+                messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
+                messageViewHolder.sndPicTime.setVisibility(View.VISIBLE);
+
+                messageViewHolder.sndPicTime.setText(messages.getTime() + " - " + messages.getDate());
+                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
+            } else {
+                messageViewHolder.rcvIDText.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
+                messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+                messageViewHolder.rcvPicTime.setVisibility(View.VISIBLE);
+
+                messageViewHolder.rcvIDText.setText(messages.getName());
+                messageViewHolder.rcvPicTime.setText(messages.getTime() + " - " + messages.getDate());
+                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
+            }
+        } else { //text message
+            //currentUserName -> currentUserID
+            if (fromUserID.equals(currentUserName) || fromUserID.equals(currentUserID))
             {
                 messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.sndTimeText.setVisibility(View.VISIBLE);
@@ -136,31 +166,22 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             }
             else
             {
+                messageViewHolder.rcvIDText.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.rcvTimeText.setVisibility(View.VISIBLE);
 
                 //messageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
+                messageViewHolder.rcvIDText.setText(messages.getName());
                 messageViewHolder.receiverMessageText.setTextColor(Color.BLACK);
+
                 messageViewHolder.receiverMessageText.setText(messages.getMessage());
                 messageViewHolder.rcvTimeText.setText(messages.getTime() + " - " + messages.getDate());
             }
-        } else if (fromMessageType.equals("image")) {
-            if (fromUserID.equals(messageSenderId)) {
-                messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
-                messageViewHolder.sndPicTime.setVisibility(View.VISIBLE);
-
-                messageViewHolder.sndPicTime.setText(messages.getTime() + " - " + messages.getDate());
-                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
-            } else {
-                messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
-                messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
-                messageViewHolder.rcvPicTime.setVisibility(View.VISIBLE);
-
-                messageViewHolder.rcvPicTime.setText(messages.getTime() + " - " + messages.getDate());
-                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
-            }
         }
+
+
+
     }
 
 

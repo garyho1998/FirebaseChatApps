@@ -180,7 +180,7 @@ public class CalendarFragment extends Fragment {
                     String GroupName = GroupNameRef.getKey();
 
                     if (GroupsList.contains(GroupName)) {
-                        Toast.makeText(getContext(), "Retrieving from " + GroupName, Toast.LENGTH_SHORT).show();
+                        Log.d("myTag", "Retrieving from " + GroupName);
                         DelayMsgRef = GroupNameRef.child("DelayMessage");
 
 
@@ -190,8 +190,8 @@ public class CalendarFragment extends Fragment {
 //                        FirebaseRecyclerOptions<DelayMsg> options;
 //                        FirebaseRecyclerAdapter<DelayMsg, DelayMsgViewHolder> adapter = null;
                         options = new FirebaseRecyclerOptions.Builder<DelayMsg>().setQuery(query, DelayMsg.class).build();
-                        //---
-                        Toast.makeText(getContext(), "Querying: the options are" + options.toString(), Toast.LENGTH_SHORT).show();
+
+                        Log.d("myTag", "Querying: the options are" + options.toString());
 
                         adapter =
                                 new FirebaseRecyclerAdapter<DelayMsg, DelayMsgViewHolder>(options) {
@@ -199,8 +199,8 @@ public class CalendarFragment extends Fragment {
                                     protected void onBindViewHolder(@NonNull final DelayMsgViewHolder delayMsgViewHolder, int i, @NonNull final DelayMsg delayMsg) {
                                         delayMsgViewHolder.delayMsg.setText(delayMsg.getMessage());
                                         delayMsgViewHolder.displayTime.setText("Scheduled to send at " + delayMsg.getDisplayTime() + " to " + DelayMsgRef.getParent().getKey());
-                                        //--
-                                        Toast.makeText(getContext(), "Binding " + delayMsg.getMessage() + "\n==========" + selectedDate, Toast.LENGTH_SHORT).show();
+
+                                        Log.d("myTag", "Binding " + delayMsg.getMessage() + "\n==========" + selectedDate);
                                     }
 
                                     @NonNull
@@ -209,13 +209,12 @@ public class CalendarFragment extends Fragment {
                                         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.delay_msg_display_layout, parent, false);
                                         // create a new layout
                                         DelayMsgViewHolder viewHolder = new DelayMsgViewHolder(view);
-                                        //---
-                                        Toast.makeText(getContext(), "CreatingViewHolder: ", Toast.LENGTH_SHORT).show();
+
+                                        Log.d("myTag", "CreatingViewHolder: ");
                                         return viewHolder;
                                     }
                                 };
-                        //---
-                        Toast.makeText(getContext(), "Adapter: " + adapter.toString(), Toast.LENGTH_SHORT).show();
+                        Log.d("myTag", "Adapter: " + adapter.toString());
 
                         mDelayMsgRecyclerList.setAdapter(adapter);
 //                        adapter.startListening();

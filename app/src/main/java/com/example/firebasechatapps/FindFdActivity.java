@@ -142,7 +142,7 @@ public class FindFdActivity extends AppCompatActivity {
                             mUid.setText(user.uid);
                             mUserProfileImage.setVisibility(View.VISIBLE);
                             if (user.image!=null) {
-                                Picasso.get().load(user.image).into(mUserProfileImage);
+                                Picasso.get().load(user.image).placeholder(R.drawable.profile_image).into(mUserProfileImage);
                             } else {
                                 Picasso.get().load(R.drawable.profile_image).into(mUserProfileImage);
                             }
@@ -193,7 +193,6 @@ public class FindFdActivity extends AppCompatActivity {
                     DataSnapshot item = items.next();
                     String contactUid = item.getRef().getKey();
                     contactsList.add(contactUid);
-                    mUsrStatus.setText("Added to list: " + contactUid);
                 }
             }
 
