@@ -41,7 +41,7 @@ public class AddMemberActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private RecyclerView myContactsList;
     private DatabaseReference RootRef, UsersRef, ContactRef, GroupNameRef;
-    private String currentUserID, currentGroupName;
+    private String currentUserID, currentGroupName, currentGroupID;
     final String TAG = "AddMemberActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +51,7 @@ public class AddMemberActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
         currentGroupName = getIntent().getExtras().get("groupName").toString();
+        currentGroupID = getIntent().getExtras().get("groupID").toString();
 
         RootRef = FirebaseDatabase.getInstance().getReference();
         UsersRef = RootRef.child("Users");
@@ -132,7 +133,7 @@ public class AddMemberActivity extends AppCompatActivity {
                                     Toast.makeText(AddMemberActivity.this, "holder.itemView.onClick", Toast.LENGTH_SHORT).show();
                                     holder.row_linearlayout.setBackgroundColor(Color.parseColor("#62FF00"));
                                     GroupNameRef.child("Member").child(userIDs).setValue("");
-                                    RootRef.child("Users").child(userIDs).child("groups").child(currentGroupName).setValue("");
+                                    RootRef.child("Users").child(userIDs).child("groups").child(currentGroupID).setValue(currentGroupName);
                                 }
                             });
 

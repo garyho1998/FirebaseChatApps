@@ -48,7 +48,7 @@ public class CalendarActivity extends AppCompatActivity {
     private MCalendarView mCalendarView;
     private TextView mdateView;
     private Button mMonthTextView, mPrevBtn, mNextBtn;
-    private String currentGroupName;
+    private String currentGroupName, currentGroupID;
 
     private RecyclerView mDelayMsgRecyclerList;
 
@@ -81,7 +81,8 @@ public class CalendarActivity extends AppCompatActivity {
         mCalendarView.travelTo(new DateData(yyyy, mm, dd));
 
         currentGroupName = getIntent().getExtras().get("groupName").toString();
-        GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupName);
+        currentGroupID = getIntent().getExtras().get("groupID").toString();
+        GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupID);
         DelayMsgRef = GroupNameRef.child("DelayMessage");
 
         mToolbar = (Toolbar) findViewById(R.id.calendar_toolbar);
@@ -151,7 +152,6 @@ public class CalendarActivity extends AppCompatActivity {
                             {
                                 holder.delayMsg.setText(model.getMessage());
                                 holder.displayTime.setText("Scheduled to send at " + model.getDisplayTime());
-
                             }
 
                             @NonNull
@@ -193,7 +193,7 @@ public class CalendarActivity extends AppCompatActivity {
             mCalendarView.unMarkDate((DateData)markData.get(k));
         }
 
-        mCalendarView.invalidate();
+        //mCalendarView.invalidate();
 
         GroupNameRef.child("DelayMessage").addValueEventListener(new ValueEventListener() {
             @Override

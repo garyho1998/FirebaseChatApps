@@ -55,7 +55,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef;
 
-    private String currentGroupName, currentUserID, currentUserName, currentDate, currentTime;
+    private String currentGroupName, currentGroupID,  currentUserID, currentUserName, currentDate, currentTime;
     AlarmController alarmController;
     final String TAG = "GroupChatActivity";
     @Override
@@ -64,12 +64,13 @@ public class GroupChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_group_chat);
 
         currentGroupName = getIntent().getExtras().get("groupName").toString();
+        currentGroupID = getIntent().getExtras().get("groupID").toString();
         Toast.makeText(GroupChatActivity.this, currentGroupName, Toast.LENGTH_SHORT).show();
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupName);
+        GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupID);
 
         InitializeFields();
         GetUserInfo();
@@ -100,9 +101,8 @@ public class GroupChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent calendarIntent = new Intent(GroupChatActivity.this, CalendarActivity.class);
                 calendarIntent.putExtra("groupName", currentGroupName);
+                calendarIntent.putExtra("groupID", currentGroupID);
                 startActivity(calendarIntent);
-
-
             }
         });
     }
@@ -177,7 +177,11 @@ public class GroupChatActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {}
         });
     }
-
+    @Override
+    protected void onResume(){
+        super.onResume();
+        displayTextMessages.setText("");
+    }
     private void InitializeFields() {
         mToolbar = (Toolbar) findViewById(R.id.group_chat_bar_layout);
         setSupportActionBar(mToolbar);
@@ -189,7 +193,6 @@ public class GroupChatActivity extends AppCompatActivity {
         displayTextMessages = (TextView) findViewById(R.id.group_chat_text_display);
         mScrollView = (ScrollView) findViewById(R.id.my_scroll_view);
         mcalendarButton = (FloatingActionButton) findViewById(R.id.calendarButton);
-
     }
 
     private void DisplayMessages(DataSnapshot dataSnapshot) {
@@ -231,7 +234,6 @@ public class GroupChatActivity extends AppCompatActivity {
         }else{
             alarmController.addAlarm(this, id, displayTimestamp, currentGroupName);
         }
-
     }
 
     private void GetUserInfo() {
@@ -292,6 +294,8 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         }
     }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -305,6 +309,7 @@ public class GroupChatActivity extends AppCompatActivity {
         if(item.getItemId()== R.id.group_add_members_option){
             Intent intent = new Intent(GroupChatActivity.this, AddMemberActivity.class);
             intent.putExtra("groupName", currentGroupName);
+            intent.putExtra("groupID", currentGroupID);
             startActivity(intent);
         }
         return true;

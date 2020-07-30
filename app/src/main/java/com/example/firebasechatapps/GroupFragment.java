@@ -35,13 +35,13 @@ public class GroupFragment extends Fragment {
 
     private View groupFragmentView;
     private ListView list_view;
-    private ArrayAdapter<String> arrayAdapter;
-    private ArrayList<String> list_of_groups = new ArrayList<>();
+    private ArrayAdapter<groupObject> arrayAdapter;
+    private ArrayList<groupObject> list_of_groups = new ArrayList<>();
 //    private FloatingActionButton mcalendarButton;
 
     private DatabaseReference GroupRef, UserRef;
     private FirebaseAuth mAuth;
-    private String currentUserId;
+    private String currentUserID;
     public GroupFragment() {
         // Required empty public constructor
     }
@@ -55,8 +55,8 @@ public class GroupFragment extends Fragment {
         groupFragmentView = inflater.inflate(R.layout.fragment_group, container, false);
 
         mAuth = FirebaseAuth.getInstance();
-        currentUserId = mAuth.getCurrentUser().getUid();
-        UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId);
+        currentUserID = mAuth.getCurrentUser().getUid();
+        UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserID);
         IntializeFields();
         RetrieveAndDisplayGroups();
 
@@ -64,26 +64,15 @@ public class GroupFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id)
             {
-                String currentGroupName = adapterView.getItemAtPosition(position).toString();
-
+                String currentGroupName = ((groupObject)adapterView.getItemAtPosition(position)).getName();
+                String currentGroupID = ((groupObject)adapterView.getItemAtPosition(position)).getID();
+                
                 Intent groupChatIntent = new Intent(getContext(), GroupChatActivity.class);
                 groupChatIntent.putExtra("groupName" , currentGroupName);
+                groupChatIntent.putExtra("groupID" , currentGroupID);
                 startActivity(groupChatIntent);
             }
         });
-
-
-        /*
-        mcalendarButton = (FloatingActionButton) groupFragmentView.findViewById(R.id.calendarButton);
-
-        mcalendarButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent calendarIntent = new Intent(getContext(), CalendarActivity.class);
-//                calendarIntent.putExtra("type" , valueToPass);
-                startActivity(calendarIntent);
-            }
-        });*/
 
         return groupFragmentView;
     }
@@ -91,7 +80,7 @@ public class GroupFragment extends Fragment {
     private void IntializeFields()
     {
         list_view = (ListView) groupFragmentView.findViewById(R.id.list_view);
-        arrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, list_of_groups);
+        arrayAdapter = new ArrayAdapter<groupObject>(getContext(), android.R.layout.simple_list_item_1, list_of_groups);
         list_view.setAdapter(arrayAdapter);
     }
 
@@ -101,12 +90,14 @@ public class GroupFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
-                Set<String> set = new HashSet<>();
+                Set<groupObject> set = new HashSet<>();
                 Iterator iterator = dataSnapshot.getChildren().iterator();
 
                 while (iterator.hasNext())
                 {
-                    set.add(((DataSnapshot)iterator.next()).getKey());
+                    DataSnapshot dataSnapshotTemp = ((DataSnapshot)iterator.next());
+                    groupObject tempGroup = new groupObject(dataSnapshotTemp.getKey(), (String) dataSnapshotTemp.getValue());
+                    set.add(tempGroup);
                 }
 
                 list_of_groups.clear();
@@ -120,4 +111,27 @@ public class GroupFragment extends Fragment {
             }
         });
     }
+
+    private class groupObject {
+        private String id;
+        private String name;
+
+        public groupObject(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public String getID() {
+            return id;
+        }
+        public String getName() {
+            return name;
+        }
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 }
+
+

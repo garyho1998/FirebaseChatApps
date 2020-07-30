@@ -185,18 +185,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void CreateNewGroup(final String groupName)
     {
-        RootRef.child("Groups").child(groupName).setValue("")
+        final DatabaseReference GroupRef = RootRef.child("Groups");
+        final String groupID = GroupRef.push().getKey();
+        GroupRef.child(groupID).setValue("")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task)
                     {
                         if (task.isSuccessful())
                         {
-                            RootRef.child("Groups").child(groupName).child("DelayMessage").setValue("");
-                            RootRef.child("Groups").child(groupName).child("Message").setValue("");
-                            RootRef.child("Groups").child(groupName).child("GroupAdmin").child(currentUserID).setValue("");
-                            RootRef.child("Groups").child(groupName).child("Member").child(currentUserID).setValue("");
-                            RootRef.child("Users").child(currentUserID).child("groups").child(groupName).setValue("");
+                            GroupRef.child(groupID).child("DelayMessage").setValue("");
+                            GroupRef.child(groupID).child("Message").setValue("");
+                            GroupRef.child(groupID).child("GroupAdmin").child(currentUserID).setValue("");
+                            GroupRef.child(groupID).child("Member").child(currentUserID).setValue("");
+                            GroupRef.child(groupID).child("GroupName").setValue(groupName);
+                            RootRef.child("Users").child(currentUserID).child("groups").child(groupID).setValue(groupName);
                             Toast.makeText(MainActivity.this, groupName + " group is Created Successfully...", Toast.LENGTH_SHORT).show();
                         }
                     }

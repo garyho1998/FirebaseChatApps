@@ -179,11 +179,7 @@ public class CalendarFragment extends Fragment {
                         while (items.hasNext()) {
                             DataSnapshot item = items.next();
                             GroupNameRef = item.getRef();
-//                            final String itemKey = item.getKey();
-//                            GroupNameRef = GroupRef.child(itemKey);
                             DelayMsgRef = GroupNameRef.child("DelayMessage");
-
-
 
                             query = DelayMsgRef.orderByChild("displayDate").equalTo(selectedDate);
                             options = new FirebaseRecyclerOptions.Builder<DelayMsg>().setQuery(query, DelayMsg.class).build();
@@ -215,8 +211,6 @@ public class CalendarFragment extends Fragment {
 
                             //---
                             Toast.makeText(getContext(), "Adapter: " + adapter.toString(), Toast.LENGTH_SHORT).show();
-
-
                         }
 
                         mDelayMsgRecyclerList.setAdapter(adapter);
@@ -343,9 +337,6 @@ public class CalendarFragment extends Fragment {
 
             }
         });
-
-//        return GroupsList.contains(GroupName);
-
     }
 
 
