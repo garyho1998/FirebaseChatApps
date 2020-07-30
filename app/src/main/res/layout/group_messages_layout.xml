@@ -14,13 +14,24 @@
         />
 
     <TextView
+        android:id="@+id/rcv_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/message_profile_image"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="3dp"
+        android:text="receiver id"
+        android:textColor="@android:color/black"
+        />
+
+    <TextView
         android:id="@+id/receiver_message_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxWidth="255dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="1dp"
         android:layout_marginLeft="3dp"
+        android:layout_below="@id/rcv_id"
         android:layout_toEndOf="@+id/message_profile_image"
         android:background="@drawable/receiver_messages_layout"
         android:text="receiver messages here"
@@ -73,8 +84,9 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_alignParentStart="true"
+        android:layout_below="@id/rcv_id"
         android:layout_marginStart="50dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="1dp"
         android:scaleType="centerCrop"
         />
 

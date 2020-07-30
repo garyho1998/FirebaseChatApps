@@ -1,5 +1,7 @@
 package com.example.firebasechatapps;
 
+import androidx.annotation.Nullable;
+
 public class Messages
 {
     private String from, message, type, to, messageID, time, date, name;
@@ -83,4 +85,21 @@ public class Messages
     public void setName(String name) {
         this.name = name;
     }
+
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        boolean isEqual = false;
+
+        if (obj!=null && obj instanceof Messages) {
+            isEqual = (this.messageID.equals(((Messages) obj).getMessageID()));
+        }
+
+        return isEqual;
+    }
+
+//    @Override
+//    public int hashCode() {
+//        return Integer.parseInt(this.messageID);
+//    }
 }
