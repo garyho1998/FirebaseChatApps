@@ -2,6 +2,8 @@ package com.example.firebasechatapps;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -56,7 +58,7 @@ public class AddMemberActivity extends AppCompatActivity {
         RootRef = FirebaseDatabase.getInstance().getReference();
         UsersRef = RootRef.child("Users");
         ContactRef = RootRef.child("Contacts").child(currentUserID);
-        GroupNameRef = RootRef.child("Groups").child(currentGroupName);
+        GroupNameRef = RootRef.child("Groups").child(currentGroupID);
 
         myContactsList = (RecyclerView) findViewById(R.id.contacts_list);
         myContactsList.setLayoutManager(new LinearLayoutManager(this));
@@ -118,7 +120,13 @@ public class AddMemberActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(DataSnapshot snapshot) {
                                     if (snapshot.hasChild(userIDs)) {
-                                        holder.row_linearlayout.setBackgroundColor(Color.parseColor("#62FF00"));
+                                        holder.row_linearlayout.setBackgroundColor(Color.parseColor("#FFFFFF"));
+//                                        holder.row_linearlayout.getBackground().setAlpha(10);
+
+                                        PorterDuffColorFilter greyFilter = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                                        holder.row_linearlayout.getBackground().setColorFilter(greyFilter);
+                                        holder.profileImage.setColorFilter(greyFilter);
+                                        holder.userName.setTextColor(0xff777777);
                                     }
                                 }
 
@@ -131,7 +139,13 @@ public class AddMemberActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(View view) {
                                     Toast.makeText(AddMemberActivity.this, "holder.itemView.onClick", Toast.LENGTH_SHORT).show();
-                                    holder.row_linearlayout.setBackgroundColor(Color.parseColor("#62FF00"));
+                                    holder.row_linearlayout.setBackgroundColor(Color.parseColor("#FFFFFF"));
+//                                    holder.row_linearlayout.getBackground().setAlpha(10);
+
+                                    PorterDuffColorFilter greyFilter = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                                    holder.row_linearlayout.getBackground().setColorFilter(greyFilter);
+                                    holder.profileImage.setColorFilter(greyFilter);
+                                    holder.userName.setTextColor(0xff777777);
                                     GroupNameRef.child("Member").child(userIDs).setValue("");
                                     RootRef.child("Users").child(userIDs).child("groups").child(currentGroupID).setValue(currentGroupName);
                                 }
