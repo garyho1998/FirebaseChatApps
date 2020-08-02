@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 public class TabsAccessorAdapter extends FragmentPagerAdapter
 {
+    private boolean enableSwipe;
 
     public TabsAccessorAdapter(FragmentManager fm)
     {

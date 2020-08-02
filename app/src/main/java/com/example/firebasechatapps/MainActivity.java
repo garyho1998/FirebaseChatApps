@@ -30,7 +30,7 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
-    private ViewPager myViewPager;
+    private NoSwipeViewPager myViewPager;
     private TabLayout myTabLayout;
     private TabsAccessorAdapter myTabsAccessorAdapter;
 
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("FirebaseChatApps");
 
-        myViewPager = (ViewPager) findViewById(R.id.main_tabs_pager);
+        myViewPager = (NoSwipeViewPager) findViewById(R.id.main_tabs_pager);
         myTabsAccessorAdapter = new TabsAccessorAdapter((getSupportFragmentManager()));
         myViewPager.setAdapter(myTabsAccessorAdapter);
 

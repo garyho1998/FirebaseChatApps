@@ -28,12 +28,12 @@
         </com.google.android.material.tabs.TabLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.viewpager.widget.ViewPager
+    <com.example.firebasechatapps.NoSwipeViewPager
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/main_tabs_pager"
         android:layout_below="@+id/appBarLayout"
         >
 
-    </androidx.viewpager.widget.ViewPager>
+    </com.example.firebasechatapps.NoSwipeViewPager>
 </RelativeLayout>
