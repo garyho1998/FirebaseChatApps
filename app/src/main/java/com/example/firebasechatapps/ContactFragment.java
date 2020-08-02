@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -15,11 +17,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,14 +38,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ContactFragment extends Fragment
-{
+public class ContactFragment extends Fragment implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener{
     private View ContactsView;
     private RecyclerView myContactsList;
 
     private DatabaseReference ContacsRef, UsersRef, GroupNameRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
+    private ContactFirebaseRecyclerAdapter adapter;
 
 
     public ContactFragment() {
@@ -64,7 +68,8 @@ public class ContactFragment extends Fragment
         ContacsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
-
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(myContactsList);
 
         return ContactsView;
     }
@@ -75,119 +80,29 @@ public class ContactFragment extends Fragment
     {
         super.onStart();
 
-        FirebaseRecyclerOptions options =
-                new FirebaseRecyclerOptions.Builder<Contacts>()
-                        .setQuery(ContacsRef, Contacts.class)
-                        .build();
+        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Contacts>().setQuery(ContacsRef, Contacts.class).build();
 
-
-        final FirebaseRecyclerAdapter<Contacts, ContactsViewHolder> adapter = new FirebaseRecyclerAdapter<Contacts, ContactsViewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull final ContactsViewHolder holder, int position, @NonNull Contacts model)
-            {
-                final String userIDs = getRef(position).getKey();
-
-                UsersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        if (dataSnapshot.exists())
-                        {
-                            if (dataSnapshot.child("userState").hasChild("state"))
-                            {
-                                String state = dataSnapshot.child("userState").child("state").getValue().toString();
-                                String date = dataSnapshot.child("userState").child("date").getValue().toString();
-                                String time = dataSnapshot.child("userState").child("time").getValue().toString();
-
-                                if (state.equals("online"))
-                                {
-                                    holder.onlineIcon.setVisibility(View.VISIBLE);
-                                }
-                                else if (state.equals("offline"))
-                                {
-                                    holder.onlineIcon.setVisibility(View.INVISIBLE);
-                                }
-                            }
-                            else
-                            {
-                                holder.onlineIcon.setVisibility(View.INVISIBLE);
-                            }
-
-
-                            if (dataSnapshot.hasChild("image"))
-                            {
-                                String userImage = dataSnapshot.child("image").getValue().toString();
-                                String profileName = dataSnapshot.child("name").getValue().toString();
-                                String profileStatus = dataSnapshot.child("status").getValue().toString();
-
-                                holder.userName.setText(profileName);
-                                holder.userStatus.setText(profileStatus);
-                                Picasso.get().load(userImage).placeholder(R.drawable.profile_image).into(holder.profileImage);
-                            }
-                            else
-                            {
-                                String profileName = dataSnapshot.child("name").getValue().toString();
-                                String profileStatus = dataSnapshot.child("status").getValue().toString();
-
-                                holder.userName.setText(profileName);
-                                holder.userStatus.setText(profileStatus);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-            }
-
-            @NonNull
-            @Override
-            public ContactsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
-            {
-                View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.user_display_layout_with_delete, viewGroup, false);
-                ContactsViewHolder viewHolder = new ContactsViewHolder(view);
-                return viewHolder;
-            }
-
-            public void removeItem(int position) {
-
-            }
-
-            public void restoreItem() {
-
-            }
-
-
-        };
-
-
+        adapter = new ContactFirebaseRecyclerAdapter(options, UsersRef);
 
         myContactsList.setAdapter(adapter);
         adapter.startListening();
+
+//        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+//            @Override
+//            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+//                return false;
+//            }
+//            @Override
+//            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+//                adapter.deleteItem(viewHolder.getAdapterPosition());
+//            }
+//        }).attachToRecyclerView(myContactsList);
     }
 
-
-
-
-    public static class ContactsViewHolder extends RecyclerView.ViewHolder
-    {
-        TextView userName, userStatus;
-        CircleImageView profileImage;
-        ImageView onlineIcon;
-        public RelativeLayout viewBackground, viewForeground;
-
-        public ContactsViewHolder(@NonNull View itemView)
-        {
-            super(itemView);
-
-            viewBackground = itemView.findViewById(R.id.view_background);
-            viewForeground = itemView.findViewById(R.id.view_foreground);
-            userName = itemView.findViewById(R.id.user_profile_name);
-            userStatus = itemView.findViewById(R.id.user_status);
-            profileImage = itemView.findViewById(R.id.users_profile_image);
-            onlineIcon = (ImageView) itemView.findViewById(R.id.user_online_status);
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if (viewHolder instanceof ContactFirebaseRecyclerAdapter.ContactsViewHolder) {
+            adapter.deleteItem(viewHolder.getAdapterPosition());
         }
     }
 }
