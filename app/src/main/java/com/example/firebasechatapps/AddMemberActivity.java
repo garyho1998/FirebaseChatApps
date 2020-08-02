@@ -1,40 +1,34 @@
 package com.example.firebasechatapps;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Comment;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -61,6 +55,7 @@ public class AddMemberActivity extends AppCompatActivity {
         GroupNameRef = RootRef.child("Groups").child(currentGroupID);
 
         myContactsList = (RecyclerView) findViewById(R.id.contacts_list);
+        myContactsList.setItemAnimator(new DefaultItemAnimator());
         myContactsList.setLayoutManager(new LinearLayoutManager(this));
 
         mToolbar = (Toolbar) findViewById(R.id.add_members_toolbar);
@@ -122,7 +117,6 @@ public class AddMemberActivity extends AppCompatActivity {
                                     if (snapshot.hasChild(userIDs)) {
                                         holder.row_linearlayout.setBackgroundColor(Color.parseColor("#FFFFFF"));
 //                                        holder.row_linearlayout.getBackground().setAlpha(10);
-
                                         PorterDuffColorFilter greyFilter = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
                                         holder.row_linearlayout.getBackground().setColorFilter(greyFilter);
                                         holder.profileImage.setColorFilter(greyFilter);
@@ -180,11 +174,11 @@ public class AddMemberActivity extends AppCompatActivity {
         TextView userName, userStatus;
         CircleImageView profileImage;
         ImageView onlineIcon;
-        LinearLayout row_linearlayout;
+        RelativeLayout row_linearlayout;
 
         public ContactsViewHolder(@NonNull View itemView) {
             super(itemView);
-            row_linearlayout = itemView.findViewById(R.id.row_linearlayout);
+            row_linearlayout = itemView.findViewById(R.id.row_relativeLayout);
             userName = itemView.findViewById(R.id.user_profile_name);
             userStatus = itemView.findViewById(R.id.user_status);
             profileImage = itemView.findViewById(R.id.users_profile_image);

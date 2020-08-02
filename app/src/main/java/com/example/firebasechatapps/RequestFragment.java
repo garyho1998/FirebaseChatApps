@@ -7,9 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -82,8 +80,8 @@ public class RequestFragment extends Fragment {
                 new FirebaseRecyclerAdapter<Contacts, RequestsViewHolder>(options) {
                     @Override
                     protected void onBindViewHolder(@NonNull final RequestsViewHolder holder, int position, @NonNull Contacts model) {
-                        holder.itemView.findViewById(R.id.request_accept_btn).setVisibility(View.VISIBLE);
-                        holder.itemView.findViewById(R.id.request_cancel_btn).setVisibility(View.VISIBLE);
+//                        holder.itemView.findViewById(R.id.request_accept_btn).setVisibility(View.VISIBLE);
+//                        holder.itemView.findViewById(R.id.request_cancel_btn).setVisibility(View.VISIBLE);
                         final String list_user_id = getRef(position).getKey();
 
                         DatabaseReference getTypeRef = getRef(position).child("request_type").getRef();
@@ -173,8 +171,8 @@ public class RequestFragment extends Fragment {
                                                     }
 
                                                 };
-                                                holder.itemView.findViewById(R.id.request_accept_btn).setOnClickListener(acceptListener);
-                                                holder.itemView.findViewById(R.id.request_cancel_btn).setOnClickListener(cancelListener);
+//                                                holder.itemView.findViewById(R.id.request_accept_btn).setOnClickListener(acceptListener);
+//                                                holder.itemView.findViewById(R.id.request_cancel_btn).setOnClickListener(cancelListener);
                                             }
 
                                             @Override
@@ -183,10 +181,10 @@ public class RequestFragment extends Fragment {
                                             }
                                         });
                                     } else if (type.equals("sent")) {
-                                        Button request_sent_btn = holder.itemView.findViewById(R.id.request_accept_btn);
-                                        request_sent_btn.setText("Req Sent");
+//                                        Button request_sent_btn = holder.itemView.findViewById(R.id.request_accept_btn);
+//                                        request_sent_btn.setText("Req Sent");
 
-                                        holder.itemView.findViewById(R.id.request_cancel_btn).setVisibility(View.INVISIBLE);
+//                                        holder.itemView.findViewById(R.id.request_cancel_btn).setVisibility(View.INVISIBLE);
 
                                         UsersRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
                                             @Override
@@ -290,8 +288,8 @@ public class RequestFragment extends Fragment {
             userName = itemView.findViewById(R.id.user_profile_name);
             userStatus = itemView.findViewById(R.id.user_status);
             profileImage = itemView.findViewById(R.id.users_profile_image);
-            AcceptButton = itemView.findViewById(R.id.request_accept_btn);
-            CancelButton = itemView.findViewById(R.id.request_cancel_btn);
+//            AcceptButton = itemView.findViewById(R.id.request_accept_btn);
+//            CancelButton = itemView.findViewById(R.id.request_cancel_btn);
         }
     }
 }
