@@ -4,28 +4,34 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/message_profile_image"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="3dp"
-        android:src="@drawable/profile_image"
+    <TextView
+        android:id="@+id/date_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="255dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="2dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/chat_date_layout"
+        android:text="Jan 1, 2020"
+        android:padding="6dp"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
         />
+
 
     <TextView
         android:id="@+id/receiver_message_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxWidth="255dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp"
+        android:layout_below="@id/date_text"
+        android:layout_marginTop="5dp"
         android:layout_marginLeft="3dp"
-        android:layout_toEndOf="@+id/message_profile_image"
         android:background="@drawable/receiver_messages_layout"
         android:text="receiver messages here"
         android:padding="6dp"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
         />
@@ -49,6 +55,8 @@
         android:id="@+id/message_sender_image_view"
         android:layout_width="150dp"
         android:layout_height="150dp"
+        android:layout_below="@id/date_text"
+        android:layout_marginTop="5dp"
         android:layout_alignParentEnd="true"
         android:layout_margin="5dp"
         android:scaleType="centerCrop"
@@ -73,8 +81,9 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginStart="3dp"
+        android:layout_below="@id/date_text"
+        android:layout_marginTop="5dp"
         android:scaleType="centerCrop"
         />
 
@@ -100,12 +109,13 @@
         android:maxWidth="300dp"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="3dp"
-        android:layout_marginTop="10dp"
+        android:layout_below="@id/date_text"
+        android:layout_marginTop="5dp"
         android:layout_alignParentTop="@+id/receiver_message_text"
         android:background="@drawable/sender_messages_layout"
         android:text="sender messages"
         android:padding="6dp"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
         />

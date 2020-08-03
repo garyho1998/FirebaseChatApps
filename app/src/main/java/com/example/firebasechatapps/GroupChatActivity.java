@@ -16,6 +16,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -48,7 +49,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -57,6 +64,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import id.zelory.compressor.Compressor;
 
 public class GroupChatActivity extends AppCompatActivity {
     private Toolbar mToolbar;
@@ -74,9 +83,9 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private String currentGroupName, currentGroupID,  currentUserID, currentUserName, currentDate, currentTime;
     private String saveCurrentTime, saveCurrentDate;
-    private String checker="", myUri="";
-    private StorageTask uploadTask;
-    private Uri fileUri;
+    private String myUri="";
+//    private ProgressDialog loadingBar;
+    private static final int GalleryPick = 1;
 
     AlarmController alarmController;
     final String TAG = "GroupChatActivity";
@@ -130,27 +139,10 @@ public class GroupChatActivity extends AppCompatActivity {
         SendFilesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CharSequence options[] = new CharSequence[]
-                        {
-                                "Images"
-                        };
-                AlertDialog.Builder builder = new AlertDialog.Builder(GroupChatActivity.this);
-                builder.setTitle("Select the File");
-
-                builder.setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0) {
-                            checker = "image";
-
-                            Intent intent = new Intent();
-                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                            intent.setType("image/*");
-                            startActivityForResult(intent.createChooser(intent, "Select Image"), 438);
-                        }
-                    }
-                });
-                builder.show();
+                Intent galleryIntent = new Intent();
+                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                galleryIntent.setType("image/*");
+                startActivityForResult(galleryIntent, GalleryPick);
             }
         });
 
@@ -161,53 +153,64 @@ public class GroupChatActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode==438 && resultCode==RESULT_OK && data!=null && data.getData()!=null) {
-//            loadingBar.setTitle("Sending File");
-//            loadingBar.setMessage("Please wait, we are sending the file...");
-//            loadingBar.setCanceledOnTouchOutside(false);
-//            loadingBar.show();
+        if (requestCode==GalleryPick && resultCode==RESULT_OK && data!=null && data.getData()!=null)
+        {
+            Uri ImageUri = data.getData();
 
-            fileUri = data.getData();
+            CropImage.activity()
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .start(this);
 
-            if (!checker.equals("image")) {
+        }
 
-            } else if (checker.equals("image")) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+            if (resultCode == RESULT_OK)
+            {
+//                loadingBar.setTitle("Set Profile Image");
+//                loadingBar.setMessage("Please wait, your image is uploading...");
+//                loadingBar.setCanceledOnTouchOutside(false);
+//                loadingBar.show();
+
+                final Uri resultUri = result.getUri();
+
+                File filePathUri = new File(resultUri.getPath());
+                Bitmap bitmap = null;
+                try {
+                    bitmap = new Compressor(this)
+                            .setMaxWidth(200)
+                            .setMaxHeight(200)
+                            .setQuality(50)
+                            .compressToBitmap(filePathUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+                final byte[] bytes = byteArrayOutputStream.toByteArray();
+
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Image Files");
 
-                //currentGroupName to be changed
-                final String messageSenderRef = "Groups/" + currentGroupName + "/" + "Message";
-
-                //GroupNameRef to be changed
                 DatabaseReference userMessageKeyRef = GroupNameRef.child("Message").push();
 
                 final String messagePushID = userMessageKeyRef.getKey();
 
                 final StorageReference filePath = storageReference.child(messagePushID + "." + "jpg");
 
-                uploadTask = filePath.putFile(fileUri);
-
-                uploadTask.continueWithTask(new Continuation() {
+                filePath.putBytes(bytes).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
-                    public Object then(@NonNull Task task) throws Exception {
-                        if (!task.isSuccessful()) {
-                            throw  task.getException();
-                        }
-
-                        return filePath.getDownloadUrl();
-                    }
-                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()) {
-                            Uri downloadUri = task.getResult();
+                            final String downloadUri = task.getResult().getDownloadUrl().toString();
                             myUri = downloadUri.toString();
 
                             Map messageTextBody = new HashMap();
                             messageTextBody.put("message", myUri);
-                            messageTextBody.put("name", fileUri.getLastPathSegment());
-                            messageTextBody.put("type", checker);
+                            messageTextBody.put("name", currentUserName);
+                            messageTextBody.put("type", "image");
                             //name is the sender user name, here is the sender user id
-                            messageTextBody.put("name", currentUserID);
+                            messageTextBody.put("from", currentUserID);
                             messageTextBody.put("messageID", messagePushID);
                             messageTextBody.put("time", saveCurrentTime);
                             messageTextBody.put("date", saveCurrentDate);
@@ -215,7 +218,6 @@ public class GroupChatActivity extends AppCompatActivity {
                             Map messageBodyDetails = new HashMap();
                             messageBodyDetails.put("/Message/" + messagePushID, messageTextBody);
 
-                            //RootRef -> GroupNameRef
                             GroupNameRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                                 @Override
                                 public void onComplete(@NonNull Task task)
@@ -232,14 +234,18 @@ public class GroupChatActivity extends AppCompatActivity {
                                     }
                                 }
                             });
+
+                        } else {
+                            String message = task.getException().toString();
+                            Toast.makeText(GroupChatActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+//                            loadingBar.dismiss();
                         }
                     }
                 });
-            } else {
-//                loadingBar.dismiss();
-                Toast.makeText(this, "Nothing Selected, Error.", Toast.LENGTH_SHORT).show();
+
             }
         }
+
     }
 
     private void showDateTimeDialogAndSend() {
@@ -279,9 +285,13 @@ public class GroupChatActivity extends AppCompatActivity {
                     {
                         Messages messages = dataSnapshot.getValue(Messages.class);
 
-                        messagesList.add(messages);
+                        //add message only if the message does not exist in messageList already...
+                        if (!messagesList.contains(messages)) {
+                            messagesList.add(messages);
+                            Log.d("myTag", "size of messagesList: " + Integer.toString(messagesList.size()));
 
-                        gpMsgAdapter.notifyDataSetChanged();
+                            gpMsgAdapter.notifyDataSetChanged();
+                        }
 
                         userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
                     }
@@ -344,7 +354,8 @@ public class GroupChatActivity extends AppCompatActivity {
         userMessageInput = (EditText) findViewById(R.id.input_group_message);
         mcalendarButton = (FloatingActionButton) findViewById(R.id.calendarButton);
 
-        gpMsgAdapter = new GroupMessageAdapter(currentGroupName, messagesList);
+        Log.d("myTag", "currentUserName passed to msgAdapter: " + currentUserName + "     currentUserID: " + currentUserID);
+        gpMsgAdapter = new GroupMessageAdapter(currentGroupName, messagesList, currentUserID);
         userMessagesList = (RecyclerView) findViewById(R.id.messages_list);
         linearLayoutManager = new LinearLayoutManager(this);
         userMessagesList.setLayoutManager(linearLayoutManager);
@@ -427,6 +438,8 @@ public class GroupChatActivity extends AppCompatActivity {
                 messageObject.put("name", currentUserName);
                 messageObject.put("type", "normal");
                 messageObject.put("message", message);
+                messageObject.put("from", currentUserID);
+                messageObject.put("messageID", messageKey);
                 messageObject.put("date", currentDate);
                 messageObject.put("time", currentTime);
                 messageObject.put("timestamp", now.getTimeInMillis());
@@ -439,6 +452,8 @@ public class GroupChatActivity extends AppCompatActivity {
                 HashMap<String, Object> messageObject = new HashMap<>();
                 messageObject.put("name", currentUserName);
                 messageObject.put("message", message);
+                messageObject.put("from", currentUserID);
+                messageObject.put("messageID", messageKey);
                 messageObject.put("type", "delay");
                 messageObject.put("date", currentDateFormat.format(now.getTime()));
                 messageObject.put("time", currentTimeFormat.format(now.getTime()));
