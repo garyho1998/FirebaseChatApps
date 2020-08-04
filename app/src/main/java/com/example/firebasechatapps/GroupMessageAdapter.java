@@ -28,17 +28,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapter.MessageViewHolder>
 {
     private String groupID, currentUserID;
-    //--
-    private String currentUserName = "phone1";
     private List<Messages> userMessagesList;
     private FirebaseAuth mAuth;
     private DatabaseReference msgRef;
 
+    private String last_date = "";
+    private String last_sender = "";
 
-    public GroupMessageAdapter (String groupID, List<Messages> userMessagesList)
+    public GroupMessageAdapter (String groupID, List<Messages> userMessagesList, String currentUserID)
     {
         this.groupID = groupID;
         this.userMessagesList = userMessagesList;
+        this.currentUserID = currentUserID;
 
     }
 
@@ -46,9 +47,8 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
 
     public class MessageViewHolder extends RecyclerView.ViewHolder
     {
-        public TextView senderMessageText, sndTimeText, receiverMessageText, rcvTimeText, sndPicTime, rcvPicTime;
-        public TextView rcvIDText;
-        public CircleImageView receiverProfileImage;
+        public TextView senderMessageText, sndTimeText, receiverMessageText, rcvTimeText, sndPicTime, rcvPicTime, dataText;
+        public TextView rcvNameText;
         public ImageView messageSenderPicture, messageReceiverPicture;
 
 
@@ -56,16 +56,16 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
         {
             super(itemView);
 
-            rcvIDText = (TextView) itemView.findViewById(R.id.rcv_id);
+            rcvNameText = (TextView) itemView.findViewById(R.id.rcv_name);
             senderMessageText = (TextView) itemView.findViewById(R.id.sender_messsage_text);
             sndTimeText = (TextView) itemView.findViewById(R.id.snd_time);
             receiverMessageText = (TextView) itemView.findViewById(R.id.receiver_message_text);
             rcvTimeText = (TextView) itemView.findViewById(R.id.rcv_time);
-            receiverProfileImage = (CircleImageView) itemView.findViewById(R.id.message_profile_image);
             messageReceiverPicture = (ImageView) itemView.findViewById(R.id.message_receiver_image_view);
             messageSenderPicture = (ImageView) itemView.findViewById(R.id.message_sender_image_view);
             sndPicTime = (TextView) itemView.findViewById(R.id.snd_time_pic);
             rcvPicTime = (TextView) itemView.findViewById(R.id.rcv_time_pic);
+            dataText = (TextView) itemView.findViewById(R.id.date_text);
 
         }
     }
@@ -92,7 +92,7 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
     {
         Messages messages = userMessagesList.get(i);
 
-        String fromUserID = messages.getName();
+        String from = messages.getFrom();
         String fromMessageType ="";
         if (messages.getType()!=null) {
             fromMessageType = messages.getType();
@@ -101,82 +101,64 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
 
         msgRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupID).child("Message");
 
-        msgRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                if (dataSnapshot.hasChild("image"))
-                {
-                    String receiverImage = dataSnapshot.child("image").getValue().toString();
 
-                    Picasso.get().load(receiverImage).placeholder(R.drawable.profile_image).into(messageViewHolder.receiverProfileImage);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-
-        messageViewHolder.rcvIDText.setVisibility(View.GONE);
+        messageViewHolder.rcvNameText.setVisibility(View.GONE);
         messageViewHolder.receiverMessageText.setVisibility(View.GONE);
         messageViewHolder.rcvTimeText.setVisibility(View.GONE);
-        messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
         messageViewHolder.senderMessageText.setVisibility(View.GONE);
         messageViewHolder.sndTimeText.setVisibility(View.GONE);
         messageViewHolder.messageSenderPicture.setVisibility(View.GONE);
         messageViewHolder.messageReceiverPicture.setVisibility(View.GONE);
         messageViewHolder.sndPicTime.setVisibility(View.GONE);
         messageViewHolder.rcvPicTime.setVisibility(View.GONE);
+        messageViewHolder.dataText.setVisibility(View.GONE);
 
+        if ( !messages.getDate().equals(last_date) ) {
+            messageViewHolder.dataText.setVisibility(View.VISIBLE);
+            messageViewHolder.dataText.setText(messages.getDate());
+            last_date = messages.getDate();
+            last_sender = "";
+        }
 
+        if ( !messages.getName().equals(last_sender) && !from.equals(currentUserID)) {
+            messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
+            messageViewHolder.rcvNameText.setText(messages.getName());
+            last_sender = messages.getName();
+        }
 
         if (fromMessageType.equals("image")) {
-            //currentUserID -> currentUserName
-            if (fromUserID.equals(currentUserName) || fromUserID.equals(currentUserID)) {
+            if (from.equals(currentUserID)) {
                 messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
                 messageViewHolder.sndPicTime.setVisibility(View.VISIBLE);
 
-                messageViewHolder.sndPicTime.setText(messages.getTime() + " - " + messages.getDate());
+                messageViewHolder.sndPicTime.setText(messages.getTime());
                 Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
             } else {
-                messageViewHolder.rcvIDText.setVisibility(View.VISIBLE);
-                messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
                 messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
                 messageViewHolder.rcvPicTime.setVisibility(View.VISIBLE);
 
-                messageViewHolder.rcvIDText.setText(messages.getName());
-                messageViewHolder.rcvPicTime.setText(messages.getTime() + " - " + messages.getDate());
+                messageViewHolder.rcvPicTime.setText(messages.getTime());
                 Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
             }
         } else { //text message
-            //currentUserName -> currentUserID
-            if (fromUserID.equals(currentUserName) || fromUserID.equals(currentUserID))
+            if (from.equals(currentUserID))
             {
                 messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.sndTimeText.setVisibility(View.VISIBLE);
 
-                //messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
                 messageViewHolder.senderMessageText.setTextColor(Color.BLACK);
                 messageViewHolder.senderMessageText.setText(messages.getMessage());
-                messageViewHolder.sndTimeText.setText(messages.getTime() + " - " + messages.getDate());
+                messageViewHolder.sndTimeText.setText(messages.getTime());
             }
             else
             {
-                messageViewHolder.rcvIDText.setVisibility(View.VISIBLE);
-                messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.rcvTimeText.setVisibility(View.VISIBLE);
 
-                //messageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
-                messageViewHolder.rcvIDText.setText(messages.getName());
                 messageViewHolder.receiverMessageText.setTextColor(Color.BLACK);
 
                 messageViewHolder.receiverMessageText.setText(messages.getMessage());
-                messageViewHolder.rcvTimeText.setText(messages.getTime() + " - " + messages.getDate());
+                messageViewHolder.rcvTimeText.setText(messages.getTime());
             }
         }
 

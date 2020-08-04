@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -24,7 +25,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,8 +37,14 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -47,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
 public class ChatActivity extends AppCompatActivity
 {
@@ -69,10 +76,9 @@ public class ChatActivity extends AppCompatActivity
 
 
     private String saveCurrentTime, saveCurrentDate;
-    private String checker="", myUri="";
-    private StorageTask uploadTask;
-    private Uri fileUri;
+    private String myUri="";
     private ProgressDialog loadingBar;
+    private static final int GalleryPick = 1;
 
 
     @Override
@@ -113,27 +119,10 @@ public class ChatActivity extends AppCompatActivity
         SendFilesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CharSequence options[] = new CharSequence[]
-                        {
-                                "Images"
-                        };
-                AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this);
-                builder.setTitle("Select the File");
-
-                builder.setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0) {
-                            checker = "image";
-
-                            Intent intent = new Intent();
-                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                            intent.setType("image/*");
-                            startActivityForResult(intent.createChooser(intent, "Select Image"), 438);
-                        }
-                    }
-                });
-                builder.show();
+                Intent galleryIntent = new Intent();
+                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                galleryIntent.setType("image/*");
+                startActivityForResult(galleryIntent, GalleryPick);
             }
         });
 
@@ -185,17 +174,43 @@ public class ChatActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode==438 && resultCode==RESULT_OK && data!=null && data.getData()!=null) {
-            loadingBar.setTitle("Sending File");
-            loadingBar.setMessage("Please wait, we are sending the file...");
-            loadingBar.setCanceledOnTouchOutside(false);
-            loadingBar.show();
+        if (requestCode==GalleryPick && resultCode==RESULT_OK && data!=null && data.getData()!=null)
+        {
+            Uri ImageUri = data.getData();
 
-            fileUri = data.getData();
+            CropImage.activity()
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .start(this);
 
-            if (!checker.equals("image")) {
+        }
 
-            } else if (checker.equals("image")) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+            if (resultCode == RESULT_OK)
+            {
+                loadingBar.setTitle("Set Profile Image");
+                loadingBar.setMessage("Please wait, your image is uploading...");
+                loadingBar.setCanceledOnTouchOutside(false);
+                loadingBar.show();
+
+                final Uri resultUri = result.getUri();
+
+                File filePathUri = new File(resultUri.getPath());
+                Bitmap bitmap = null;
+                try {
+                    bitmap = new Compressor(this)
+                            .setMaxWidth(200)
+                            .setMaxHeight(200)
+                            .setQuality(50)
+                            .compressToBitmap(filePathUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+                final byte[] bytes = byteArrayOutputStream.toByteArray();
+
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Image Files");
 
                 final String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
@@ -208,28 +223,17 @@ public class ChatActivity extends AppCompatActivity
 
                 final StorageReference filePath = storageReference.child(messagePushID + "." + "jpg");
 
-                uploadTask = filePath.putFile(fileUri);
-
-                uploadTask.continueWithTask(new Continuation() {
+                filePath.putBytes(bytes).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
-                    public Object then(@NonNull Task task) throws Exception {
-                        if (!task.isSuccessful()) {
-                            throw  task.getException();
-                        }
-
-                        return filePath.getDownloadUrl();
-                    }
-                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()) {
-                            Uri downloadUri = task.getResult();
+                            final String downloadUri = task.getResult().getDownloadUrl().toString();
                             myUri = downloadUri.toString();
 
                             Map messageTextBody = new HashMap();
                             messageTextBody.put("message", myUri);
-                            messageTextBody.put("name", fileUri.getLastPathSegment());
-                            messageTextBody.put("type", checker);
+                            messageTextBody.put("name", resultUri.getLastPathSegment());
+                            messageTextBody.put("type", "image");
                             messageTextBody.put("from", messageSenderID);
                             messageTextBody.put("to", messageReceiverID);
                             messageTextBody.put("messageID", messagePushID);
@@ -239,7 +243,6 @@ public class ChatActivity extends AppCompatActivity
                             Map messageBodyDetails = new HashMap();
                             messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
                             messageBodyDetails.put( messageReceiverRef + "/" + messagePushID, messageTextBody);
-
                             RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                                 @Override
                                 public void onComplete(@NonNull Task task)
@@ -254,18 +257,22 @@ public class ChatActivity extends AppCompatActivity
                                         loadingBar.dismiss();
                                         Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                                     }
-//                                    MessageInputText.setText("");
                                 }
                             });
+
+                        } else {
+                            String message = task.getException().toString();
+                            Toast.makeText(ChatActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                            loadingBar.dismiss();
                         }
                     }
                 });
-            } else {
-                loadingBar.dismiss();
-                Toast.makeText(this, "Nothing Selected, Error.", Toast.LENGTH_SHORT).show();
+
             }
         }
+
     }
+
 
     private void DisplayLastSeen()
     {
