@@ -482,6 +482,12 @@ public class GroupChatActivity extends AppCompatActivity {
             intent.putExtra("groupID", currentGroupID);
             startActivity(intent);
         }
+        if(item.getItemId()== R.id.group_info_option){
+            Intent intent = new Intent(GroupChatActivity.this, GroupInfoActivity.class);
+            intent.putExtra("groupName", currentGroupName);
+            intent.putExtra("groupID", currentGroupID);
+            startActivity(intent);
+        }
         return true;
     }
 }

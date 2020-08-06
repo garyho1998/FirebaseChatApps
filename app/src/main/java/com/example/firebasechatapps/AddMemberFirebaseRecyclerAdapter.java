@@ -97,22 +97,7 @@ public class AddMemberFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Co
                         public void onCancelled(DatabaseError databaseError) {
 
                         }
-                    });
-//                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View view) {
-//                            Toast.makeText(AddMemberActivity.this, "holder.itemView.onClick", Toast.LENGTH_SHORT).show();
-//                            PorterDuffColorFilter greyFilter = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-//                            holder.profileImage.setColorFilter(greyFilter);
-//                            holder.userName.setTextColor(0xff777777);
-//                            holder.userStatus.setText("Contact already in group");
-//                            holder.userStatus.setTextColor(0xff777777);
-//                            GroupNameRef.child("Member").child(userIDs).setValue("");
-//                            RootRef.child("Users").child(userIDs).child("groups").child(currentGroupID).setValue(currentGroupName);
-//                        }
-//                    });
-
-                }
+                    });                }
             }
 
             @Override
@@ -125,10 +110,10 @@ public class AddMemberFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Co
     }
 
     public void AddMember(int position) {
-//        String userID = getSnapshots().getSnapshot(position).getKey();
-//
-//        GroupNameRef.child("Member").child(userID).setValue("");
-//        UsersRef.child(userID).child("groups").child(currentGroupID).setValue(currentGroupName);
+        String userID = getSnapshots().getSnapshot(position).getKey();
+
+        GroupNameRef.child("Member").child(userID).setValue("");
+        UsersRef.child(userID).child("groups").child(currentGroupID).setValue(currentGroupName);
 
     }
 }

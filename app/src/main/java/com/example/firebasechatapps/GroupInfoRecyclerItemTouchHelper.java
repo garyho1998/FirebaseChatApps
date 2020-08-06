@@ -1,7 +1,9 @@
 package com.example.firebasechatapps;
 import android.graphics.Canvas;
 import android.view.View;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -9,10 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
  * Created by ravi on 29/09/17.
  */
 
-public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
+public class GroupInfoRecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private RecyclerItemTouchHelperListener listener;
 
-    public RecyclerItemTouchHelper(int dragDirs, int swipeDirs, RecyclerItemTouchHelperListener listener) {
+    public GroupInfoRecyclerItemTouchHelper(int dragDirs, int swipeDirs, RecyclerItemTouchHelperListener listener) {
         super(dragDirs, swipeDirs);
         this.listener = listener;
     }
@@ -35,6 +37,7 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     public void onChildDrawOver(Canvas c, RecyclerView recyclerView,
                                 RecyclerView.ViewHolder viewHolder, float dX, float dY,
                                 int actionState, boolean isCurrentlyActive) {
+        System.out.println("onChildDrawOver");
         final View foregroundView = ((ContactsViewHolder) viewHolder).view_foreground;
         getDefaultUIUtil().onDrawOver(c, recyclerView, foregroundView, dX, dY,
                 actionState, isCurrentlyActive);
@@ -64,6 +67,30 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     @Override
     public int convertToAbsoluteDirection(int flags, int layoutDirection) {
         return super.convertToAbsoluteDirection(flags, layoutDirection);
+    }
+
+    //Not Working
+    @Override
+    public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+        System.out.println("getSwipeDirs");
+        if (((TextView) viewHolder.itemView).getText().equals("Contact already in group")) {
+            return 0;
+        }
+        return super.getSwipeDirs(recyclerView, viewHolder);
+    }
+
+    //Not Working
+    @Override
+    public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+        System.out.println("getMovementFlags");
+
+        int dragFlags = 0;
+        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+
+        if (((TextView) viewHolder.itemView).getText().equals("Contact already in group")) {
+            return makeMovementFlags(dragFlags, 0);
+        }
+        return makeMovementFlags(dragFlags, swipeFlags);
     }
 
     public interface RecyclerItemTouchHelperListener {
