@@ -36,7 +36,8 @@
         <receiver android:name=".AlarmReceiver" />
 
 
-        <activity android:name=".RegisterActivity" />
+        <activity android:name=".RegisterActivity"
+            android:parentActivityName=".LoginActivity"/>
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".FindFriendsActivity"

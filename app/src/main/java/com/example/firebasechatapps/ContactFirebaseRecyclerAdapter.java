@@ -20,7 +20,7 @@ import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Contacts, ContactFirebaseRecyclerAdapter.ContactsViewHolder> {
+public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Contacts, ContactsViewHolder> {
     private DatabaseReference UsersRef;
 
     public ContactFirebaseRecyclerAdapter(@NonNull FirebaseRecyclerOptions options, DatabaseReference UsersRef) {
@@ -96,25 +96,5 @@ public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Cont
 
     public void deleteItem(int position) {
         getSnapshots().getSnapshot(position).getRef().removeValue();
-    }
-
-    public static class ContactsViewHolder extends RecyclerView.ViewHolder
-    {
-        TextView userName, userStatus;
-        CircleImageView profileImage;
-        ImageView onlineIcon;
-        public RelativeLayout viewBackground, viewForeground;
-
-        public ContactsViewHolder(@NonNull View itemView)
-        {
-            super(itemView);
-
-            viewBackground = itemView.findViewById(R.id.view_background);
-            viewForeground = itemView.findViewById(R.id.view_foreground);
-            userName = itemView.findViewById(R.id.user_profile_name);
-            userStatus = itemView.findViewById(R.id.user_status);
-            profileImage = itemView.findViewById(R.id.users_profile_image);
-            onlineIcon = (ImageView) itemView.findViewById(R.id.user_online_status);
-        }
     }
 }

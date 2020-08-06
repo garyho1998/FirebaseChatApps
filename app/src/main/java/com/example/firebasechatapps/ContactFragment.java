@@ -86,22 +86,11 @@ public class ContactFragment extends Fragment implements RecyclerItemTouchHelper
 
         myContactsList.setAdapter(adapter);
         adapter.startListening();
-
-//        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-//            @Override
-//            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-//                return false;
-//            }
-//            @Override
-//            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-//                adapter.deleteItem(viewHolder.getAdapterPosition());
-//            }
-//        }).attachToRecyclerView(myContactsList);
     }
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        if (viewHolder instanceof ContactFirebaseRecyclerAdapter.ContactsViewHolder) {
+        if (viewHolder instanceof ContactsViewHolder) {
             adapter.deleteItem(viewHolder.getAdapterPosition());
         }
     }

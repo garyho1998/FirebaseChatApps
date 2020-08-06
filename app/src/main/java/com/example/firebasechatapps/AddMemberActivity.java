@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,12 +33,14 @@ import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AddMemberActivity extends AppCompatActivity {
+public class AddMemberActivity extends AppCompatActivity implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener{
     private Toolbar mToolbar;
     private FirebaseAuth mAuth;
     private RecyclerView myContactsList;
     private DatabaseReference RootRef, UsersRef, ContactRef, GroupNameRef;
     private String currentUserID, currentGroupName, currentGroupID;
+    private AddMemberFirebaseRecyclerAdapter adapter;
+
     final String TAG = "AddMemberActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,9 @@ public class AddMemberActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Add Members");
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(myContactsList);
     }
 
     public void onStart() {
@@ -73,117 +79,17 @@ public class AddMemberActivity extends AppCompatActivity {
                         .setQuery(ContactRef, Contacts.class)
                         .build();
 
-        final FirebaseRecyclerAdapter<Contacts, ContactsViewHolder> adapter
-                = new FirebaseRecyclerAdapter<Contacts, ContactsViewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull final ContactsViewHolder holder, int position, @NonNull Contacts model) {
-                final String userIDs = getRef(position).getKey();
-                UsersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            if (dataSnapshot.child("userState").hasChild("state")) {
-                                String state = dataSnapshot.child("userState").child("state").getValue().toString();
-                                String date = dataSnapshot.child("userState").child("date").getValue().toString();
-                                String time = dataSnapshot.child("userState").child("time").getValue().toString();
-
-                                if (state.equals("online")) {
-                                    holder.onlineIcon.setVisibility(View.VISIBLE);
-                                } else if (state.equals("offline")) {
-                                    holder.onlineIcon.setVisibility(View.INVISIBLE);
-                                }
-                            } else {
-                                holder.onlineIcon.setVisibility(View.INVISIBLE);
-                            }
-
-                            if (dataSnapshot.hasChild("image")) {
-                                String userImage = dataSnapshot.child("image").getValue().toString();
-                                String profileName = dataSnapshot.child("name").getValue().toString();
-                                String profileStatus = dataSnapshot.child("status").getValue().toString();
-
-                                holder.userName.setText(profileName);
-                                holder.userStatus.setText(profileStatus);
-                                Picasso.get().load(userImage).placeholder(R.drawable.profile_image).into(holder.profileImage);
-                            } else {
-                                String profileName = dataSnapshot.child("name").getValue().toString();
-                                String profileStatus = dataSnapshot.child("status").getValue().toString();
-
-                                holder.userName.setText(profileName);
-                                holder.userStatus.setText(profileStatus);
-                            }
-                            GroupNameRef.child("Member").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot snapshot) {
-                                    if (snapshot.hasChild(userIDs)) {
-                                        holder.row_linearlayout.setBackgroundColor(Color.parseColor("#FFFFFF"));
-//                                        holder.row_linearlayout.getBackground().setAlpha(10);
-                                        PorterDuffColorFilter greyFilter = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-                                        holder.row_linearlayout.getBackground().setColorFilter(greyFilter);
-                                        holder.profileImage.setColorFilter(greyFilter);
-                                        holder.userName.setTextColor(0xff777777);
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-                            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Toast.makeText(AddMemberActivity.this, "holder.itemView.onClick", Toast.LENGTH_SHORT).show();
-                                    holder.row_linearlayout.setBackgroundColor(Color.parseColor("#FFFFFF"));
-//                                    holder.row_linearlayout.getBackground().setAlpha(10);
-
-                                    PorterDuffColorFilter greyFilter = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-                                    holder.row_linearlayout.getBackground().setColorFilter(greyFilter);
-                                    holder.profileImage.setColorFilter(greyFilter);
-                                    holder.userName.setTextColor(0xff777777);
-                                    GroupNameRef.child("Member").child(userIDs).setValue("");
-                                    RootRef.child("Users").child(userIDs).child("groups").child(currentGroupID).setValue(currentGroupName);
-                                }
-                            });
-
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-
-            }
-
-            @NonNull
-            @Override
-            public ContactsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-                View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.users_display_layout, viewGroup, false);
-                ContactsViewHolder viewHolder = new ContactsViewHolder(view);
-                return viewHolder;
-            }
-        };
+        adapter = new AddMemberFirebaseRecyclerAdapter(options, UsersRef, GroupNameRef, currentGroupName, currentGroupID);
 
         myContactsList.setAdapter(adapter);
         adapter.startListening();
     }
 
-    public static class ContactsViewHolder extends RecyclerView.ViewHolder {
-        TextView userName, userStatus;
-        CircleImageView profileImage;
-        ImageView onlineIcon;
-        RelativeLayout row_linearlayout;
-
-        public ContactsViewHolder(@NonNull View itemView) {
-            super(itemView);
-            row_linearlayout = itemView.findViewById(R.id.row_relativeLayout);
-            userName = itemView.findViewById(R.id.user_profile_name);
-            userStatus = itemView.findViewById(R.id.user_status);
-            profileImage = itemView.findViewById(R.id.users_profile_image);
-            onlineIcon = (ImageView) itemView.findViewById(R.id.user_online_status);
-        }
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        adapter.AddMember(viewHolder.getAdapterPosition());
     }
+
+
 
 }

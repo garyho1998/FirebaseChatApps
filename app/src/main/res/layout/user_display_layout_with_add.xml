@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_marginTop="8dp"
-        android:background="@color/delete">
+        android:background="@color/add">
 
         <ImageView
             android:id="@+id/delete_icon"
@@ -19,7 +19,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
-            android:src="@android:drawable/ic_menu_delete" />
+            android:src="@android:drawable/ic_menu_add" />
     </RelativeLayout>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"

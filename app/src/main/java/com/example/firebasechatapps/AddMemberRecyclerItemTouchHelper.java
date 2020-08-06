@@ -2,6 +2,7 @@ package com.example.firebasechatapps;
 import android.graphics.Canvas;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -9,10 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
  * Created by ravi on 29/09/17.
  */
 
-public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
+public class AddMemberRecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private RecyclerItemTouchHelperListener listener;
 
-    public RecyclerItemTouchHelper(int dragDirs, int swipeDirs, RecyclerItemTouchHelperListener listener) {
+    public AddMemberRecyclerItemTouchHelper(int dragDirs, int swipeDirs, RecyclerItemTouchHelperListener listener) {
         super(dragDirs, swipeDirs);
         this.listener = listener;
     }
@@ -66,7 +67,26 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         return super.convertToAbsoluteDirection(flags, layoutDirection);
     }
 
+    @Override
+    public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+        if (viewHolder.itemView.findViewById(R.id.messageholder_from) == null) {
+            return 0;
+        }
+        return super.getSwipeDirs(recyclerView, viewHolder);
+    }
+
     public interface RecyclerItemTouchHelperListener {
         void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position);
+    }
+
+    public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder holder) {
+        int position = holder.getAdapterPosition();
+        int dragFlags = 0; // whatever your dragFlags need to be
+        int swipeFlags = createSwipeFlags(position);
+        return makeMovementFlags(dragFlags, swipeFlags);
+    }
+
+    private int createSwipeFlags(int position) {
+        return position == 0 ? 0 : ItemTouchHelper.START | ItemTouchHelper.END;
     }
 }
