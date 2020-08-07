@@ -78,5 +78,5 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="65dp"
         android:clickable="true"
-        android:src="@drawable/calendar" />
+        android:src="@drawable/ic_calendar" />
 </RelativeLayout>

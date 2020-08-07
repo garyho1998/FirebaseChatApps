@@ -21,9 +21,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.Calendar;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import sun.bob.mcalendarview.vo.DateData;
 
 public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapter.MessageViewHolder>
 {
@@ -32,8 +34,8 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
     private FirebaseAuth mAuth;
     private DatabaseReference msgRef;
 
-    private String last_date = "";
-    private String last_sender = "";
+    private Calendar today;
+    private String sToday = "";
 
     public GroupMessageAdapter (String groupID, List<Messages> userMessagesList, String currentUserID)
     {
@@ -66,6 +68,18 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
             sndPicTime = (TextView) itemView.findViewById(R.id.snd_time_pic);
             rcvPicTime = (TextView) itemView.findViewById(R.id.rcv_time_pic);
             dataText = (TextView) itemView.findViewById(R.id.date_text);
+
+            today = Calendar.getInstance();
+            int dd = today.get(Calendar.DAY_OF_MONTH);
+            int mm = today.get(Calendar.MONTH);
+            int yyyy = today.get(Calendar.YEAR);
+            DateData todayDate = new DateData(yyyy, mm, dd);
+            int month = todayDate.getMonth()+1;
+            if (todayDate.getDay()<10) {
+                sToday = TransferMonth(month) + " 0" + todayDate.getDay() + ", " + todayDate.getYear();
+            } else {
+                sToday = TransferMonth(month) + " " + todayDate.getDay() + ", " + todayDate.getYear();
+            }
 
         }
     }
@@ -113,11 +127,16 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
         messageViewHolder.rcvPicTime.setVisibility(View.GONE);
         messageViewHolder.dataText.setVisibility(View.GONE);
 
+        /*
+        Log.d("groupMsg", "=========================a new message=====================");
+        Log.d("groupMsg", messages.getMessage() + ": " + messages.getDate() + "\nlast_date: " + last_date);
+        Log.d("groupMsg", "msg date = last_date? " + Boolean.toString(messages.getDate().equals(last_date)));
         if ( !messages.getDate().equals(last_date) ) {
             messageViewHolder.dataText.setVisibility(View.VISIBLE);
             messageViewHolder.dataText.setText(messages.getDate());
             last_date = messages.getDate();
             last_sender = "";
+            Log.d("groupMsg", "create a new dateText: " + messages.getDate());
         }
 
         if ( !messages.getName().equals(last_sender) && !from.equals(currentUserID)) {
@@ -125,6 +144,44 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
             messageViewHolder.rcvNameText.setText(messages.getName());
             last_sender = messages.getName();
         }
+        */
+        if (i>1) {
+            Messages pm = userMessagesList.get(i-1);
+            if ( !messages.getDate().equals(pm.getDate()) ) {
+                messageViewHolder.dataText.setVisibility(View.VISIBLE);
+                if ( messages.getDate().equals(sToday) ) {
+                    messageViewHolder.dataText.setText("Today");
+                } else {
+                    messageViewHolder.dataText.setText(messages.getDate());
+                }
+                //besides a new date view, also add a new receiver view if not from current user
+                if (!from.equals(currentUserID)) {
+                    messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
+                    messageViewHolder.rcvNameText.setText(messages.getName());
+                }
+            }
+        } else if (i==0)  {
+            messageViewHolder.dataText.setVisibility(View.VISIBLE);
+            if ( messages.getDate().equals(sToday) ) {
+                messageViewHolder.dataText.setText("Today");
+            } else {
+                messageViewHolder.dataText.setText(messages.getDate());
+            }
+        }
+
+        if (i>1) {
+            Messages pm = userMessagesList.get(i-1);
+            if ( !messages.getName().equals(pm.getName()) && !from.equals(currentUserID) ) {
+                messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
+                messageViewHolder.rcvNameText.setText(messages.getName());
+            }
+        } else if (i==0)  {
+            messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
+            messageViewHolder.rcvNameText.setText(messages.getName());
+        }
+
+
+
 
         if (fromMessageType.equals("image")) {
             if (from.equals(currentUserID)) {
@@ -173,6 +230,38 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
     public int getItemCount()
     {
         return userMessagesList.size();
+    }
+
+    private String TransferMonth(int month) {
+        switch (month){
+            case 1:
+                return "Jan";
+            case 2:
+                return "Feb";
+            case 3:
+                return "Mar";
+            case 4:
+                return "Apr";
+            case 5:
+                return "May";
+            case 6:
+                return "Jun";
+            case 7:
+                return "Jul";
+            case 8:
+                return "Aug";
+            case 9:
+                return "Sep";
+            case 10:
+                return "Oct";
+            case 11:
+                return "Nov";
+            case 12:
+                return "Dec";
+            default:
+                return null;
+        }
+
     }
 
 }

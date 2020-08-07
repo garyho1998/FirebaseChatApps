@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,9 +39,9 @@ public class FindFdActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private EditText mPhoneNoView;
     private CircleImageView mUserProfileImage;
-    private TextView mUsrName, mUsrStatus, mUid, mResultView;
+    private TextView mUsrName, mUsrStatus, mUid, mResultView, mReminderView;
     private Button mSearchBtn, mAddBtn;
-//    private ProgressDialog loadingBar;
+    private ProgressDialog loadingBar;
     private String senderUserID, receiverUserID;
 
     private DatabaseReference UsersRef, ContactsRef, currentUserRef;
@@ -63,6 +64,7 @@ public class FindFdActivity extends AppCompatActivity {
         mUsrStatus = (TextView) findViewById(R.id.usr_status_view);
         mUid = (TextView) findViewById(R.id.usr_uid_view);
         mResultView = (TextView) findViewById(R.id.result_view);
+        mReminderView = (TextView) findViewById(R.id.reminder_view);
         mSearchBtn = (Button) findViewById(R.id.find_btn);
         mAddBtn = (Button) findViewById(R.id.add_contact_btn);
 
@@ -86,6 +88,7 @@ public class FindFdActivity extends AppCompatActivity {
                 SearchFriend();
 
                 if (mResultView.getText().equals("Not found")) {
+                    mReminderView.setVisibility(View.VISIBLE);
                     mResultView.setVisibility(View.VISIBLE);
                     mUserProfileImage.setVisibility(View.INVISIBLE);
                     mUsrName.setVisibility(View.INVISIBLE);
@@ -105,7 +108,9 @@ public class FindFdActivity extends AppCompatActivity {
     }
 
     private void SearchFriend() {
-        final String phone = mPhoneNoView.getText().toString();
+        final String input = mPhoneNoView.getText().toString();
+        final String phone = input.replaceAll("\\s","");
+        Log.d("findFriend", "phone input to compare: " + phone);
         mResultView.setText("Not found");
 
         if (TextUtils.isEmpty(phone)) {
@@ -116,8 +121,9 @@ public class FindFdActivity extends AppCompatActivity {
 //            loadingBar.setCanceledOnTouchOutside(true);
 //            loadingBar.show();
 
+
             mAddBtn.setText("Add to contact");
-            mAddBtn.setBackgroundColor(Color.parseColor("#476ea8"));
+            mAddBtn.setBackgroundResource(R.drawable.buttons);
             mAddBtn.setClickable(true);
 
             UsersRef.addValueEventListener(new ValueEventListener() {
@@ -133,12 +139,12 @@ public class FindFdActivity extends AppCompatActivity {
                         User user = usrItem.getValue(User.class);
                         String number = user.phoneNumber;
 
-                        if ( phone.equals(number) ) {
+                        if ( number.equals(phone) || number.equals("+852"+phone) || number.equals("+"+phone)) {
 //                            loadingBar.dismiss();
                             mUsrName.setVisibility(View.VISIBLE);
-                            mUsrName.setText("Name: " + user.name);
+                            mUsrName.setText(user.name);
                             mUsrStatus.setVisibility(View.VISIBLE);
-                            mUsrStatus.setText("Status: " + user.status);
+                            mUsrStatus.setText(user.status);
                             mUid.setText(user.uid);
                             mUserProfileImage.setVisibility(View.VISIBLE);
                             if (user.image!=null) {
@@ -160,7 +166,7 @@ public class FindFdActivity extends AppCompatActivity {
                             //check if the user searched is current user
                             if (usrItem.getRef().getKey().equals(currentUserRef.getKey())) {
                                 mAddBtn.setText("This is you");
-                                mAddBtn.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                                mAddBtn.setBackgroundResource(R.drawable.dull_button);
                                 mAddBtn.setClickable(false);
                                 return;
                             }
@@ -201,11 +207,9 @@ public class FindFdActivity extends AppCompatActivity {
 
             }
         });
-        //--
-//        Toast.makeText(this, "contactsList has " + contactsList.get(1), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(this, "uid to compare is " + uid, Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "inside CheckIfContactExists, result for " + uid + " is " + Boolean.toString(contactsList.contains(uid)), Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "length of list: " + contactsList.size(), Toast.LENGTH_SHORT).show();
+
+        Log.d("findFriend", "inside CheckIfContactExists, result for " + uid + " is " + Boolean.toString(contactsList.contains(uid)));
+        Log.d("findFriend", "length of list: " + contactsList.size());
 
         boolean result = contactsList.contains(uid);
         contactsList.clear();
@@ -226,6 +230,7 @@ public class FindFdActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task)
                         {
                             SetPageForContactAdded();
+                            Toast.makeText(FindFdActivity.this, "Friend added to your contact!", Toast.LENGTH_SHORT).show();
                             /*
                             if (task.isSuccessful())
                             {
@@ -247,7 +252,7 @@ public class FindFdActivity extends AppCompatActivity {
 
     private void SetPageForContactAdded() {
         mAddBtn.setText("Already in your contact!");
-        mAddBtn.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+        mAddBtn.setBackgroundResource(R.drawable.dull_button);
         mAddBtn.setClickable(false);
     }
 }

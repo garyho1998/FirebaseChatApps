@@ -5,6 +5,7 @@
     android:id="@+id/find_fd_btn"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     tools:context=".FindFriendsActivity">
 
     <include
@@ -13,12 +14,14 @@
 
     <EditText
         android:id="@+id/phone_input"
-        android:layout_width="300dp"
+        android:layout_width="290dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/find_fd_toolbar"
         android:layout_marginTop="10dp"
         android:layout_alignParentStart="true"
         android:layout_marginStart="13dp"
+        android:textSize="26dp"
+        android:background="@drawable/edit_text_shape"
         android:hint="phone number" />
 
     <Button
@@ -43,6 +46,17 @@
         android:text="result default"
         android:textAlignment="center"
         android:textSize="32sp"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/reminder_view"
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/result_view"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:textSize="20dp"
         android:visibility="invisible"/>
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -98,15 +112,14 @@
 
     <Button
         android:id="@+id/add_contact_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="170dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="532dp"
-        android:layout_marginEnd="155dp"
         android:background="@drawable/buttons"
         android:text="Add to contact"
+        android:textAllCaps="false"
         android:visibility="invisible" />
 
 
