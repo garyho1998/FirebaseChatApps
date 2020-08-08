@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,12 +28,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import org.w3c.dom.Text;
+
 import java.util.concurrent.TimeUnit;
 
 public class PhoneLoginActivity extends AppCompatActivity {
 
     private Button SendVerificationCodeButton, VerifyButton;
     private EditText InputPhoneNumber, InputVerificationCode;
+    private TextView PhoneText, CodeText;
     private String phoneNumber;
 
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
@@ -54,6 +58,8 @@ public class PhoneLoginActivity extends AppCompatActivity {
         VerifyButton = (Button) findViewById(R.id.verify_button);
         InputPhoneNumber = (EditText) findViewById(R.id.phone_number_input);
         InputVerificationCode = (EditText) findViewById(R.id.verification_code_input);
+        PhoneText = (TextView) findViewById(R.id.phone_number_text);
+        CodeText = (TextView) findViewById(R.id.code_text);
         RootRef = FirebaseDatabase.getInstance().getReference();
         loadingBar = new ProgressDialog(this);
 
@@ -90,6 +96,8 @@ public class PhoneLoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 SendVerificationCodeButton.setVisibility(View.INVISIBLE);
                 InputPhoneNumber.setVisibility(View.INVISIBLE);
+                PhoneText.setVisibility(View.INVISIBLE);
+                CodeText.setVisibility(View.VISIBLE);
 
                 String verificationCode = InputVerificationCode.getText().toString();
 
@@ -120,13 +128,15 @@ public class PhoneLoginActivity extends AppCompatActivity {
             @Override
             public void onVerificationFailed(FirebaseException e) {
                 loadingBar.dismiss();
-                Toast.makeText(PhoneLoginActivity.this, "Invalid Phone NUmber, Please enter correct phone number with your country code...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(PhoneLoginActivity.this, "Invalid Phone Number, Please enter correct phone number with your country code...", Toast.LENGTH_SHORT).show();
 
                 SendVerificationCodeButton.setVisibility(View.VISIBLE);
                 InputPhoneNumber.setVisibility(View.VISIBLE);
+                PhoneText.setVisibility(View.VISIBLE);
 
                 VerifyButton.setVisibility(View.INVISIBLE);
                 InputVerificationCode.setVisibility(View.INVISIBLE);
+                CodeText.setVisibility(View.INVISIBLE);
             }
 
             @Override
@@ -141,9 +151,11 @@ public class PhoneLoginActivity extends AppCompatActivity {
 
                 SendVerificationCodeButton.setVisibility(View.INVISIBLE);
                 InputPhoneNumber.setVisibility(View.INVISIBLE);
+                PhoneText.setVisibility(View.INVISIBLE);
 
                 VerifyButton.setVisibility(View.VISIBLE);
                 InputVerificationCode.setVisibility(View.VISIBLE);
+                CodeText.setVisibility(View.VISIBLE);
 
             }
         };
@@ -163,7 +175,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                             //RootRef.child("Users").child(currentUserID).setValue("");
                             RootRef.child("Users").child(currentUserID).child("deviceToken").setValue(deviceToken);
                             //RootRef.child("Users").child(currentUserID).child("groups").setValue("");
-                            Log.i(TAG, "phoneNumer:" + phoneNumber);
+                            Log.i(TAG, "phoneNumber:" + phoneNumber);
                             RootRef.child("Users").child(currentUserID).child("phoneNumber").setValue(phoneNumber);
                             loadingBar.dismiss();
                             Toast.makeText(PhoneLoginActivity.this, "Congratulation, you're logged in successfully...", Toast.LENGTH_SHORT).show();
@@ -173,6 +185,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                         {
                             String message = task.getException().toString();
                             Toast.makeText(PhoneLoginActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                            loadingBar.dismiss();
 
                         }
                     }

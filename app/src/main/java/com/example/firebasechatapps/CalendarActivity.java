@@ -1,6 +1,7 @@
 package com.example.firebasechatapps;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,6 +37,7 @@ import sun.bob.mcalendarview.MCalendarView;
 import sun.bob.mcalendarview.MarkStyle;
 import sun.bob.mcalendarview.listeners.OnDateClickListener;
 import sun.bob.mcalendarview.listeners.OnMonthChangeListener;
+import sun.bob.mcalendarview.views.ExpCalendarView;
 import sun.bob.mcalendarview.vo.DateData;
 import sun.bob.mcalendarview.vo.MarkedDates;
 
@@ -45,9 +47,9 @@ public class CalendarActivity extends AppCompatActivity {
     private Calendar today;
     private DateData selectedDate;
     private Toolbar mToolbar;
-    private MCalendarView mCalendarView;
-    private TextView mdateView;
-    private Button mMonthTextView, mPrevBtn, mNextBtn;
+    private ExpCalendarView mCalendarView;
+    private TextView mdateView, mMonthTextView;
+    private Button mTodayBtn;
     private String currentGroupName, currentGroupID;
 
     private RecyclerView mDelayMsgRecyclerList;
@@ -63,12 +65,11 @@ public class CalendarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
 
-        mCalendarView = (MCalendarView) findViewById(R.id.calendarView);
+        mCalendarView = (ExpCalendarView) findViewById(R.id.calendarView);
 
         mdateView = (TextView) findViewById(R.id.dateView);
-        mMonthTextView = (Button) findViewById(R.id.monthView);
-        mPrevBtn = (Button) findViewById(R.id.prev_button);
-        mNextBtn = (Button) findViewById(R.id.next_button);
+        mMonthTextView = (TextView) findViewById(R.id.monthView);
+        mTodayBtn = (Button) findViewById(R.id.today_button);
 
 
         today = Calendar.getInstance();
@@ -76,9 +77,12 @@ public class CalendarActivity extends AppCompatActivity {
         int mm = today.get(Calendar.MONTH);
         int yyyy = today.get(Calendar.YEAR);
         selectedDate = new DateData(yyyy, mm, dd);
-        mdateView.setText(selectedDate.toString());
+        int month = selectedDate.getMonth()+1;
+        String sDate = TransferMonth(month) + " " + selectedDate.getDay() + ", " + selectedDate.getYear();
+        mdateView.setText(sDate);
         mMonthTextView.setText(Integer.toString(yyyy) + "-" + Integer.toString(++(mm)));
         mCalendarView.travelTo(new DateData(yyyy, mm, dd));
+
 
         currentGroupName = getIntent().getExtras().get("groupName").toString();
         currentGroupID = getIntent().getExtras().get("groupID").toString();
@@ -89,8 +93,14 @@ public class CalendarActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Calendar of " + currentGroupName);
 
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);
+
         mDelayMsgRecyclerList = (RecyclerView) findViewById(R.id.msgView);
         mDelayMsgRecyclerList.setLayoutManager(new LinearLayoutManager(this));
+
     }
 
     @Override
@@ -109,19 +119,11 @@ public class CalendarActivity extends AppCompatActivity {
         super.onStart();
         RetrieveAndMarkDelayDate();
 
-        mPrevBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCalendarView.travelTo(new DateData(selectedDate.getYear(), selectedDate.getMonth(), selectedDate.getDay()));
-                int m = selectedDate.getMonth()-1;
-                selectedDate.setMonth(m);
-            }
-        });
 
-        mNextBtn.setOnClickListener(new View.OnClickListener() {
+        mTodayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int m = selectedDate.getMonth()+2;
+                int m = selectedDate.getMonth()+1;
                 mCalendarView.travelTo(new DateData(selectedDate.getYear(), m, selectedDate.getDay()));
                 m--;
                 selectedDate.setMonth(m);
@@ -139,10 +141,10 @@ public class CalendarActivity extends AppCompatActivity {
             @Override
             public void onDateClick(View view, DateData date) {
 
-                final String selectedDate = TransferMonth(date.getMonth()) + " " + date.getDay() + ", " + date.getYear();
-                mdateView.setText(selectedDate);
+                final String sDate = TransferMonth(date.getMonth()) + " " + date.getDay() + ", " + date.getYear();
+                mdateView.setText(sDate);
 
-                query = DelayMsgRef.orderByChild("displayDate").equalTo(selectedDate);
+                query = DelayMsgRef.orderByChild("displayDate").equalTo(sDate);
                 FirebaseRecyclerOptions<DelayMsg> options = new FirebaseRecyclerOptions.Builder<DelayMsg>().setQuery(query, DelayMsg.class).build();
 
                 FirebaseRecyclerAdapter<DelayMsg, DelayMsgViewHolder> adapter =
@@ -151,7 +153,7 @@ public class CalendarActivity extends AppCompatActivity {
                             protected void onBindViewHolder(@NonNull DelayMsgViewHolder holder, final int position, @NonNull DelayMsg model)
                             {
                                 holder.delayMsg.setText(model.getMessage());
-                                holder.displayTime.setText("Scheduled to send at " + model.getDisplayTime());
+                                holder.displayTime.setText(model.getDisplayTime());
                             }
 
                             @NonNull

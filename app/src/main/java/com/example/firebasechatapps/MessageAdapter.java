@@ -20,9 +20,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.Calendar;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import sun.bob.mcalendarview.vo.DateData;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>
 {
@@ -30,7 +32,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
     private String last_date = "";
-
+    private Calendar today;
+    private String sToday = "";
 
     public MessageAdapter (List<Messages> userMessagesList)
     {
@@ -48,6 +51,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public MessageViewHolder(@NonNull View itemView)
         {
             super(itemView);
+
+            today = Calendar.getInstance();
+            int dd = today.get(Calendar.DAY_OF_MONTH);
+            int mm = today.get(Calendar.MONTH);
+            int yyyy = today.get(Calendar.YEAR);
+            DateData todayDate = new DateData(yyyy, mm, dd);
+            int month = todayDate.getMonth()+1;
+            if (todayDate.getDay()<10) {
+                sToday = TransferMonth(month) + " 0" + todayDate.getDay() + ", " + todayDate.getYear();
+            } else {
+                sToday = TransferMonth(month) + " " + todayDate.getDay() + ", " + todayDate.getYear();
+            }
+
 
             senderMessageText = (TextView) itemView.findViewById(R.id.sender_messsage_text);
             sndTimeText = (TextView) itemView.findViewById(R.id.snd_time);
@@ -100,10 +116,29 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         messageViewHolder.rcvPicTime.setVisibility(View.GONE);
         messageViewHolder.dataText.setVisibility(View.GONE);
 
+        /*
         if ( !messages.getDate().equals(last_date) ) {
             messageViewHolder.dataText.setVisibility(View.VISIBLE);
             messageViewHolder.dataText.setText(messages.getDate());
             last_date = messages.getDate();
+        }*/
+        if (i>1) {
+            Messages pm = userMessagesList.get(i-1);
+            if ( !messages.getDate().equals(pm.getDate()) ) {
+                messageViewHolder.dataText.setVisibility(View.VISIBLE);
+                if ( messages.getDate().equals(sToday) ) {
+                    messageViewHolder.dataText.setText("Today");
+                } else {
+                    messageViewHolder.dataText.setText(messages.getDate());
+                }
+            }
+        } else if (i==0)  { //display date view whenever this is the first message
+            messageViewHolder.dataText.setVisibility(View.VISIBLE);
+            if ( messages.getDate().equals(sToday) ) {
+                messageViewHolder.dataText.setText("Today");
+            } else {
+                messageViewHolder.dataText.setText(messages.getDate());
+            }
         }
 
 
@@ -114,7 +149,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.sndTimeText.setVisibility(View.VISIBLE);
 
-                //messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
                 messageViewHolder.senderMessageText.setTextColor(Color.BLACK);
                 messageViewHolder.senderMessageText.setText(messages.getMessage());
                 messageViewHolder.sndTimeText.setText(messages.getTime());
@@ -153,6 +187,38 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public int getItemCount()
     {
         return userMessagesList.size();
+    }
+
+    private String TransferMonth(int month) {
+        switch (month){
+            case 1:
+                return "Jan";
+            case 2:
+                return "Feb";
+            case 3:
+                return "Mar";
+            case 4:
+                return "Apr";
+            case 5:
+                return "May";
+            case 6:
+                return "Jun";
+            case 7:
+                return "Jul";
+            case 8:
+                return "Aug";
+            case 9:
+                return "Sep";
+            case 10:
+                return "Oct";
+            case 11:
+                return "Nov";
+            case 12:
+                return "Dec";
+            default:
+                return null;
+        }
+
     }
 
 }

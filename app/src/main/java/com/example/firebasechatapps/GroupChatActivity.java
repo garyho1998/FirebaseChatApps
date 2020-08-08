@@ -2,6 +2,7 @@ package com.example.firebasechatapps;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -278,6 +279,18 @@ public class GroupChatActivity extends AppCompatActivity {
         super.onStart();
         messagesList.clear();
 
+        userMessagesList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if ( dy>0 &&  mcalendarButton.getVisibility()==View.VISIBLE ) {
+                    mcalendarButton.hide();
+                } else if ( dy<0 && mcalendarButton.getVisibility()!=View.VISIBLE ) {
+                    mcalendarButton.show();
+                }
+            }
+        });
+
         GroupNameRef.child("Message")
                 .addChildEventListener(new ChildEventListener() {
                     @Override
@@ -347,6 +360,9 @@ public class GroupChatActivity extends AppCompatActivity {
         mToolbar = (Toolbar) findViewById(R.id.group_chat_bar_layout);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(currentGroupName);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);
 
         SendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
         SendMessageButton = (ImageButton) findViewById(R.id.send_message_button);

@@ -7,80 +7,92 @@
     tools:context=".CalendarFragment">
 
 
-    <Button
+    <TextView
         android:id="@+id/monthView"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="37dp"
         android:background="@color/colorPrimaryDark"
         android:padding="6dp"
         android:text="month displayed"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/prev_button"
+        android:id="@+id/today_button"
         android:layout_width="75dp"
-        android:layout_height="40dp"
+        android:layout_height="37dp"
         android:background="@color/colorPrimaryDark"
         android:padding="2dp"
-        android:text="Prev"
-        android:textAllCaps="false"
-        android:textColor="@android:color/background_light"
-        android:textSize="20sp" />
-
-    <Button
-        android:id="@+id/next_button"
-        android:layout_width="75dp"
-        android:layout_height="40dp"
-        android:background="@color/colorPrimaryDark"
-        android:padding="2dp"
-        android:text="Next"
+        android:text="Today"
         android:textAllCaps="false"
         android:textColor="@android:color/background_light"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="@+id/monthView" />
+        app:layout_constraintStart_toStartOf="@id/monthView"
+        />
+
+    <Button
+        android:id="@+id/exp_button"
+        android:layout_width="75dp"
+        android:layout_height="37dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="2dp"
+        android:text="Shrink"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@id/monthView"
+        />
 
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@+id/calendar_toolbar"
-        android:layout_marginTop="55dp"
+        android:layout_height="match_parent"
+        android:layout_below="@id/monthView"
+        android:layout_marginTop="37dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/calendar_toolbar">
+        app:layout_constraintTop_toTopOf="@+id/monthView"
+        android:background="#ffffff">
 
+        <TextView
+            android:id="@+id/dayView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="    Sun       Mon       Tue       Wed       Thu       Fri       Sat"
+            android:textSize="17dp"
+            />
 
-        <sun.bob.mcalendarview.MCalendarView
+        <sun.bob.mcalendarview.views.ExpCalendarView
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:context=".MainActivity"
-            >
-
-
-
-        </sun.bob.mcalendarview.MCalendarView>
+            android:layout_below="@+id/dayView"
+            android:layout_marginTop="0dp"
+            tools:context=".MainActivity" />
 
         <TextView
             android:id="@+id/dateView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/calendarView"
             android:text="date selected"
-            android:textSize="24sp" />
+            android:layout_gravity="center"
+            android:textSize="20sp"
+            android:background="#ffffff"
+            />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/msgView"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="match_parent"
             android:layout_below="@+id/delayView"
-            android:background="@android:color/darker_gray"/>
+            android:background="#ffffff"
+            />
 
 
     </LinearLayout>
