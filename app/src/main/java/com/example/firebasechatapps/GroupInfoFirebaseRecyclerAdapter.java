@@ -94,8 +94,6 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
 
             }
         });
-
-
     }
 
     public void deleteItem(int position) {

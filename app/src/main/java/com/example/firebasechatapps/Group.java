@@ -2,17 +2,25 @@ package com.example.firebasechatapps;
 
 public class Group {
 
-    public String GroupName;
+    private String GroupName;
+    private String image;
+    private String id;
 
     public Group(){
 
     }
-
-    public Group(String GroupName) {
+    public Group(String id, String GroupName) {
         this.GroupName = GroupName;
+        this.id = id;
     }
-
-    public String getName() {
+    public String getID() {
+        return id;
+    }
+    public String getGroupName() {
+        return GroupName;
+    }
+    @Override
+    public String toString() {
         return GroupName;
     }
 }

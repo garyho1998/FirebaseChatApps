@@ -3,7 +3,7 @@
     android:id="@+id/main_app_bar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#FF9800"
+    android:background="#00FF9800"
 
     android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
 </androidx.appcompat.widget.Toolbar>

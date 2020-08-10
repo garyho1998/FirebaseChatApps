@@ -245,7 +245,7 @@ public class CalendarFragment extends Fragment {
                     String id = gpItem.getKey();
 
                     if ( id.equals(key) ) {
-                        groupName = group.getName();
+                        groupName = group.getGroupName();
                     }
                 }
             }

@@ -169,10 +169,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK)
             {
-//                loadingBar.setTitle("Set Profile Image");
-//                loadingBar.setMessage("Please wait, your image is uploading...");
-//                loadingBar.setCanceledOnTouchOutside(false);
-//                loadingBar.show();
 
                 final Uri resultUri = result.getUri();
 

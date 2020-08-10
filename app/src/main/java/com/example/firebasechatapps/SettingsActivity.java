@@ -147,8 +147,6 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-
-
         if (requestCode==GalleryPick && resultCode==RESULT_OK && data!=null && data.getData()!=null)
         {
             Uri ImageUri = data.getData();
@@ -190,7 +188,6 @@ public class SettingsActivity extends AppCompatActivity {
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
                 final byte[] bytes = byteArrayOutputStream.toByteArray();
-
 
                 StorageReference filePath = UserProfileImagesRef.child(currentUserID + ".jpg");
 
