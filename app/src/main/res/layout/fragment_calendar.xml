@@ -41,7 +41,7 @@
         android:padding="2dp"
         android:text="Shrink"
         android:textAllCaps="false"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@android:color/background_light"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="@id/monthView"
         />
@@ -59,20 +59,21 @@
         app:layout_constraintTop_toTopOf="@+id/monthView"
         android:background="#ffffff">
 
-        <TextView
-            android:id="@+id/dayView"
+        <sun.bob.mcalendarview.views.WeekColumnView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="    Sun       Mon       Tue       Wed       Thu       Fri       Sat"
-            android:textSize="17dp"
-            />
+            android:paddingBottom="12dp"
+            android:paddingTop="12dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#ccc" />
 
         <sun.bob.mcalendarview.views.ExpCalendarView
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/dayView"
-            android:layout_marginTop="0dp"
             tools:context=".MainActivity" />
 
         <TextView
@@ -90,7 +91,7 @@
             android:id="@+id/msgView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/delayView"
+            android:layout_below="@+id/dateView"
             android:background="#ffffff"
             />
 

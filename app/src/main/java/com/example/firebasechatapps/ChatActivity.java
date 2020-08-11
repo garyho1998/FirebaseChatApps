@@ -119,10 +119,9 @@ public class ChatActivity extends AppCompatActivity
         SendFilesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, GalleryPick);
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .start(ChatActivity.this);
             }
         });
 
@@ -152,7 +151,7 @@ public class ChatActivity extends AppCompatActivity
         SendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
         MessageInputText = (EditText) findViewById(R.id.input_message);
 
-        messageAdapter = new MessageAdapter(messagesList);
+        messageAdapter = new MessageAdapter(this, messageReceiverID, messagesList);
         userMessagesList = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
         linearLayoutManager = new LinearLayoutManager(this);
         userMessagesList.setLayoutManager(linearLayoutManager);
@@ -178,10 +177,6 @@ public class ChatActivity extends AppCompatActivity
         {
             Uri ImageUri = data.getData();
 
-            CropImage.activity()
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .start(this);
-
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -189,7 +184,7 @@ public class ChatActivity extends AppCompatActivity
 
             if (resultCode == RESULT_OK)
             {
-                loadingBar.setTitle("Set Profile Image");
+                loadingBar.setTitle("Sending Image");
                 loadingBar.setMessage("Please wait, your image is uploading...");
                 loadingBar.setCanceledOnTouchOutside(false);
                 loadingBar.show();

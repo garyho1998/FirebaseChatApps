@@ -74,7 +74,6 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/password_text"
                 android:hint=" Password..."
-                android:inputType="textPassword"
                 android:background="@drawable/edit_text_shape"
                 android:padding="3dp"
                 android:textSize="16dp"

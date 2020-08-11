@@ -1,5 +1,7 @@
 package com.example.firebasechatapps;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -17,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,7 +34,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.TimeZone;
 
+import sun.bob.mcalendarview.CellConfig;
 import sun.bob.mcalendarview.MarkStyle;
 import sun.bob.mcalendarview.listeners.OnDateClickListener;
 import sun.bob.mcalendarview.listeners.OnMonthChangeListener;
@@ -43,7 +50,8 @@ import sun.bob.mcalendarview.vo.MarkedDates;
  * create an instance of this fragment.
  *
  */
-public class CalendarFragment extends Fragment {
+public class CalendarFragment extends Fragment implements EditDelayMsgDialog.EditMsgDialogListener {
+//    implements EditDelayMsgDialog.EditMsgDialogListener
 
     private static final String TAG = "CalendarFragment";
     private ArrayList<String> groupsList = new ArrayList<String>();
@@ -57,10 +65,10 @@ public class CalendarFragment extends Fragment {
     private Button mTodayBtn, mExpBtn;
     private RecyclerView mDelayMsgRecyclerList;
 
-    private String userID;
+    private String currentUserID;
     private String groupName = "";
     private FirebaseAuth mAuth;
-    private DatabaseReference GroupRef, GroupNameRef, DelayMsgRef, UserRef;
+    private DatabaseReference GroupsRef, GroupNameRef, DelayMsgRef, CurrentUserRef;
     private Query query;
 
     public CalendarFragment() {
@@ -83,7 +91,10 @@ public class CalendarFragment extends Fragment {
         mDelayMsgRecyclerList = (RecyclerView) calendarFragmentView.findViewById(R.id.msgView);
         mDelayMsgRecyclerList.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        GroupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
+        mAuth = FirebaseAuth.getInstance();
+        currentUserID = mAuth.getCurrentUser().getUid();
+        GroupsRef = FirebaseDatabase.getInstance().getReference().child("Groups");
+        CurrentUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserID);
 
         today = Calendar.getInstance();
         int dd = today.get(Calendar.DAY_OF_MONTH);
@@ -110,13 +121,14 @@ public class CalendarFragment extends Fragment {
         for (int k=0; k<markData.size();k++){
             mCalendarView.unMarkDate((DateData)markData.get(k));
         }
+        RetrieveAndMarkDelayMsg();
     }
 
     @Override
     public void onStart()
     {
         super.onStart();
-        RetrieveGroupsList();
+//        RetrieveGroupsList();
         RetrieveAndMarkDelayMsg();
 
         mTodayBtn.setOnClickListener(new View.OnClickListener() {
@@ -133,9 +145,13 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (mExpBtn.getText().equals("Shrink")) {
+                    CellConfig.Month2WeekPos = CellConfig.middlePosition;
+                    CellConfig.ifMonth = false;
                     mCalendarView.shrink();
                     mExpBtn.setText("Expand");
                 } else if (mExpBtn.getText().equals("Expand")) {
+                    CellConfig.Week2MonthPos = CellConfig.middlePosition;
+                    CellConfig.ifMonth = true;
                     mCalendarView.expand();
                     mExpBtn.setText("Shrink");
                 }
@@ -163,7 +179,7 @@ public class CalendarFragment extends Fragment {
     }
 
     private void RetrieveAndDisplayDelayMsg(final String selectedDate) {
-        GroupRef.addValueEventListener(new ValueEventListener() {
+        GroupsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
@@ -174,7 +190,7 @@ public class CalendarFragment extends Fragment {
                 while (items.hasNext()) {
                     DataSnapshot item = items.next();
                     GroupNameRef = item.getRef();
-                    String groupID = GroupNameRef.getKey();
+                    final String groupID = GroupNameRef.getKey();
 
                     if (groupsList.contains(groupID)) {
                         Log.d("myTag", "Retrieving from " + groupID);
@@ -197,6 +213,45 @@ public class CalendarFragment extends Fragment {
                                         delayMsgViewHolder.delayMsg.setText("To: " + findGroupName(DelayMsgRef.getParent().getKey()) + "\nMessage: " + delayMsg.getMessage());
 
                                         Log.d("myTag", "Binding " + delayMsg.getMessage() + "\n==========" + selectedDate);
+
+                                        delayMsgViewHolder.editBtn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Toast.makeText(getContext(), "Edit button clicked\n" + delayMsg.getId(), Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getContext(), "groupID passed: " + groupID + "\nmsgID passed: " + delayMsg.getId(), Toast.LENGTH_SHORT).show();
+
+                                                EditDelayMsgDialog dialog = new EditDelayMsgDialog(false, groupID, delayMsg.getId());
+                                                dialog.setTargetFragment(CalendarFragment.this, 1);
+                                                dialog.show(getFragmentManager(), "edit dialog");
+
+
+                                            }
+                                        });
+
+                                        delayMsgViewHolder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                AlertDialog.Builder dialog=new AlertDialog.Builder(getContext(), R.style.AlertDialog);
+                                                dialog.setMessage("Are you sure?");
+                                                dialog.setTitle("Delete delay message");
+                                                dialog.setPositiveButton("Yes",
+                                                        new DialogInterface.OnClickListener() {
+                                                            public void onClick(DialogInterface dialog,
+                                                                                int which) {
+                                                                GroupNameRef.child("DelayMessage").child(delayMsg.getId()).removeValue();
+                                                                Toast.makeText(getContext(),"Delay message deleted!",Toast.LENGTH_LONG).show();
+
+                                                            }
+                                                        });
+                                                dialog.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                    }
+                                                });
+                                                AlertDialog alertDialog=dialog.create();
+                                                alertDialog.show();
+                                            }
+                                        });
                                     }
 
                                     @NonNull
@@ -217,8 +272,11 @@ public class CalendarFragment extends Fragment {
                     }
 
                 }
-                mDelayMsgRecyclerList.setAdapter(adapter);
-                adapter.startListening();
+                if (adapter!=null) {
+                    mDelayMsgRecyclerList.setAdapter(adapter);
+                    adapter.startListening();
+                }
+
 
             }
 
@@ -231,7 +289,7 @@ public class CalendarFragment extends Fragment {
     }
 
     private String findGroupName(final String key) {
-        GroupRef.addValueEventListener(new ValueEventListener() {
+        GroupsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
@@ -258,24 +316,41 @@ public class CalendarFragment extends Fragment {
         return groupName;
     }
 
+    @Override
+    public void applyEdit(String groupID, String msgID, String msg, String date, String time) {
+        Toast.makeText(getContext(), "Delay message edited" + msg, Toast.LENGTH_SHORT).show();
+
+        DatabaseReference msgRef = GroupNameRef.child("DelayMessage").child(msgID);
+        msgRef.child("message").setValue(msg);
+        msgRef.child("displayDate").setValue(date);
+        msgRef.child("displayTime").setValue(time);
+
+        onResume();
+//        RetrieveAndMarkDelayDate();
+    }
+
 
     public static class DelayMsgViewHolder extends RecyclerView.ViewHolder
     {
         TextView delayMsg, displayTime;
+        ImageButton editBtn, deleteBtn;
 
         public DelayMsgViewHolder(@NonNull View itemView)
         {
             super(itemView);
             delayMsg = itemView.findViewById(R.id.delay_msg);
             displayTime = itemView.findViewById(R.id.display_time);
+            editBtn = itemView.findViewById(R.id.edit_btn);
+            deleteBtn = itemView.findViewById(R.id.delete_btn);
         }
     }
 
+
     private void RetrieveGroupsList() {
         mAuth = FirebaseAuth.getInstance();
-        userID = mAuth.getCurrentUser().getUid();
-        UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(userID);
-        DatabaseReference UsrGpRef = UserRef.child("groups");
+        currentUserID = mAuth.getCurrentUser().getUid();
+        CurrentUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserID);
+        DatabaseReference UsrGpRef = CurrentUserRef.child("groups");
 
         UsrGpRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -307,6 +382,7 @@ public class CalendarFragment extends Fragment {
             mCalendarView.unMarkDate((DateData)markData.get(k));
         }
 
+        /*
         Log.d("tag2", "inside RetrieveAndMarkDelayMsg(), length og groupList" + Integer.toString(groupsList.size()));
         for (String groupID: groupsList) {
             Log.d("tag2", "for looping group " + groupID);
@@ -346,8 +422,79 @@ public class CalendarFragment extends Fragment {
                 }
             });
 
-        }
+        }*/
+        CurrentUserRef.child("groups").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot userGroupsSnapshot, String s) {
+                LoadGroupsListAndMarkLater(userGroupsSnapshot);
+            }
 
+            @Override
+            public void onChildChanged(DataSnapshot userGroupsSnapshot, String s) {
+                LoadGroupsListAndMarkLater(userGroupsSnapshot);
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void LoadGroupsListAndMarkLater(DataSnapshot userGroupsSnapshot) {
+        if (userGroupsSnapshot.exists()) {
+            final String currentGroupID = userGroupsSnapshot.getKey();
+            GroupsRef.child(currentGroupID).child("DelayMessage").addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot messagesSnapshot, String s) {
+                    MarkDate(messagesSnapshot);
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot messagesSnapshot, String s) {
+                    MarkDate(messagesSnapshot);
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    private void MarkDate(DataSnapshot messagesSnapshot) {
+        if (messagesSnapshot.exists()) {
+            Date date = new Date((long) messagesSnapshot.child("displayTimestamp").getValue());
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Hong_Kong"));
+            cal.setTime(date);
+            mCalendarView.markDate(
+                    new DateData(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)+1, cal.get(Calendar.DATE)).setMarkStyle(
+                            new MarkStyle(MarkStyle.DOT, Color.RED))
+            );
+
+        }
     }
 
     private String TransferMonth(int month) {

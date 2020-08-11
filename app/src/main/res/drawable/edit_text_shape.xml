@@ -9,7 +9,7 @@
                 />
         </shape>
     </item>
-    <!-- Overlap the left, top and right border using background color  -->
+    <!-- Overlap the left, top and right border using spinner_bg color  -->
     <item
         android:bottom="2dp"
         >

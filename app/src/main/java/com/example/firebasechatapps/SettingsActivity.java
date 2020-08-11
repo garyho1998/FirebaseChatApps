@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -53,7 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
     private StorageReference UserProfileImagesRef;
     private ProgressDialog loadingBar;
 
-    private Toolbar SettingsToolBar;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,10 +82,10 @@ public class SettingsActivity extends AppCompatActivity {
         userProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, GalleryPick);
+                CropImage.activity()
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .setAspectRatio(1, 1)
+                    .start(SettingsActivity.this);
             }
         });
 
@@ -136,33 +137,29 @@ public class SettingsActivity extends AppCompatActivity {
         userProfileImage = (CircleImageView) findViewById(R.id.set_profile_image);
         loadingBar = new ProgressDialog(this);
 
-        SettingsToolBar = (Toolbar) findViewById(R.id.settings_toolbar);
-        setSupportActionBar(SettingsToolBar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        toolbar = (Toolbar) findViewById(R.id.setting_toolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Account Settings");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-
-
-        if (requestCode==GalleryPick && resultCode==RESULT_OK && data!=null && data.getData()!=null)
+//        if (requestCode==GalleryPick && resultCode==RESULT_OK && data!=null && data.getData()!=null)
+        if (requestCode==GalleryPick && resultCode==RESULT_OK && data!=null)
         {
             Uri ImageUri = data.getData();
-
-            CropImage.activity()
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(1, 1)
-                    .start(this);
 
             /*
             Picasso.get().load(ImageUri).into(userProfileImage);
             Toast.makeText(SettingsActivity.this, "picture picked", Toast.LENGTH_SHORT).show();
             */
         }
+
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);

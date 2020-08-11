@@ -1,18 +1,24 @@
 package com.example.firebasechatapps;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -28,6 +35,10 @@ import sun.bob.mcalendarview.vo.DateData;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>
 {
+    private Context mcon;
+    private String rcvID;
+    private Boolean inContact = false;
+
     private List<Messages> userMessagesList;
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
@@ -35,8 +46,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private Calendar today;
     private String sToday = "";
 
-    public MessageAdapter (List<Messages> userMessagesList)
+    public MessageAdapter (Context con,String rcvID, List<Messages> userMessagesList)
     {
+        this.mcon = con;
+        this.rcvID = rcvID;
         this.userMessagesList = userMessagesList;
     }
 
@@ -44,7 +57,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     public class MessageViewHolder extends RecyclerView.ViewHolder
     {
-        public TextView senderMessageText, sndTimeText, receiverMessageText, rcvTimeText, sndPicTime, rcvPicTime, dataText;
+        public TextView senderMessageText, sndTimeText, receiverMessageText, rcvTimeText, sndPicTime, rcvPicTime, dataText, inContactText;
         public ImageView messageSenderPicture, messageReceiverPicture;
 
 
@@ -74,6 +87,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             messageSenderPicture = (ImageView) itemView.findViewById(R.id.message_sender_image_view);
             rcvPicTime = (TextView) itemView.findViewById(R.id.rcv_time_pic);
             dataText = (TextView) itemView.findViewById(R.id.date_text);
+            inContactText = (TextView) itemView.findViewById(R.id.in_contact_text);
 
         }
     }
@@ -93,13 +107,125 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         return new MessageViewHolder(view);
     }
 
+    /*
+    private Boolean checkIfInContact(final String rcvID) {
+        final Boolean[] in = {false};
+        final int[] changed = {0};
+        final DatabaseReference contactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+//        Log.d("checkContact", "contactsRef: " + contactsRef.toString());
+
+        contactsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final Iterator<DataSnapshot> contactItems = dataSnapshot.getChildren().iterator();
+
+                while (contactItems.hasNext()) {
+                    DataSnapshot item = contactItems.next();
+                    Log.d("checkContact", "checking contact: " + item.getKey() + "   with " + rcvID + "\nresult = " + Boolean.toString(item.getKey().equals(rcvID)));
+                    if (item.getKey().equals(rcvID)) {
+//                        inContact = true;
+                        in[0] = true;
+                        changed[0] = 1;
+                        Log.d("checkContact", "in[0] after checking equal: " + Boolean.toString(in[0]));
+
+                        break;
+                    }
+                }
+                in[0] = false;
+                changed[0] = 1;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                // yourMethod();
+
+            }
+        }, 3000);   //5 seconds
+        Log.d("checkContact", "in[0] RETURN in func: " + Boolean.toString(in[0]));
+        return in[0];
+    }*/
+
+
+    private Boolean checkIfInContact(final String rcvID) {
+        final Boolean[] exist = {null};
+        final DatabaseReference contactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        /*
+        Log.d("checkContact", "hash code = " + Integer.toString(contactsRef.child(rcvID).hashCode()));
+        Log.d("checkContact", "hash code = " + "");
+        contactsRef.child(rcvID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("checkContact", "exist? " + Boolean.toString(dataSnapshot.exists()));
+                if (dataSnapshot.exists()) {
+                    exist[0] = true;
+                    inContact = true;
+                    Log.d("checkContact", "inContact? " + Boolean.toString(inContact));
+                } else {
+                    exist[0] = false;
+                    inContact = false;
+                    Log.d("checkContact", "inContact? " + Boolean.toString(inContact));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
+
+        contactsRef.orderByKey().equalTo(rcvID)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        if (dataSnapshot.exists()){
+                            inContact = true;
+                            Log.d("checkContact", "inContact = " + Boolean.toString(inContact));
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                        if (dataSnapshot.exists()){
+                            inContact = true;
+                            Log.d("checkContact", "inContact = " + Boolean.toString(inContact));
+                        }
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+        Log.d("checkContact", "inContact returned in func " + Boolean.toString(inContact));
+        return inContact;
+    }
+
+
+
 
 
     @Override
     public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, int i)
     {
         String messageSenderId = mAuth.getCurrentUser().getUid();
-        Messages messages = userMessagesList.get(i);
+        final Messages messages = userMessagesList.get(i);
 
         String fromUserID = messages.getFrom();
         String fromMessageType = messages.getType();
@@ -115,14 +241,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         messageViewHolder.sndPicTime.setVisibility(View.GONE);
         messageViewHolder.rcvPicTime.setVisibility(View.GONE);
         messageViewHolder.dataText.setVisibility(View.GONE);
+        messageViewHolder.inContactText.setVisibility(View.GONE);
 
-        /*
-        if ( !messages.getDate().equals(last_date) ) {
-            messageViewHolder.dataText.setVisibility(View.VISIBLE);
-            messageViewHolder.dataText.setText(messages.getDate());
-            last_date = messages.getDate();
-        }*/
+
+        if (i==0) { //display reminder if sender not in contact
+//            Log.d("checkContact", "func inContact return " + Boolean.toString(checkIfInContact(rcvID)));
+
+            if (!checkIfInContact(rcvID)) {
+//                messageViewHolder.inContactText.setVisibility(View.VISIBLE);
+                messageViewHolder.inContactText.setText("NO, not in your contact");
+                Toast.makeText(mcon, "user NOT in your contact!", Toast.LENGTH_SHORT).show();
+            } else {
+//                messageViewHolder.inContactText.setVisibility(View.VISIBLE);
+                messageViewHolder.inContactText.setText("YES, in your contact");
+                Toast.makeText(mcon, "user IN your contact!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
+
         if (i>1) {
+
             Messages pm = userMessagesList.get(i-1);
             if ( !messages.getDate().equals(pm.getDate()) ) {
                 messageViewHolder.dataText.setVisibility(View.VISIBLE);
@@ -177,6 +316,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.rcvPicTime.setText(messages.getTime());
                 Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
             }
+
+            messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent imageIntent = new Intent(mcon, ImageViewActivity.class);
+                    imageIntent.putExtra("imageID", messages.getMessage());
+                    mcon.startActivity(imageIntent);
+
+                }
+            });
         }
     }
 

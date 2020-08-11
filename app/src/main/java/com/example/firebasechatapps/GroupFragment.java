@@ -37,7 +37,6 @@ public class GroupFragment extends Fragment {
     private ListView list_view;
     private ArrayAdapter<groupObject> arrayAdapter;
     private ArrayList<groupObject> list_of_groups = new ArrayList<>();
-//    private FloatingActionButton mcalendarButton;
 
     private DatabaseReference GroupRef, UserRef;
     private FirebaseAuth mAuth;

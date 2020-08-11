@@ -1,6 +1,9 @@
 package com.example.firebasechatapps;
 
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +32,7 @@ import sun.bob.mcalendarview.vo.DateData;
 
 public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapter.MessageViewHolder>
 {
+    private Context mcon;
     private String groupID, currentUserID;
     private List<Messages> userMessagesList;
     private FirebaseAuth mAuth;
@@ -36,9 +40,11 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
 
     private Calendar today;
     private String sToday = "";
+    private static final int GroupChatType = 1;
 
-    public GroupMessageAdapter (String groupID, List<Messages> userMessagesList, String currentUserID)
+    public GroupMessageAdapter (Context con, String groupID, List<Messages> userMessagesList, String currentUserID)
     {
+        this.mcon = con;
         this.groupID = groupID;
         this.userMessagesList = userMessagesList;
         this.currentUserID = currentUserID;
@@ -104,7 +110,7 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
     @Override
     public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, int i)
     {
-        Messages messages = userMessagesList.get(i);
+        final Messages messages = userMessagesList.get(i);
 
         String from = messages.getFrom();
         String fromMessageType ="";
@@ -127,24 +133,6 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
         messageViewHolder.rcvPicTime.setVisibility(View.GONE);
         messageViewHolder.dataText.setVisibility(View.GONE);
 
-        /*
-        Log.d("groupMsg", "=========================a new message=====================");
-        Log.d("groupMsg", messages.getMessage() + ": " + messages.getDate() + "\nlast_date: " + last_date);
-        Log.d("groupMsg", "msg date = last_date? " + Boolean.toString(messages.getDate().equals(last_date)));
-        if ( !messages.getDate().equals(last_date) ) {
-            messageViewHolder.dataText.setVisibility(View.VISIBLE);
-            messageViewHolder.dataText.setText(messages.getDate());
-            last_date = messages.getDate();
-            last_sender = "";
-            Log.d("groupMsg", "create a new dateText: " + messages.getDate());
-        }
-
-        if ( !messages.getName().equals(last_sender) && !from.equals(currentUserID)) {
-            messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
-            messageViewHolder.rcvNameText.setText(messages.getName());
-            last_sender = messages.getName();
-        }
-        */
         if (i>1) {
             Messages pm = userMessagesList.get(i-1);
             if ( !messages.getDate().equals(pm.getDate()) ) {
@@ -182,7 +170,6 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
 
 
 
-
         if (fromMessageType.equals("image")) {
             if (from.equals(currentUserID)) {
                 messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
@@ -197,6 +184,17 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
                 messageViewHolder.rcvPicTime.setText(messages.getTime());
                 Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
             }
+
+            messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent imageIntent = new Intent(mcon, ImageViewActivity.class);
+                    imageIntent.putExtra("imageID", messages.getMessage());
+                    mcon.startActivity(imageIntent);
+
+                }
+            });
+
         } else { //text message
             if (from.equals(currentUserID))
             {
@@ -218,6 +216,7 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
                 messageViewHolder.rcvTimeText.setText(messages.getTime());
             }
         }
+
 
 
 
