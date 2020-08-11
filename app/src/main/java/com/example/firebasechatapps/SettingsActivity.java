@@ -152,11 +152,6 @@ public class SettingsActivity extends AppCompatActivity {
         if (requestCode==GalleryPick && resultCode==RESULT_OK && data!=null && data.getData()!=null)
         {
             Uri ImageUri = data.getData();
-
-            /*
-            Picasso.get().load(ImageUri).into(userProfileImage);
-            Toast.makeText(SettingsActivity.this, "picture picked", Toast.LENGTH_SHORT).show();
-            */
         }
 
 
@@ -261,7 +256,6 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                         else
                         {
-                            //userName.setVisibility(View.VISIBLE);
                             Toast.makeText(SettingsActivity.this, "Please set & update your profile information...", Toast.LENGTH_SHORT).show();
                         }
                     }

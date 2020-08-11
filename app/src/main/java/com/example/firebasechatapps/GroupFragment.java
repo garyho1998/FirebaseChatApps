@@ -37,17 +37,12 @@ import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class GroupFragment extends Fragment {
 
     private View groupFragmentView;
     private RecyclerView GroupList;
     private ArrayAdapter<Group> arrayAdapter;
     private ArrayList<Group> list_of_groups = new ArrayList<>();
-//    private FloatingActionButton mcalendarButton;
 
     private DatabaseReference GroupRef, UserRef;
     private FirebaseAuth mAuth;
