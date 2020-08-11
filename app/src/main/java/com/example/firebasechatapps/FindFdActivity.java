@@ -12,8 +12,11 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,14 +38,14 @@ import java.util.Iterator;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FindFdActivity extends AppCompatActivity {
+public class FindFdActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private ArrayList<String> contactsList = new ArrayList<String>();
 
     private Toolbar mToolbar;
-    private EditText mPhoneNoView;
+    private EditText mPhoneDistictView, mPhoneNoView, mNameView;
     private CircleImageView mUserProfileImage;
-    private TextView mUsrName, mUsrStatus, mUid, mResultView, mReminderView;
+    private TextView mUsrName, mUsrStatus, mUid, mResultView, mReminderView, mUsrPhone, mPlusText;
     private Button mSearchBtn, mAddBtn;
     private ProgressDialog loadingBar;
     private String currentUserID, receiverUserID;
@@ -61,6 +64,8 @@ public class FindFdActivity extends AppCompatActivity {
         currentUserID = mAuth.getCurrentUser().getUid();
         currentUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserID);
 
+        loadingBar = new ProgressDialog(this);
+
         mPhoneNoView = (EditText) findViewById(R.id.phone_input);
         mUserProfileImage = (CircleImageView) findViewById(R.id.usr_image_view);
         mUsrName = (TextView) findViewById(R.id.usr_name_view);
@@ -70,6 +75,17 @@ public class FindFdActivity extends AppCompatActivity {
         mReminderView = (TextView) findViewById(R.id.reminder_view);
         mSearchBtn = (Button) findViewById(R.id.find_btn);
         mAddBtn = (Button) findViewById(R.id.add_contact_btn);
+        mNameView = (EditText) findViewById(R.id.name_input);
+        mNameView.setVisibility(View.INVISIBLE);
+        mUsrPhone = (TextView) findViewById(R.id.usr_phone_view);
+        mPlusText = (TextView) findViewById(R.id.plus_text);
+        mPhoneDistictView = (EditText) findViewById(R.id.distict_input);
+
+        Spinner dropdown = findViewById(R.id.spinner1);
+        String[] items = new String[]{"click to choose...", "phone number", "user name"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        dropdown.setAdapter(adapter);
+        dropdown.setOnItemSelectedListener(this);
 
         mToolbar = (Toolbar) findViewById(R.id.find_fd_toolbar);
         setSupportActionBar(mToolbar);
@@ -81,26 +97,77 @@ public class FindFdActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
+
+        switch (position) {
+            case 0:
+                mNameView.setVisibility(View.INVISIBLE);
+                mPlusText.setVisibility(View.INVISIBLE);
+                mPhoneDistictView.setVisibility(View.INVISIBLE);
+                mPhoneNoView.setVisibility(View.INVISIBLE);
+                mSearchBtn.setVisibility(View.INVISIBLE);
+                break;
+            case 1:
+                mNameView.setVisibility(View.INVISIBLE);
+                mPlusText.setVisibility(View.VISIBLE);
+                mPhoneDistictView.setVisibility(View.VISIBLE);
+                mPhoneNoView.setVisibility(View.VISIBLE);
+                mSearchBtn.setVisibility(View.VISIBLE);
+
+                mSearchBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SearchFriend("phoneNumber");
+
+                        if (mResultView.getText().equals("Not found")) {
+                            mReminderView.setVisibility(View.VISIBLE);
+                            mResultView.setVisibility(View.VISIBLE);
+                            mUserProfileImage.setVisibility(View.INVISIBLE);
+                            mUsrName.setVisibility(View.INVISIBLE);
+                            mUsrPhone.setVisibility(View.INVISIBLE);
+                            mUsrStatus.setVisibility(View.INVISIBLE);
+                            mAddBtn.setVisibility(View.INVISIBLE);
+                        }
+
+                    }
+                });
+                break;
+            case 2:
+                mPlusText.setVisibility(View.INVISIBLE);
+                mPhoneDistictView.setVisibility(View.INVISIBLE);
+                mPhoneNoView.setVisibility(View.INVISIBLE);
+                mNameView.setVisibility(View.VISIBLE);
+                mSearchBtn.setVisibility(View.VISIBLE);
+
+                mSearchBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SearchFriend("name");
+
+                        if (mResultView.getText().equals("Not found")) {
+                            mReminderView.setVisibility(View.VISIBLE);
+                            mResultView.setVisibility(View.VISIBLE);
+                            mUserProfileImage.setVisibility(View.INVISIBLE);
+                            mUsrName.setVisibility(View.INVISIBLE);
+                            mUsrPhone.setVisibility(View.INVISIBLE);
+                            mUsrStatus.setVisibility(View.INVISIBLE);
+                            mAddBtn.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                });
+                break;
+
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
-
-        mSearchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                SearchFriend();
-
-                if (mResultView.getText().equals("Not found")) {
-                    mReminderView.setVisibility(View.VISIBLE);
-                    mResultView.setVisibility(View.VISIBLE);
-                    mUserProfileImage.setVisibility(View.INVISIBLE);
-                    mUsrName.setVisibility(View.INVISIBLE);
-                    mUsrStatus.setVisibility(View.INVISIBLE);
-                    mAddBtn.setVisibility(View.INVISIBLE);
-                }
-
-            }
-        });
 
         mAddBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,17 +177,22 @@ public class FindFdActivity extends AppCompatActivity {
         });
     }
 
-    private void SearchFriend() {
-        final String input = mPhoneNoView.getText().toString();
-        final String phone = input.replaceAll("\\s", "");
-        String debugPhone = "+85222345678";
-        mResultView.setText("Not found");
-        Log.d("findFriend", "phone input to compare: " + phone);
 
-        if (TextUtils.isEmpty(debugPhone)) {
-            Toast.makeText(this, "Please enter phone number...", Toast.LENGTH_SHORT).show();
+    private void SearchFriend(String type) {
+        String input = "";
+        if (type.equals("phoneNumber")) {
+            input = "+" + mPhoneDistictView.getText().toString() + mPhoneNoView.getText().toString();
+            input = input.replaceAll("\\s","");
+        } else if (type.equals("name")) {
+            input = mNameView.getText().toString();
+        }
+
+        mResultView.setText("Not found");
+
+        if (TextUtils.isEmpty(input)) {
+            Toast.makeText(this, "Please enter to search...", Toast.LENGTH_SHORT).show();
         } else {
-            UsersRef.orderByChild("phoneNumber").equalTo(debugPhone)
+            UsersRef.orderByChild(type).equalTo(input)
                     .addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {

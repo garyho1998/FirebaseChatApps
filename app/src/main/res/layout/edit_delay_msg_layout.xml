@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/text_msg"
+        android:layout_width="85dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/edit_msg"
+        android:text="Message"
+        android:textSize="20dp"
+        />
+
+    <EditText
+        android:id="@+id/edit_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/text_msg"
+        android:hint="message..." />
+
+    <TextView
+        android:id="@+id/text_date"
+        android:layout_width="85dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_msg"
+        android:layout_alignBaseline="@+id/edit_date"
+        android:text="Date"
+        android:textSize="20dp"
+        />
+
+    <EditText
+        android:id="@+id/edit_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="e.g. Jan 01, 2000"
+        android:layout_toEndOf="@+id/text_date"
+        android:layout_below="@+id/edit_msg"/>
+
+    <TextView
+        android:id="@+id/text_time"
+        android:layout_width="85dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_date"
+        android:layout_alignBaseline="@+id/edit_time"
+        android:text="Time"
+        android:textSize="20dp"
+        />
+
+    <EditText
+        android:id="@+id/edit_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="e.g. 10:10 AM"
+        android:layout_toEndOf="@+id/text_time"
+        android:layout_below="@+id/edit_date" />
+
+    <TextView
+        android:id="@+id/text_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"/>
+
+</RelativeLayout>

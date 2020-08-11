@@ -69,6 +69,7 @@ import java.util.Map;
 import id.zelory.compressor.Compressor;
 
 public class GroupChatActivity extends AppCompatActivity {
+//    private Toolbar mToolbar;
     private Toolbar mToolbar;
     private ImageButton SendMessageButton, DelyButton, SendFilesButton;
     private EditText userMessageInput;
@@ -85,7 +86,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private String currentGroupName, currentGroupID,  currentUserID, currentUserName, currentDate, currentTime;
     private String saveCurrentTime, saveCurrentDate;
     private String myUri="";
-//    private ProgressDialog loadingBar;
+    private ProgressDialog loadingBar;
     private static final int GalleryPick = 1;
 
     AlarmController alarmController;
@@ -140,10 +141,9 @@ public class GroupChatActivity extends AppCompatActivity {
         SendFilesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, GalleryPick);
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .start(GroupChatActivity.this);
             }
         });
 
@@ -157,11 +157,6 @@ public class GroupChatActivity extends AppCompatActivity {
         if (requestCode==GalleryPick && resultCode==RESULT_OK && data!=null && data.getData()!=null)
         {
             Uri ImageUri = data.getData();
-
-            CropImage.activity()
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .start(this);
-
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -169,6 +164,10 @@ public class GroupChatActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK)
             {
+                loadingBar.setTitle("Sending Image");
+                loadingBar.setMessage("Please wait, your image is uploading...");
+                loadingBar.setCanceledOnTouchOutside(false);
+                loadingBar.show();
 
                 final Uri resultUri = result.getUri();
 
@@ -221,12 +220,12 @@ public class GroupChatActivity extends AppCompatActivity {
                                 {
                                     if (task.isSuccessful())
                                     {
-//                                        loadingBar.dismiss();
+                                        loadingBar.dismiss();
                                         Toast.makeText(GroupChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
                                     }
                                     else
                                     {
-//                                        loadingBar.dismiss();
+                                        loadingBar.dismiss();
                                         Toast.makeText(GroupChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                                     }
                                 }
@@ -235,7 +234,7 @@ public class GroupChatActivity extends AppCompatActivity {
                         } else {
                             String message = task.getException().toString();
                             Toast.makeText(GroupChatActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
-//                            loadingBar.dismiss();
+                            loadingBar.dismiss();
                         }
                     }
                 });
@@ -356,9 +355,9 @@ public class GroupChatActivity extends AppCompatActivity {
         mToolbar = (Toolbar) findViewById(R.id.group_chat_bar_layout);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(currentGroupName);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
 
         SendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
         SendMessageButton = (ImageButton) findViewById(R.id.send_message_button);
@@ -367,11 +366,13 @@ public class GroupChatActivity extends AppCompatActivity {
         mcalendarButton = (FloatingActionButton) findViewById(R.id.calendarButton);
 
         Log.d("myTag", "currentUserName passed to msgAdapter: " + currentUserName + "     currentUserID: " + currentUserID);
-        gpMsgAdapter = new GroupMessageAdapter(currentGroupName, messagesList, currentUserID);
+        gpMsgAdapter = new GroupMessageAdapter(this, currentGroupName, messagesList, currentUserID);
         userMessagesList = (RecyclerView) findViewById(R.id.messages_list);
         linearLayoutManager = new LinearLayoutManager(this);
         userMessagesList.setLayoutManager(linearLayoutManager);
         userMessagesList.setAdapter(gpMsgAdapter);
+
+        loadingBar = new ProgressDialog(this);
 
         Calendar calendar = Calendar.getInstance();
 

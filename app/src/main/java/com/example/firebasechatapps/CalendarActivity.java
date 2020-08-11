@@ -7,6 +7,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -15,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 
+import sun.bob.mcalendarview.CellConfig;
 import sun.bob.mcalendarview.MCalendarView;
 import sun.bob.mcalendarview.MarkStyle;
 import sun.bob.mcalendarview.listeners.OnDateClickListener;
@@ -41,7 +46,7 @@ import sun.bob.mcalendarview.views.ExpCalendarView;
 import sun.bob.mcalendarview.vo.DateData;
 import sun.bob.mcalendarview.vo.MarkedDates;
 
-public class CalendarActivity extends AppCompatActivity {
+public class CalendarActivity extends AppCompatActivity implements EditDelayMsgDialog.EditMsgDialogListener {
 
 
     private Calendar today;
@@ -49,11 +54,9 @@ public class CalendarActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private ExpCalendarView mCalendarView;
     private TextView mdateView, mMonthTextView;
-    private Button mTodayBtn;
+    private Button mTodayBtn, mExpBtn;
     private String currentGroupName, currentGroupID;
-
     private RecyclerView mDelayMsgRecyclerList;
-
 
     private DatabaseReference GroupNameRef, DelayMsgRef;
     private Query query;
@@ -70,6 +73,8 @@ public class CalendarActivity extends AppCompatActivity {
         mdateView = (TextView) findViewById(R.id.dateView);
         mMonthTextView = (TextView) findViewById(R.id.monthView);
         mTodayBtn = (Button) findViewById(R.id.today_button);
+        mExpBtn = (Button) findViewById(R.id.exp_button);
+
 
 
         today = Calendar.getInstance();
@@ -82,7 +87,6 @@ public class CalendarActivity extends AppCompatActivity {
         mdateView.setText(sDate);
         mMonthTextView.setText(Integer.toString(yyyy) + "-" + Integer.toString(++(mm)));
         mCalendarView.travelTo(new DateData(yyyy, mm, dd));
-
 
         currentGroupName = getIntent().getExtras().get("groupName").toString();
         currentGroupID = getIntent().getExtras().get("groupID").toString();
@@ -130,6 +134,23 @@ public class CalendarActivity extends AppCompatActivity {
             }
         });
 
+        mExpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mExpBtn.getText().equals("Shrink")) {
+                    CellConfig.Month2WeekPos = CellConfig.middlePosition;
+                    CellConfig.ifMonth = false;
+                    mCalendarView.shrink();
+                    mExpBtn.setText("Expand");
+                } else if (mExpBtn.getText().equals("Expand")) {
+                    CellConfig.Week2MonthPos = CellConfig.middlePosition;
+                    CellConfig.ifMonth = true;
+                    mCalendarView.expand();
+                    mExpBtn.setText("Shrink");
+                }
+            }
+        });
+
         mCalendarView.setOnMonthChangeListener(new OnMonthChangeListener() {
             @Override
             public void onMonthChange(int year, int month) {
@@ -150,10 +171,46 @@ public class CalendarActivity extends AppCompatActivity {
                 FirebaseRecyclerAdapter<DelayMsg, DelayMsgViewHolder> adapter =
                         new FirebaseRecyclerAdapter<DelayMsg, DelayMsgViewHolder>(options) {
                             @Override
-                            protected void onBindViewHolder(@NonNull DelayMsgViewHolder holder, final int position, @NonNull DelayMsg model)
+                            protected void onBindViewHolder(@NonNull final DelayMsgViewHolder holder, final int position, @NonNull final DelayMsg model)
                             {
                                 holder.delayMsg.setText(model.getMessage());
                                 holder.displayTime.setText(model.getDisplayTime());
+
+                                holder.editBtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, currentGroupID, model.getId());
+                                        dialog.show(getSupportFragmentManager(), "edit dialog");
+                                    }
+                                });
+
+                                holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        AlertDialog.Builder dialog=new AlertDialog.Builder(CalendarActivity.this, R.style.AlertDialog);
+                                        dialog.setMessage("Are you sure?");
+                                        dialog.setTitle("Delete delay message");
+                                        dialog.setPositiveButton("Yes",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog,
+                                                                        int which) {
+                                                        DelayMsgRef.child(model.getId()).removeValue();
+                                                        Toast.makeText(getApplicationContext(),"Delay message deleted!",Toast.LENGTH_LONG).show();
+
+                                                        // check marked date
+//                                                        onResume();
+                                                        RetrieveAndMarkDelayDate();
+                                                    }
+                                                });
+                                        dialog.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        });
+                                        AlertDialog alertDialog=dialog.create();
+                                        alertDialog.show();
+                                    }
+                                });
                             }
 
                             @NonNull
@@ -173,10 +230,25 @@ public class CalendarActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void applyEdit(String groupID, String msgID, String msg, String date, String time) {
+        Toast.makeText(this, "Delay message edited" + msg, Toast.LENGTH_SHORT).show();
+        //apply change to firebase...
+        DatabaseReference msgRef = GroupNameRef.child("DelayMessage").child(msgID);
+        msgRef.child("message").setValue(msg);
+        msgRef.child("displayDate").setValue(date);
+        msgRef.child("displayTime").setValue(time);
+
+        onResume();
+        RetrieveAndMarkDelayDate();
+    }
+
+
 
     public static class DelayMsgViewHolder extends RecyclerView.ViewHolder
     {
         TextView delayMsg, displayTime;
+        ImageButton editBtn, deleteBtn;
 
         public DelayMsgViewHolder(@NonNull View itemView)
         {
@@ -184,6 +256,8 @@ public class CalendarActivity extends AppCompatActivity {
 
             delayMsg = itemView.findViewById(R.id.delay_msg);
             displayTime = itemView.findViewById(R.id.display_time);
+            deleteBtn = itemView.findViewById(R.id.delete_btn);
+            editBtn = itemView.findViewById(R.id.edit_btn);
 
         }
     }

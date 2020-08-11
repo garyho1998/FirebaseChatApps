@@ -6,7 +6,7 @@
     app:showAsAction="never"
     >
     </item>
-    <item android:title="Find Friend via Phone"
+    <item android:title="Find Friend"
         android:id="@+id/main_fd_option"
         app:showAsAction="never"
         >

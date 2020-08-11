@@ -42,6 +42,20 @@
         app:layout_constraintStart_toStartOf="@id/monthView"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/exp_button"
+        android:layout_width="75dp"
+        android:layout_height="37dp"
+        android:layout_marginTop="55dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="2dp"
+        android:text="Shrink"
+        android:textAllCaps="false"
+        android:textColor="@color/colorAccent"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@id/monthView"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <LinearLayout
         android:layout_width="409dp"
@@ -54,21 +68,21 @@
         app:layout_constraintTop_toBottomOf="@+id/monthView">
 
 
-        <TextView
-            android:id="@+id/dayView"
+        <sun.bob.mcalendarview.views.WeekColumnView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="   Sun     Mon     Tue     Wed     Thu     Fri     Sat"
-            android:textSize="20dp"
-            />
+            android:paddingBottom="12dp"
+            android:paddingTop="12dp" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#ccc" />
 
         <sun.bob.mcalendarview.views.ExpCalendarView
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/dayView"
-            android:layout_marginTop="0dp"
             tools:context=".MainActivity" />
 
         <TextView
@@ -84,8 +98,9 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/msgView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="160dp"
             android:layout_below="@+id/dateView"
+            android:background="#ffffff"
             />
 
 

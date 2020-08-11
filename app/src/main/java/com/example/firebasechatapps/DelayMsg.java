@@ -1,7 +1,7 @@
 package com.example.firebasechatapps;
 
 public class DelayMsg {
-    public String message, displayDate, displayTime;
+    public String message, displayDate, displayTime, messageID;
 //    public int display_day, display_month, display_yr;
 //    public int display_hr, display_minute, display_sec;
 
@@ -12,12 +12,15 @@ public class DelayMsg {
 
     }
 
-    public DelayMsg(String message, String displayTime, String displayDate) {
+    public DelayMsg(String messageID, String message, String displayTime, String displayDate) {
+        this.messageID = messageID;
         this.message = message;
         this.displayTime = displayTime;
         this.displayDate = displayDate;
 
     }
+
+    public  String getId() { return messageID; }
 
     public String getMessage() { return message; }
 

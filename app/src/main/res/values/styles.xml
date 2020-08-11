@@ -16,7 +16,6 @@
         <item name="android:textColorSecondary">@android:color/holo_red_dark</item>
         <item name="actionMenuTextColor">@android:color/holo_purple</item>
     </style>
-
     <style name="AlertDialog" parent="Base.Theme.AppCompat.Light.Dialog"></style>
 
     <style name="date_picker_theme" parent="@android:style/Widget.DatePicker"/>

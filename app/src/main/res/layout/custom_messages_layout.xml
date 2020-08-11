@@ -134,4 +134,14 @@
         android:textColor="@android:color/darker_gray"
         />
 
+    <TextView
+        android:id="@+id/in_contact_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="user in contact?"
+        android:textSize="28dp"
+        android:layout_alignParentBottom="true"
+        />
+
+
 </RelativeLayout>

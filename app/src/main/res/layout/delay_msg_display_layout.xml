@@ -29,12 +29,26 @@
 
             <TextView
                 android:id="@+id/delay_msg"
-                android:layout_width="match_parent"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:text="message content"
                 android:textAlignment="textStart"
                 android:textSize="16sp"
                 />
+
+            <ImageButton
+                android:id="@+id/edit_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@color/colorAccent"
+                android:foreground="@android:drawable/ic_menu_edit" />
+
+            <ImageButton
+                android:id="@+id/delete_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@color/colorAccent"
+                android:foreground="@android:drawable/ic_menu_delete" />
 
 
             <LinearLayout
