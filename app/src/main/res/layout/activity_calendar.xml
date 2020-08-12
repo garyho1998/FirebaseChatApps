@@ -12,7 +12,6 @@
         >
     </include>
 
-
     <TextView
         android:id="@+id/monthView"
         android:layout_width="match_parent"

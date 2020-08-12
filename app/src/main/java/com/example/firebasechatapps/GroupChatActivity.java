@@ -69,7 +69,6 @@ import java.util.Map;
 import id.zelory.compressor.Compressor;
 
 public class GroupChatActivity extends AppCompatActivity {
-//    private Toolbar mToolbar;
     private Toolbar mToolbar;
     private ImageButton SendMessageButton, DelyButton, SendFilesButton;
     private EditText userMessageInput;
@@ -148,7 +147,6 @@ public class GroupChatActivity extends AppCompatActivity {
         });
 
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -354,10 +352,17 @@ public class GroupChatActivity extends AppCompatActivity {
     private void InitializeFields() {
         mToolbar = (Toolbar) findViewById(R.id.group_chat_bar_layout);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(currentGroupName);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setTitle(currentGroupName);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroupChatActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
 
         SendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
         SendMessageButton = (ImageButton) findViewById(R.id.send_message_button);

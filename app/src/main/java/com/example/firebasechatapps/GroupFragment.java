@@ -101,7 +101,7 @@ public class GroupFragment extends Fragment {
                                                 Intent groupChatIntent = new Intent(getContext(), GroupChatActivity.class);
                                                 groupChatIntent.putExtra("groupName", GroupName);
                                                 groupChatIntent.putExtra("groupID", GroupID);
-                                                startActivityForResult(groupChatIntent, 0);
+                                                startActivity(groupChatIntent);
                                             }
                                         });
                                     } else {

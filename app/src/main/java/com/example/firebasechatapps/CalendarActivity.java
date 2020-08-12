@@ -75,8 +75,6 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
         mTodayBtn = (Button) findViewById(R.id.today_button);
         mExpBtn = (Button) findViewById(R.id.exp_button);
 
-
-
         today = Calendar.getInstance();
         int dd = today.get(Calendar.DAY_OF_MONTH);
         int mm = today.get(Calendar.MONTH);
@@ -96,7 +94,6 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
         mToolbar = (Toolbar) findViewById(R.id.calendar_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Calendar of " + currentGroupName);
-
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);

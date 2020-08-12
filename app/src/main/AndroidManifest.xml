@@ -29,6 +29,7 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".GroupChatActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".GroupInfoActivity"
@@ -46,10 +47,11 @@
         <activity
             android:name=".FindFriendsActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".MainActivity" android:launchMode="singleTop">
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

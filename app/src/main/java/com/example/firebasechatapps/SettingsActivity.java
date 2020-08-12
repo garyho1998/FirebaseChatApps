@@ -2,6 +2,7 @@ package com.example.firebasechatapps;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -66,8 +67,6 @@ public class SettingsActivity extends AppCompatActivity {
         UserProfileImagesRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
 
         InitializeFields();
-
-        //userName.setVisibility(View.INVISIBLE);
 
         UpdateAccountSettings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,9 +138,17 @@ public class SettingsActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.setting_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Account Settings");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setTitle("Setting");
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -153,7 +160,6 @@ public class SettingsActivity extends AppCompatActivity {
         {
             Uri ImageUri = data.getData();
         }
-
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
@@ -226,7 +232,6 @@ public class SettingsActivity extends AppCompatActivity {
         Intent mainIntent = new Intent(SettingsActivity.this, MainActivity.class);
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mainIntent);
-        finish();
     }
 
     private void RetrieveUserInfo()
@@ -265,5 +270,10 @@ public class SettingsActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    public void onBackPressed() {
+        System.out.println("onBackPressed");
+        finish();
     }
 }
