@@ -36,7 +36,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
 
     private Button SendVerificationCodeButton, VerifyButton;
     private EditText InputPhoneNumber, InputVerificationCode;
-    private TextView PhoneText, CodeText;
+    private TextView PhoneText, CodeText, phoneRegister;
     private String phoneNumber;
 
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
@@ -62,7 +62,15 @@ public class PhoneLoginActivity extends AppCompatActivity {
         CodeText = (TextView) findViewById(R.id.code_text);
         RootRef = FirebaseDatabase.getInstance().getReference();
         loadingBar = new ProgressDialog(this);
-
+        phoneRegister = (TextView) findViewById(R.id.phone_register_link);
+        phoneRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("SendUserToRegisterActivity");
+                Intent registerIntent = new Intent(PhoneLoginActivity.this, RegisterActivity.class);
+                startActivity(registerIntent);
+            }
+        });
         SendVerificationCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

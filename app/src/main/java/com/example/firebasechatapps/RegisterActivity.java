@@ -133,7 +133,7 @@ public class RegisterActivity extends AppCompatActivity
 
     private void SendUserToLoginActivity()
     {
-        Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
+        Intent loginIntent = new Intent(RegisterActivity.this, PhoneLoginActivity.class);
         startActivity(loginIntent);
     }
 

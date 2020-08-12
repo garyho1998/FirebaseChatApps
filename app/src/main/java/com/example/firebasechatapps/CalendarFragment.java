@@ -161,11 +161,9 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
         mCalendarView.setOnDateClickListener(new OnDateClickListener() {
             @Override
             public void onDateClick(View view, DateData date) {
-
                 final String selectedDate = TransferMonth(date.getMonth()) + " " + date.getDay() + ", " + date.getYear();
                 mDateTextView.setText(selectedDate);
                 RetrieveAndDisplayDelayMsg(selectedDate);
-
             }
         });
     }
@@ -211,8 +209,6 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
                                                 EditDelayMsgDialog dialog = new EditDelayMsgDialog(false, groupID, delayMsg.getId());
                                                 dialog.setTargetFragment(CalendarFragment.this, 1);
                                                 dialog.show(getFragmentManager(), "edit dialog");
-
-
                                             }
                                         });
 
