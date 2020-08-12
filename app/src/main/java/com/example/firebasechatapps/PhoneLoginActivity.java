@@ -79,7 +79,6 @@ public class PhoneLoginActivity extends AppCompatActivity {
 
                 if (TextUtils.isEmpty(phoneNumber)) {
                     Toast.makeText(PhoneLoginActivity.this, "Please enter your phone number first...", Toast.LENGTH_SHORT).show();
-
                 }
                 else {
                     loadingBar.setTitle("Phone Verification");
@@ -93,8 +92,6 @@ public class PhoneLoginActivity extends AppCompatActivity {
                             TimeUnit.SECONDS,   // Unit of timeout
                             PhoneLoginActivity.this,               // Activity (for callback binding)
                             callbacks);        // OnVerificationStateChangedCallbacks
-
-
                 }
             }
         });
@@ -160,6 +157,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 SendVerificationCodeButton.setVisibility(View.INVISIBLE);
                 InputPhoneNumber.setVisibility(View.INVISIBLE);
                 PhoneText.setVisibility(View.INVISIBLE);
+                phoneRegister.setVisibility(View.INVISIBLE);
 
                 VerifyButton.setVisibility(View.VISIBLE);
                 InputVerificationCode.setVisibility(View.VISIBLE);
