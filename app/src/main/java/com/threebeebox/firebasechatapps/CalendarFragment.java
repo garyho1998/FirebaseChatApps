@@ -1,6 +1,6 @@
 package com.threebeebox.firebasechatapps;
 
-import android.app.AlertDialog;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -32,7 +32,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.TimeZone;
 
 import sun.bob.mcalendarview.CellConfig;
@@ -61,7 +60,7 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
     private ExpCalendarView mCalendarView;
     private TextView mDateTextView, mMonthTextView;
     private Button mTodayBtn, mExpBtn;
-    private RecyclerView mDelayMsgRecyclerList;
+    private RecyclerView DelyMessageRecyclerView;
 
     private String currentUserID;
     private String groupName = "";
@@ -86,8 +85,8 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
         mMonthTextView = (TextView) calendarFragmentView.findViewById(R.id.monthView);
         mTodayBtn = (Button) calendarFragmentView.findViewById(R.id.today_button);
         mExpBtn = (Button) calendarFragmentView.findViewById(R.id.exp_button);
-        mDelayMsgRecyclerList = (RecyclerView) calendarFragmentView.findViewById(R.id.msgView);
-        mDelayMsgRecyclerList.setLayoutManager(new LinearLayoutManager(getContext()));
+        DelyMessageRecyclerView = (RecyclerView) calendarFragmentView.findViewById(R.id.msgView);
+        DelyMessageRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
@@ -112,15 +111,13 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
     @Override
     public void onResume() {
         super.onResume();
-        RetrieveAndMarkDelayMsg();
-        RetrieveGroupsList();
+        RetrieveAndMarkDelayDate();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        RetrieveGroupsList();
-        RetrieveAndMarkDelayMsg();
+        RetrieveAndMarkDelayDate();
 
         mTodayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -167,130 +164,64 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
     }
 
     private void RetrieveAndDisplayDelayMsg(final String selectedDate) {
-         GroupsRef.addValueEventListener(new ValueEventListener() {
+        query = CurrentUserRef.child("DelayMessage").orderByChild("displayDate").equalTo(selectedDate);
+        FirebaseRecyclerOptions<DelayMessageRef> options = new FirebaseRecyclerOptions.Builder<DelayMessageRef>().setQuery(query, DelayMessageRef.class).build();
+
+        FirebaseRecyclerAdapter<DelayMessageRef, DelayMsgViewHolder> adapter = new FirebaseRecyclerAdapter<DelayMessageRef, DelayMsgViewHolder>(options) {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                FirebaseRecyclerOptions<DelayMsg> options;
-                FirebaseRecyclerAdapter<DelayMsg, DelayMsgViewHolder> adapter = null;
-                Iterator<DataSnapshot> items = dataSnapshot.getChildren().iterator();
+            protected void onBindViewHolder(@NonNull final DelayMsgViewHolder holder, final int position, @NonNull final DelayMessageRef delayMessageRef) {
+                final String messageID = getRef(position).getKey();
+                System.out.println("messageID:" + messageID);
 
-                while (items.hasNext()) {
-                    DataSnapshot item = items.next();
-                    GroupNameRef = item.getRef();
-                    final String groupID = GroupNameRef.getKey();
+                String ref = delayMessageRef.getRef(); //can be groupID or UserID of individual messages
+                String type = delayMessageRef.getType();
 
-                    if (groupsList.contains(groupID)) {
-                        Log.d("myTag", "Retrieving from " + groupID);
-                        DelayMsgRef = GroupNameRef.child("DelayMessage");
+                if (type.equals("group")) {
+                    GroupsRef.child(ref).child("DelayMessage").child(messageID).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            System.out.println("DelayMessage");
+                            Log.i(TAG, dataSnapshot.getKey());
+                            holder.delayMsg.setText((String) dataSnapshot.child("message").getValue());
+                            holder.displayTime.setText((String) dataSnapshot.child("displayTime").getValue());
+                        }
 
-                        query = DelayMsgRef.orderByChild("displayDate").equalTo(selectedDate);
-                        options = new FirebaseRecyclerOptions.Builder<DelayMsg>().setQuery(query, DelayMsg.class).build();
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                        Log.d("myTag", "Querying: the options are" + options.toString());
+                        }
+                    });
+                } else {
+                    //individual
+                    //TODO
+                }
 
-                        adapter =
-                                new FirebaseRecyclerAdapter<DelayMsg, DelayMsgViewHolder>(options) {
-                                    @Override
-                                    protected void onBindViewHolder(@NonNull final DelayMsgViewHolder delayMsgViewHolder, int i, @NonNull final DelayMsg delayMsg) {
 
-                                        delayMsgViewHolder.displayTime.setText(delayMsg.getDisplayTime());
-                                        delayMsgViewHolder.delayMsg.setText("To: " + findGroupName(DelayMsgRef.getParent().getKey()) + "\nMessage: " + delayMsg.getMessage());
-
-                                        Log.d("myTag", "Binding " + delayMsg.getMessage() + "\n==========" + selectedDate);
-
-                                        delayMsgViewHolder.editBtn.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                Toast.makeText(getContext(), "Edit button clicked\n" + delayMsg.getId(), Toast.LENGTH_SHORT).show();
-                                                Toast.makeText(getContext(), "groupID passed: " + groupID + "\nmsgID passed: " + delayMsg.getId(), Toast.LENGTH_SHORT).show();
-
-                                                EditDelayMsgDialog dialog = new EditDelayMsgDialog(false, groupID, delayMsg.getId());
-                                                dialog.setTargetFragment(CalendarFragment.this, 1);
-                                                dialog.show(getFragmentManager(), "edit dialog");
-                                            }
-                                        });
-
-                                        delayMsgViewHolder.deleteBtn.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                AlertDialog.Builder dialog = new AlertDialog.Builder(getContext(), R.style.AlertDialog);
-                                                dialog.setMessage("Are you sure?");
-                                                dialog.setTitle("Delete delay message");
-                                                dialog.setPositiveButton("Yes",
-                                                        new DialogInterface.OnClickListener() {
-                                                            public void onClick(DialogInterface dialog,
-                                                                                int which) {
-                                                                GroupNameRef.child("DelayMessage").child(delayMsg.getId()).removeValue();
-                                                                Toast.makeText(getContext(), "Delay message deleted!", Toast.LENGTH_LONG).show();
-
-                                                            }
-                                                        });
-                                                dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                    }
-                                                });
-                                                AlertDialog alertDialog = dialog.create();
-                                                alertDialog.show();
-                                            }
-                                        });
-                                    }
-
-                                    @NonNull
-                                    @Override
-                                    public DelayMsgViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                                        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.delay_msg_display_layout, parent, false);
-                                        // create a new layout
-                                        DelayMsgViewHolder viewHolder = new DelayMsgViewHolder(view);
-
-                                        Log.d("myTag", "CreatingViewHolder: ");
-                                        return viewHolder;
-                                    }
-                                };
-                        Log.d("myTag", "Adapter: " + adapter.toString());
+                holder.editBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //TODO
                     }
+                });
 
-                }
-                if (adapter != null) {
-                    mDelayMsgRecyclerList.setAdapter(adapter);
-                    adapter.startListening();
-                }
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
-    }
-
-    private String findGroupName(final String key) {
-        GroupsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                final Iterator<DataSnapshot> groupItems = dataSnapshot.getChildren().iterator();
-
-                while (groupItems.hasNext()) {
-                    DataSnapshot gpItem = groupItems.next();
-                    DatabaseReference UsrRef = gpItem.getRef();
-
-                    Group group = gpItem.getValue(Group.class);
-                    String id = gpItem.getKey();
-
-                    if (id.equals(key)) {
-                        groupName = group.getGroupName();
+                holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //TODO
                     }
-                }
+                });
             }
 
+            @NonNull
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public DelayMsgViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.delay_msg_display_layout, parent, false);
+                return new DelayMsgViewHolder(view);
             }
+        };
 
-        });
-        return groupName;
+        DelyMessageRecyclerView.setAdapter(adapter);
+        adapter.startListening();
     }
 
     @Override
@@ -306,7 +237,7 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
     }
 
 
-    private void RetrieveAndMarkDelayMsg() {
+    private void RetrieveAndMarkDelayDate() {
         unMarkDate();
         CurrentUserRef.child("groups").addChildEventListener(new ChildEventListener() {
             @Override
@@ -370,47 +301,29 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
 
     private void MarkDate(DataSnapshot messagesSnapshot) {
         if (messagesSnapshot.exists()) {
-            Date date = new Date((long) messagesSnapshot.child("displayTimestamp").getValue());
-            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Hong_Kong"));
-            cal.setTime(date);
-            mCalendarView.markDate(
-                    new DateData(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE)).setMarkStyle(
-                            new MarkStyle(MarkStyle.DOT, Color.RED))
-            );
-
+            try {
+                if (messagesSnapshot.child("from").getValue().equals(currentUserID)) {
+                    Date date = new Date((long) messagesSnapshot.child("displayTimestamp").getValue());
+                    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Hong_Kong"));
+                    cal.setTime(date);
+                    mCalendarView.markDate(
+                            new DateData(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE)).setMarkStyle(
+                                    new MarkStyle(MarkStyle.DOT, Color.RED))
+                    );
+                }
+            } catch (Exception e) {
+//                Log.i(TAG, messagesSnapshot.toString());
+//                Log.i(TAG, e.toString());
+            }
         }
     }
-    public void unMarkDate(){
+
+    public void unMarkDate() {
         MarkedDates markedDates = mCalendarView.getMarkedDates();
         ArrayList markData = markedDates.getAll();
         for (int k = 0; k < markData.size(); k++) {
             mCalendarView.unMarkDate((DateData) markData.get(k));
         }
-    }
-
-    private void RetrieveGroupsList() {
-        mAuth = FirebaseAuth.getInstance();
-        currentUserID = mAuth.getCurrentUser().getUid();
-        CurrentUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserID);
-        DatabaseReference UsrGpRef = CurrentUserRef.child("groups");
-
-        UsrGpRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                final Iterator<DataSnapshot> groupItems = dataSnapshot.getChildren().iterator();
-
-                while (groupItems.hasNext()) {
-                    DataSnapshot gpItem = groupItems.next();
-                    groupsList.add(gpItem.getKey());
-                    Log.d("tag2", "after adding the key to groupsList, size of the groupList: " + Integer.toString(groupsList.size()));
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        Log.d("tag2", "before exit RetrieveGroupsList(), size of the groupList: " + Integer.toString(groupsList.size()));
     }
 
     private static class DelayMsgViewHolder extends RecyclerView.ViewHolder {
