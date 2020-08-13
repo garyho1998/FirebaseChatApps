@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.firebasechatapps">
+    package="com.threebeebox.firebasechatapps">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -13,42 +13,42 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ImageViewActivity"/>
+        <activity android:name="com.threebeebox.firebasechatapps.ImageViewActivity"/>
         <activity
-            android:name=".FindFdActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity android:name=".PhoneLoginActivity" />
+            android:name="com.threebeebox.firebasechatapps.FindFdActivity"
+            android:parentActivityName="com.threebeebox.firebasechatapps.MainActivity" />
+        <activity android:name="com.threebeebox.firebasechatapps.PhoneLoginActivity" />
         <activity
-            android:name=".CalendarActivity"
-            android:parentActivityName=".GroupChatActivity" />
+            android:name="com.threebeebox.firebasechatapps.CalendarActivity"
+            android:parentActivityName="com.threebeebox.firebasechatapps.GroupChatActivity" />
         <activity
-            android:name=".ProfileActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name="com.threebeebox.firebasechatapps.ProfileActivity"
+            android:parentActivityName="com.threebeebox.firebasechatapps.MainActivity" />
         <activity
-            android:name=".SettingsActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name="com.threebeebox.firebasechatapps.SettingsActivity"
+            android:parentActivityName="com.threebeebox.firebasechatapps.MainActivity" />
         <activity
-            android:name=".GroupChatActivity"
+            android:name="com.threebeebox.firebasechatapps.GroupChatActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName="com.threebeebox.firebasechatapps.MainActivity"/>
         <activity
-            android:name=".GroupInfoActivity"
-            android:parentActivityName=".GroupChatActivity" />
+            android:name="com.threebeebox.firebasechatapps.GroupInfoActivity"
+            android:parentActivityName="com.threebeebox.firebasechatapps.GroupChatActivity" />
         <activity
-            android:name=".AddMemberActivity"
-            android:parentActivityName=".GroupChatActivity" />
+            android:name="com.threebeebox.firebasechatapps.AddMemberActivity"
+            android:parentActivityName="com.threebeebox.firebasechatapps.GroupChatActivity" />
 
-        <receiver android:name=".AlarmReceiver" />
+        <receiver android:name="com.threebeebox.firebasechatapps.AlarmReceiver" />
 
         <activity
-            android:name=".RegisterActivity"
-            android:parentActivityName=".LoginActivity" />
-        <activity android:name=".LoginActivity" />
+            android:name="com.threebeebox.firebasechatapps.RegisterActivity"
+            android:parentActivityName="com.threebeebox.firebasechatapps.LoginActivity" />
+        <activity android:name="com.threebeebox.firebasechatapps.LoginActivity" />
         <activity
-            android:name=".FindFriendsActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name="com.threebeebox.firebasechatapps.FindFriendsActivity"
+            android:parentActivityName="com.threebeebox.firebasechatapps.MainActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.threebeebox.firebasechatapps.MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -56,8 +56,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ChatActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name="com.threebeebox.firebasechatapps.ChatActivity"
+            android:parentActivityName="com.threebeebox.firebasechatapps.MainActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />

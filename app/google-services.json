@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:850580800882:android:1e1b6bab5b45bf90f449eb",
         "android_client_info": {
-          "package_name": "com.example.firebasechatapps"
+          "package_name": "com.threebeebox.firebasechatapps"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "850580800882-bvn3vta7p1pvkh1mr020vr3u4rogia4s.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.firebasechatapps",
+            "package_name": "com.threebeebox.firebasechatapps",
             "certificate_hash": "032f6ba2228204afefb43fa3b44f3108322f434a"
           }
         },
