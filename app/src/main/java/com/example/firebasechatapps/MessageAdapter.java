@@ -233,12 +233,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             if (!checkIfInContact(rcvID)) {
 //                messageViewHolder.inContactText.setVisibility(View.VISIBLE);
-                messageViewHolder.inContactText.setText("NO, not in your contact");
-                Toast.makeText(mcon, "user NOT in your contact!", Toast.LENGTH_SHORT).show();
+//                messageViewHolder.inContactText.setText("NO, not in your contact");
+//                Toast.makeText(mcon, "user NOT in your contact!", Toast.LENGTH_SHORT).show();
             } else {
 //                messageViewHolder.inContactText.setVisibility(View.VISIBLE);
-                messageViewHolder.inContactText.setText("YES, in your contact");
-                Toast.makeText(mcon, "user IN your contact!", Toast.LENGTH_SHORT).show();
+//                messageViewHolder.inContactText.setText("YES, in your contact");
+//                Toast.makeText(mcon, "user IN your contact!", Toast.LENGTH_SHORT).show();
             }
         }
 

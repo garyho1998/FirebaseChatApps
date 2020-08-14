@@ -210,8 +210,7 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
 
                                                 EditDelayMsgDialog dialog = new EditDelayMsgDialog(false, groupID, delayMsg.getId());
                                                 dialog.setTargetFragment(CalendarFragment.this, 1);
-//                                                dialog.show(getFragmentManager(), "edit dialog");
-                                                dialog.show()
+                                                dialog.show(getFragmentManager(), "edit dialog");
 
 
                                             }
