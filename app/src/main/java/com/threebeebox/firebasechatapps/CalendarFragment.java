@@ -181,7 +181,7 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             System.out.println("DelayMessage");
-                            Log.i(TAG, dataSnapshot.getKey());
+//                            Log.i(TAG, dataSnapshot.getKey());
                             holder.delayMsg.setText((String) dataSnapshot.child("message").getValue());
                             holder.displayTime.setText((String) dataSnapshot.child("displayTime").getValue());
                         }
