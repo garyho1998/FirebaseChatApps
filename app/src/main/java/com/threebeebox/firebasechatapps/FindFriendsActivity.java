@@ -47,12 +47,12 @@ public class FindFriendsActivity extends AppCompatActivity {
     {
         super.onStart();
 
-        FirebaseRecyclerOptions<Contacts> options = new FirebaseRecyclerOptions.Builder<Contacts>().setQuery(UsersRef, Contacts.class).build();
+        FirebaseRecyclerOptions<User> options = new FirebaseRecyclerOptions.Builder<User>().setQuery(UsersRef, User.class).build();
 
-        FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder> adapter =
-                new FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder>(options) {
+        FirebaseRecyclerAdapter<User, FindFriendViewHolder> adapter =
+                new FirebaseRecyclerAdapter<User, FindFriendViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, final int position, @NonNull Contacts model)
+                    protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, final int position, @NonNull User model)
                     {
                         holder.userName.setText(model.getName());
                         holder.userStatus.setText(model.getStatus());

@@ -14,7 +14,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Contacts, ContactsViewHolder> {
+public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<User, ContactsViewHolder> {
     private DatabaseReference UsersRef;
 
     public ContactFirebaseRecyclerAdapter(@NonNull FirebaseRecyclerOptions options, DatabaseReference UsersRef) {
@@ -30,7 +30,7 @@ public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Cont
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull final ContactsViewHolder holder, int position, @NonNull Contacts model) {
+    protected void onBindViewHolder(@NonNull final ContactsViewHolder holder, int position, @NonNull User model) {
         final String userIDs = getRef(position).getKey();
 
         UsersRef.child(userIDs).addValueEventListener(new ValueEventListener() {

@@ -4,7 +4,7 @@ import androidx.annotation.Nullable;
 
 public class Messages
 {
-    private String from, message, type, to, messageID, time, date, name;
+    public String from, message, type, to, messageID, time, date, name;
 
     public Messages()
     {
@@ -98,6 +98,10 @@ public class Messages
         return isEqual;
     }
 
+    @Override
+    public String toString(){
+        return messageID;
+    }
 //    @Override
 //    public int hashCode() {
 //        return Integer.parseInt(this.messageID);
