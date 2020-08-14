@@ -65,7 +65,7 @@ public class ChatActivity extends AppCompatActivity
     private ImageButton SendMessageButton, SendFilesButton;
     private EditText MessageInputText;
 
-    private final List<Messages> messagesList = new ArrayList<>();
+    private final List<ChatMessage> chatMessageList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
     private RecyclerView userMessagesList;
@@ -147,7 +147,7 @@ public class ChatActivity extends AppCompatActivity
         SendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
         MessageInputText = (EditText) findViewById(R.id.input_message);
 
-        messageAdapter = new MessageAdapter(this, messageReceiverID, messagesList);
+        messageAdapter = new MessageAdapter(this, messageReceiverID, chatMessageList);
         userMessagesList = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
         linearLayoutManager = new LinearLayoutManager(this);
         userMessagesList.setLayoutManager(linearLayoutManager);
@@ -204,11 +204,11 @@ public class ChatActivity extends AppCompatActivity
 
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Image Files");
 
-                final String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
-                final String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
+                final String messageSenderRef = "Messages/" + messageSenderID;
+                final String messageReceiverRef = "Messages/" + messageReceiverID;
 
                 DatabaseReference userMessageKeyRef = RootRef.child("Messages")
-                        .child(messageSenderID).child(messageReceiverID).push();
+                        .child(messageSenderID).push();
 
                 final String messagePushID = userMessageKeyRef.getKey();
 
@@ -221,7 +221,7 @@ public class ChatActivity extends AppCompatActivity
                             final String downloadUri = task.getResult().getDownloadUrl().toString();
                             myUri = downloadUri.toString();
 
-                            Map messageTextBody = new HashMap();
+                            Map<String, String> messageTextBody = new HashMap<String, String>();
                             messageTextBody.put("message", myUri);
                             messageTextBody.put("name", resultUri.getLastPathSegment());
                             messageTextBody.put("type", "image");
@@ -231,7 +231,7 @@ public class ChatActivity extends AppCompatActivity
                             messageTextBody.put("time", saveCurrentTime);
                             messageTextBody.put("date", saveCurrentDate);
 
-                            Map messageBodyDetails = new HashMap();
+                            Map<String, Object> messageBodyDetails = new HashMap<>();
                             messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
                             messageBodyDetails.put( messageReceiverRef + "/" + messagePushID, messageTextBody);
                             RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
@@ -267,7 +267,7 @@ public class ChatActivity extends AppCompatActivity
 
     private void DisplayLastSeen()
     {
-        RootRef.child("Users").child(messageReceiverID)
+        RootRef.child("Users").orderByChild("to").equalTo(messageReceiverID)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot)
@@ -307,18 +307,18 @@ public class ChatActivity extends AppCompatActivity
         super.onStart();
 //        messagesList.clear();
 
-        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
+        RootRef.child("Messages").child(messageSenderID).orderByChild("to").equalTo(messageReceiverID)
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s)
                     {
-                        Messages messages = dataSnapshot.getValue(Messages.class);
+                        ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
 //                        Log.d("myTag", "message added: " + messages.getMessageID());
 //                        Log.d("myTag", "message already exists in message list? " + Boolean.toString(messagesList.contains(messages)));
 
                         //add message only if the message does not exist in messageList already...
-                        if (!messagesList.contains(messages)) {
-                            messagesList.add(messages);
+                        if (!chatMessageList.contains(chatMessage)) {
+                            chatMessageList.add(chatMessage);
 //                            Log.d("myTag", "size of messagesList: " + Integer.toString(messagesList.size()));
 
                             messageAdapter.notifyDataSetChanged();
@@ -361,15 +361,15 @@ public class ChatActivity extends AppCompatActivity
         }
         else
         {
-            String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
-            String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
+            String messageSenderRef = "Messages/" + messageSenderID;
+            String messageReceiverRef = "Messages/" + messageReceiverID;
 
             DatabaseReference userMessageKeyRef = RootRef.child("Messages")
-                    .child(messageSenderID).child(messageReceiverID).push();
+                    .child(messageSenderID).push();
 
             String messagePushID = userMessageKeyRef.getKey();
 
-            Map messageTextBody = new HashMap();
+            Map<String, String> messageTextBody = new HashMap<String, String>();
             messageTextBody.put("message", messageText);
             messageTextBody.put("type", "text");
             messageTextBody.put("from", messageSenderID);
@@ -378,7 +378,7 @@ public class ChatActivity extends AppCompatActivity
             messageTextBody.put("time", saveCurrentTime);
             messageTextBody.put("date", saveCurrentDate);
 
-            Map messageBodyDetails = new HashMap();
+            Map<String, Object> messageBodyDetails = new HashMap<String, Object>();
             messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
             messageBodyDetails.put( messageReceiverRef + "/" + messagePushID, messageTextBody);
 

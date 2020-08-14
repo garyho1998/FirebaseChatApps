@@ -1,9 +1,9 @@
 package com.threebeebox.firebasechatapps;
 
-public class DelayMsg {
-    public String message, displayDate, displayTime, messageID;
-//    public int display_day, display_month, display_yr;
-//    public int display_hr, display_minute, display_sec;
+public class DelayMsg extends ChatMessage {
+    public String displayDate;
+    public String displayTime;
+    public String displayTimestamp;
 
     public DelayMsg()
     {
@@ -12,20 +12,11 @@ public class DelayMsg {
 
     }
 
-    public DelayMsg(String messageID, String message, String displayTime, String displayDate) {
-        this.messageID = messageID;
-        this.message = message;
+    public DelayMsg(String from, String message, String type, String to, String messageID, String time, String date, String name, String displayTimestamp, String displayTime, String displayDate) {
+        super(from, message, type, to, messageID, time, date, name);
         this.displayTime = displayTime;
         this.displayDate = displayDate;
-
-    }
-
-    public  String getId() { return messageID; }
-
-    public String getMessage() { return message; }
-
-    public void setMessage(String message) {
-        this.message = message;
+        this.displayTimestamp = displayTimestamp;
     }
 
     public String getDisplayTime() { return displayTime; }
@@ -36,6 +27,13 @@ public class DelayMsg {
 
     public void setDisplayDate(String displayDate) { this.displayDate = displayDate; }
 
+    public String getDisplayTimestamp() {
+        return displayTimestamp;
+    }
+
+    public void setDisplayTimestamp(String displayTimestamp) {
+        this.displayTimestamp = displayTimestamp;
+    }
 
 
 

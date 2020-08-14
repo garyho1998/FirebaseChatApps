@@ -70,16 +70,16 @@ public class RequestFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        FirebaseRecyclerOptions<Contacts> options =
-                new FirebaseRecyclerOptions.Builder<Contacts>()
-                        .setQuery(ChatRequestsRef.child(currentUserID), Contacts.class)
+        FirebaseRecyclerOptions<User> options =
+                new FirebaseRecyclerOptions.Builder<User>()
+                        .setQuery(ChatRequestsRef.child(currentUserID), User.class)
                         .build();
 
 
-        FirebaseRecyclerAdapter<Contacts, RequestsViewHolder> adapter =
-                new FirebaseRecyclerAdapter<Contacts, RequestsViewHolder>(options) {
+        FirebaseRecyclerAdapter<User, RequestsViewHolder> adapter =
+                new FirebaseRecyclerAdapter<User, RequestsViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull final RequestsViewHolder holder, int position, @NonNull Contacts model) {
+                    protected void onBindViewHolder(@NonNull final RequestsViewHolder holder, int position, @NonNull User model) {
 //                        holder.itemView.findViewById(R.id.request_accept_btn).setVisibility(View.VISIBLE);
 //                        holder.itemView.findViewById(R.id.request_cancel_btn).setVisibility(View.VISIBLE);
                         final String list_user_id = getRef(position).getKey();

@@ -54,8 +54,8 @@ public class AddMemberActivity extends AppCompatActivity implements ContactRecyc
         super.onStart();
 
         FirebaseRecyclerOptions options =
-                new FirebaseRecyclerOptions.Builder<Contacts>()
-                        .setQuery(ContactRef, Contacts.class)
+                new FirebaseRecyclerOptions.Builder<User>()
+                        .setQuery(ContactRef, User.class)
                         .build();
 
         adapter = new AddMemberFirebaseRecyclerAdapter(options, UsersRef, GroupNameRef, currentGroupName, currentGroupID);
