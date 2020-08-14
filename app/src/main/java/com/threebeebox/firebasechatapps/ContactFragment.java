@@ -25,7 +25,7 @@ public class ContactFragment extends Fragment implements ContactRecyclerItemTouc
     private View ContactsView;
     private RecyclerView myContactsList;
 
-    private DatabaseReference ContacsRef, UsersRef, GroupNameRef;
+    private DatabaseReference ContactsRef, UsersRef, GroupNameRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
     private ContactFirebaseRecyclerAdapter adapter;
@@ -48,7 +48,7 @@ public class ContactFragment extends Fragment implements ContactRecyclerItemTouc
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
 
-        ContacsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
+        ContactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ContactRecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
@@ -63,7 +63,7 @@ public class ContactFragment extends Fragment implements ContactRecyclerItemTouc
     {
         super.onStart();
 
-        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Contacts>().setQuery(ContacsRef, Contacts.class).build();
+        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Contacts>().setQuery(ContactsRef, Contacts.class).build();
 
         adapter = new ContactFirebaseRecyclerAdapter(options, UsersRef);
 
