@@ -178,7 +178,7 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
                                 holder.editBtn.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, currentGroupID, model.getMessageID());
+                                        EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, currentGroupID, model.getId());
                                         dialog.show(getSupportFragmentManager(), "edit dialog");
                                     }
                                 });
@@ -193,7 +193,7 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog,
                                                                         int which) {
-                                                        DelayMsgRef.child(model.getMessageID()).removeValue();
+                                                        DelayMsgRef.child(model.getId()).removeValue();
                                                         Toast.makeText(getApplicationContext(), "Delay message deleted!", Toast.LENGTH_LONG).show();
 
                                                         // check marked date

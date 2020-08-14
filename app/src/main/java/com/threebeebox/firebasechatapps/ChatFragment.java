@@ -3,7 +3,6 @@ package com.threebeebox.firebasechatapps;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +22,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -64,26 +61,26 @@ public class ChatFragment extends Fragment
         return PrivateChatsView;
     }
 
+
     @Override
     public void onStart()
     {
         super.onStart();
 
-        FirebaseRecyclerOptions<MessageList> options =
-                new FirebaseRecyclerOptions.Builder<MessageList>()
-                        .setQuery(ChatsRef, MessageList.class)
+
+        FirebaseRecyclerOptions<Contacts> options =
+                new FirebaseRecyclerOptions.Builder<Contacts>()
+                        .setQuery(ChatsRef, Contacts.class)
                         .build();
 
 
-        FirebaseRecyclerAdapter<MessageList, ChatsViewHolder> adapter =
-                new FirebaseRecyclerAdapter<MessageList, ChatsViewHolder>(options) {
+        FirebaseRecyclerAdapter<Contacts, ChatsViewHolder> adapter =
+                new FirebaseRecyclerAdapter<Contacts, ChatsViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull final ChatsViewHolder holder, int position, @NonNull MessageList messageList)
+                    protected void onBindViewHolder(@NonNull final ChatsViewHolder holder, int position, @NonNull Contacts model)
                     {
                         final String usersIDs = getRef(position).getKey();
                         final String[] retImage = {"default_image"};
-                        System.out.println(usersIDs);
-                        System.out.println(messageList.toString());
 
                         UsersRef.child(usersIDs).addValueEventListener(new ValueEventListener() {
                             @Override
@@ -157,9 +154,6 @@ public class ChatFragment extends Fragment
         adapter.startListening();
     }
 
-
-
-
     public static class  ChatsViewHolder extends RecyclerView.ViewHolder
     {
         CircleImageView profileImage;
@@ -175,6 +169,4 @@ public class ChatFragment extends Fragment
             userName = itemView.findViewById(R.id.user_profile_name);
         }
     }
-
-
 }

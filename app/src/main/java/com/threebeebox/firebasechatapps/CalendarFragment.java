@@ -76,8 +76,6 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.i(TAG, "onCreateView");
-        setRetainInstance(true);
         // Inflate the layout for this fragment
         calendarFragmentView = inflater.inflate(R.layout.fragment_calendar, container, false);
 
@@ -113,14 +111,12 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
     @Override
     public void onResume() {
         super.onResume();
-        Log.i(TAG, "onResume");
         RetrieveAndMarkDelayDate();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Log.i(TAG, "onStart");
         RetrieveAndMarkDelayDate();
 
         mTodayBtn.setOnClickListener(new View.OnClickListener() {
