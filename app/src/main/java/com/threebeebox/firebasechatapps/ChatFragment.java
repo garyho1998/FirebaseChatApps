@@ -82,6 +82,7 @@ public class ChatFragment extends Fragment
                     {
                         final String usersIDs = getRef(position).getKey();
                         final String[] retImage = {"default_image"};
+                        System.out.println(usersIDs);
                         System.out.println(messageList.toString());
 
                         UsersRef.child(usersIDs).addValueEventListener(new ValueEventListener() {
@@ -175,26 +176,5 @@ public class ChatFragment extends Fragment
         }
     }
 
-    public class MessageList{
-        List<Message> messages;
 
-        MessageList(){
-
-        }
-        MessageList(List<Message> messages){
-            this.messages = messages;
-        }
-        public void setMessages(List<Message> messages) {
-            this.messages = messages;
-        }
-        public List<Message> getMessages() {
-            return messages;
-        }
-
-        @Override
-        public String toString(){
-            return messages.toString();
-        };
-
-    }
 }

@@ -27,7 +27,7 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
 {
     private Context mcon;
     private String groupID, currentUserID;
-    private List<Messages> userMessagesList;
+    private List<ChatMessage> userChatMessageList;
     private FirebaseAuth mAuth;
     private DatabaseReference msgRef;
 
@@ -35,11 +35,11 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
     private String sToday = "";
     private static final int GroupChatType = 1;
 
-    public GroupMessageAdapter (Context con, String groupID, List<Messages> userMessagesList, String currentUserID)
+    public GroupMessageAdapter (Context con, String groupID, List<ChatMessage> userChatMessageList, String currentUserID)
     {
         this.mcon = con;
         this.groupID = groupID;
-        this.userMessagesList = userMessagesList;
+        this.userChatMessageList = userChatMessageList;
         this.currentUserID = currentUserID;
 
     }
@@ -103,12 +103,12 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
     @Override
     public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, int i)
     {
-        final Messages messages = userMessagesList.get(i);
+        final ChatMessage chatMessage = userChatMessageList.get(i);
 
-        String from = messages.getFrom();
+        String from = chatMessage.getFrom();
         String fromMessageType ="";
-        if (messages.getType()!=null) {
-            fromMessageType = messages.getType();
+        if (chatMessage.getType()!=null) {
+            fromMessageType = chatMessage.getType();
         }
 
 
@@ -127,38 +127,38 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
         messageViewHolder.dataText.setVisibility(View.GONE);
 
         if (i>1) {
-            Messages pm = userMessagesList.get(i-1);
-            if ( !messages.getDate().equals(pm.getDate()) ) {
+            ChatMessage pm = userChatMessageList.get(i-1);
+            if ( !chatMessage.getDate().equals(pm.getDate()) ) {
                 messageViewHolder.dataText.setVisibility(View.VISIBLE);
-                if ( messages.getDate().equals(sToday) ) {
+                if ( chatMessage.getDate().equals(sToday) ) {
                     messageViewHolder.dataText.setText("Today");
                 } else {
-                    messageViewHolder.dataText.setText(messages.getDate());
+                    messageViewHolder.dataText.setText(chatMessage.getDate());
                 }
                 //besides a new date view, also add a new receiver view if not from current user
                 if (!from.equals(currentUserID)) {
                     messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
-                    messageViewHolder.rcvNameText.setText(messages.getName());
+                    messageViewHolder.rcvNameText.setText(chatMessage.getName());
                 }
             }
         } else if (i==0)  {
             messageViewHolder.dataText.setVisibility(View.VISIBLE);
-            if ( messages.getDate().equals(sToday) ) {
+            if ( chatMessage.getDate().equals(sToday) ) {
                 messageViewHolder.dataText.setText("Today");
             } else {
-                messageViewHolder.dataText.setText(messages.getDate());
+                messageViewHolder.dataText.setText(chatMessage.getDate());
             }
         }
 
         if (i>1) {
-            Messages pm = userMessagesList.get(i-1);
-            if ( !messages.getName().equals(pm.getName()) && !from.equals(currentUserID) ) {
+            ChatMessage pm = userChatMessageList.get(i-1);
+            if ( !chatMessage.getName().equals(pm.getName()) && !from.equals(currentUserID) ) {
                 messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
-                messageViewHolder.rcvNameText.setText(messages.getName());
+                messageViewHolder.rcvNameText.setText(chatMessage.getName());
             }
         } else if (i==0)  {
             messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
-            messageViewHolder.rcvNameText.setText(messages.getName());
+            messageViewHolder.rcvNameText.setText(chatMessage.getName());
         }
 
 
@@ -168,21 +168,21 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
                 messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
                 messageViewHolder.sndPicTime.setVisibility(View.VISIBLE);
 
-                messageViewHolder.sndPicTime.setText(messages.getTime());
-                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
+                messageViewHolder.sndPicTime.setText(chatMessage.getTime());
+                Picasso.get().load(chatMessage.getMessage()).into(messageViewHolder.messageSenderPicture);
             } else {
                 messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
                 messageViewHolder.rcvPicTime.setVisibility(View.VISIBLE);
 
-                messageViewHolder.rcvPicTime.setText(messages.getTime());
-                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
+                messageViewHolder.rcvPicTime.setText(chatMessage.getTime());
+                Picasso.get().load(chatMessage.getMessage()).into(messageViewHolder.messageReceiverPicture);
             }
 
             messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent imageIntent = new Intent(mcon, ImageViewActivity.class);
-                    imageIntent.putExtra("imageID", messages.getMessage());
+                    imageIntent.putExtra("imageID", chatMessage.getMessage());
                     mcon.startActivity(imageIntent);
 
                 }
@@ -195,8 +195,8 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
                 messageViewHolder.sndTimeText.setVisibility(View.VISIBLE);
 
                 messageViewHolder.senderMessageText.setTextColor(Color.BLACK);
-                messageViewHolder.senderMessageText.setText(messages.getMessage());
-                messageViewHolder.sndTimeText.setText(messages.getTime());
+                messageViewHolder.senderMessageText.setText(chatMessage.getMessage());
+                messageViewHolder.sndTimeText.setText(chatMessage.getTime());
             }
             else
             {
@@ -205,8 +205,8 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
 
                 messageViewHolder.receiverMessageText.setTextColor(Color.BLACK);
 
-                messageViewHolder.receiverMessageText.setText(messages.getMessage());
-                messageViewHolder.rcvTimeText.setText(messages.getTime());
+                messageViewHolder.receiverMessageText.setText(chatMessage.getMessage());
+                messageViewHolder.rcvTimeText.setText(chatMessage.getTime());
             }
         }
 
@@ -221,7 +221,7 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
     @Override
     public int getItemCount()
     {
-        return userMessagesList.size();
+        return userChatMessageList.size();
     }
 
     private String TransferMonth(int month) {
