@@ -25,6 +25,7 @@ import android.widget.ImageButton;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.threebeebox.firebasechatapps.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -60,7 +61,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private EditText userMessageInput;
     private FloatingActionButton mcalendarButton;
 
-    private final List<ChatMessage> chatMessageList = new ArrayList<>();
+    private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private GroupMessageAdapter gpMsgAdapter;
     private RecyclerView userMessagesList;
@@ -250,7 +251,7 @@ public class GroupChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        chatMessageList.clear();
+        messagesList.clear();
 
         userMessagesList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -268,11 +269,11 @@ public class GroupChatActivity extends AppCompatActivity {
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
+                        Messages messages = dataSnapshot.getValue(Messages.class);
 
                         //add message only if the message does not exist in messageList already...
-                        if (!chatMessageList.contains(chatMessage)) {
-                            chatMessageList.add(chatMessage);
+                        if (!messagesList.contains(messages)) {
+                            messagesList.add(messages);
                             // Log.d("myTag", "size of messagesList: " + Integer.toString(messagesList.size()));
 
                             gpMsgAdapter.notifyDataSetChanged();
@@ -336,7 +337,7 @@ public class GroupChatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        chatMessageList.clear();
+        messagesList.clear();
     }
 
     private void InitializeFields() {
@@ -361,7 +362,7 @@ public class GroupChatActivity extends AppCompatActivity {
         mcalendarButton = (FloatingActionButton) findViewById(R.id.calendarButton);
 
         // Log.d("myTag", "currentUserName passed to msgAdapter: " + currentUserName + "     currentUserID: " + currentUserID);
-        gpMsgAdapter = new GroupMessageAdapter(this, currentGroupName, chatMessageList, currentUserID);
+        gpMsgAdapter = new GroupMessageAdapter(this, currentGroupName, messagesList, currentUserID);
         userMessagesList = (RecyclerView) findViewById(R.id.messages_list);
         linearLayoutManager = new LinearLayoutManager(this);
         userMessagesList.setLayoutManager(linearLayoutManager);
@@ -377,7 +378,7 @@ public class GroupChatActivity extends AppCompatActivity {
         SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
         saveCurrentTime = currentTime.format(calendar.getTime());
 
-        chatMessageList.clear();
+        messagesList.clear();
     }
 
 
