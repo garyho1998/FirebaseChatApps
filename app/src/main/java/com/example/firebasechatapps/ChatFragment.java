@@ -3,6 +3,7 @@ package com.example.firebasechatapps;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +17,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import sun.bob.mcalendarview.vo.DateData;
 
 
 /**
@@ -37,6 +44,7 @@ public class ChatFragment extends Fragment
     private DatabaseReference ChatsRef, UsersRef;
     private FirebaseAuth mAuth;
     private String currentUserID="";
+    private String sToday = "";
 
 
     public ChatFragment() {
@@ -57,6 +65,10 @@ public class ChatFragment extends Fragment
 
         chatsList = (RecyclerView) PrivateChatsView.findViewById(R.id.chats_list);
         chatsList.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
+        sToday = currentDate.format(calendar.getTime());
 
         return PrivateChatsView;
     }
@@ -99,26 +111,41 @@ public class ChatFragment extends Fragment
 
                                     holder.userName.setText(retName);
 
+                                    // get last update time
+                                    final Query lastQuery = ChatsRef.child(usersIDs).orderByKey().limitToLast(1);
+                                    lastQuery.addChildEventListener(new ChildEventListener() {
+                                        @Override
+                                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                            String last_time = dataSnapshot.child("time").getValue().toString();
+                                            String last_date = dataSnapshot.child("date").getValue().toString();
+                                            if (last_date.equals(sToday)) {
+                                                holder.lastSend.setText(last_time);
+                                            } else {
+                                                holder.lastSend.setText(last_date);
+                                            }
 
-                                    if (dataSnapshot.child("userState").hasChild("state"))
-                                    {
-                                        String state = dataSnapshot.child("userState").child("state").getValue().toString();
-                                        String date = dataSnapshot.child("userState").child("date").getValue().toString();
-                                        String time = dataSnapshot.child("userState").child("time").getValue().toString();
+                                            String type = dataSnapshot.child("type").getValue().toString();
+                                            if (type.equals("text")) {
+                                                String text_msg = dataSnapshot.child("message").getValue().toString();
+                                                holder.userMsg.setText(text_msg);
+                                            } else if (type.equals("image")) {
+                                                holder.userMsg.setText("[Image]");
+                                            }
+                                        }
+                                        @Override
+                                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                                        if (state.equals("online"))
-                                        {
-                                            holder.userStatus.setText("online");
                                         }
-                                        else if (state.equals("offline"))
-                                        {
-                                            holder.userStatus.setText("Last Seen: " + date + " " + time);
+                                        @Override
+                                        public void onChildRemoved(DataSnapshot dataSnapshot) {
                                         }
-                                    }
-                                    else
-                                    {
-                                        holder.userStatus.setText("offline");
-                                    }
+                                        @Override
+                                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                                        }
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                        }
+                                    });
 
                                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                                         @Override
@@ -160,7 +187,7 @@ public class ChatFragment extends Fragment
     public static class  ChatsViewHolder extends RecyclerView.ViewHolder
     {
         CircleImageView profileImage;
-        TextView userStatus, userName;
+        TextView userMsg, userName, lastSend;
 
 
         public ChatsViewHolder(@NonNull View itemView)
@@ -168,8 +195,9 @@ public class ChatFragment extends Fragment
             super(itemView);
 
             profileImage = itemView.findViewById(R.id.users_profile_image);
-            userStatus = itemView.findViewById(R.id.user_status);
+            userMsg = itemView.findViewById(R.id.user_msg);
             userName = itemView.findViewById(R.id.user_profile_name);
+            lastSend = itemView.findViewById(R.id.minor_info);
         }
     }
 }

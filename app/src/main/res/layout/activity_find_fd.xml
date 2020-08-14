@@ -45,13 +45,14 @@
     <EditText
         android:id="@+id/distict_input"
         android:layout_width="80dp"
-        android:layout_height="35dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/find_fd_toolbar"
         android:layout_marginTop="60dp"
         android:layout_alignParentStart="true"
         android:layout_marginStart="30dp"
-        android:textSize="24dp"
+        android:textSize="26dp"
         android:text="852"
+        android:inputType="number"
         android:background="@drawable/edit_text_shape"
         android:hint="eg. 852" />
 
@@ -64,7 +65,8 @@
         android:layout_marginStart="115dp"
         android:textSize="26dp"
         android:background="@drawable/edit_text_shape"
-        android:hint="phone number" />
+        android:hint="phone number"
+        android:inputType="phone" />
 
     <Button
         android:id="@+id/find_btn"
@@ -87,6 +89,7 @@
         android:layout_marginStart="13dp"
         android:layout_marginEnd="85dp"
         android:textSize="26dp"
+        android:inputType="text"
         android:background="@drawable/edit_text_shape"
         android:visibility="invisible"
         android:hint="user name" />

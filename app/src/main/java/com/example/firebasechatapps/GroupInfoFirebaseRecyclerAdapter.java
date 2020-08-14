@@ -17,6 +17,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<String, ContactsViewHolder> {
     private DatabaseReference UsersRef, GroupNameRef;
     private String currentGroupName, currentGroupID, currentUserID;
@@ -59,12 +62,20 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
                                 if (userSnapshot.child("userState").hasChild("state")) {
                                     String state = userSnapshot.child("userState").child("state").getValue().toString();
                                     String date = userSnapshot.child("userState").child("date").getValue().toString();
-                                    String time = userSnapshot.child("userState").child("time").getValue().toString();
 
                                     if (state.equals("online")) {
                                         holder.onlineIcon.setVisibility(View.VISIBLE);
                                     } else if (state.equals("offline")) {
                                         holder.onlineIcon.setVisibility(View.INVISIBLE);
+                                    }
+
+                                    Calendar calendar = Calendar.getInstance();
+                                    SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
+                                    String today = currentDate.format(calendar.getTime());
+                                    if (date.equals(today)) {
+                                        holder.userState.setText( userSnapshot.child("userState").child("time").getValue().toString() );
+                                    } else {
+                                        holder.userState.setText(date);
                                     }
                                 }
                                 else {

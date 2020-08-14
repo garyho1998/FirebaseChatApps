@@ -93,6 +93,8 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        loadingBar = new ProgressDialog(this);
+
         contactsList.clear();
     }
 
@@ -127,6 +129,7 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
                             mUsrPhone.setVisibility(View.INVISIBLE);
                             mUsrStatus.setVisibility(View.INVISIBLE);
                             mAddBtn.setVisibility(View.INVISIBLE);
+                            loadingBar.dismiss();
                         }
 
                     }
@@ -152,6 +155,7 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
                             mUsrPhone.setVisibility(View.INVISIBLE);
                             mUsrStatus.setVisibility(View.INVISIBLE);
                             mAddBtn.setVisibility(View.INVISIBLE);
+                            loadingBar.dismiss();
                         }
                     }
                 });
@@ -192,6 +196,11 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
         if (TextUtils.isEmpty(input)) {
             Toast.makeText(this, "Please enter to search...", Toast.LENGTH_SHORT).show();
         } else {
+            loadingBar.setTitle("Finding Friend");
+            loadingBar.setMessage("Please wait...");
+            loadingBar.setCanceledOnTouchOutside(false);
+            loadingBar.show();
+
             UsersRef.orderByChild(type).equalTo(input)
                     .addChildEventListener(new ChildEventListener() {
                         @Override
@@ -217,6 +226,7 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
             String userName = (String) dataSnapshot.child("name").getValue();
             String userStatus = (String) dataSnapshot.child("status").getValue();
             String imageUrl = (String) dataSnapshot.child("image").getValue();
+            String userPhone = (String) dataSnapshot.child("phoneNumber").getValue();
 
             mUsrName.setVisibility(View.VISIBLE);
             mUsrName.setText(userName);
@@ -224,6 +234,8 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
             mUsrStatus.setText(userStatus);
             mUid.setText(userID);
             mUserProfileImage.setVisibility(View.VISIBLE);
+            mUsrPhone.setVisibility(View.VISIBLE);
+            mUsrPhone.setText(userPhone);
 
             if (imageUrl != null) {
                 Picasso.get().load(imageUrl).placeholder(R.drawable.profile_image).into(mUserProfileImage);
@@ -261,6 +273,7 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
             }
 
         }
+        loadingBar.dismiss();
     }
     private void CheckIfContactNotExists(DataSnapshot dataSnapshot) {
         if (dataSnapshot.exists()){

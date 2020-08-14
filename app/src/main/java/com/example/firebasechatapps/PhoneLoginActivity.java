@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -35,9 +36,9 @@ import java.util.concurrent.TimeUnit;
 public class PhoneLoginActivity extends AppCompatActivity {
 
     private Button SendVerificationCodeButton, VerifyButton;
-    private EditText InputPhoneNumber, InputVerificationCode;
-    private TextView PhoneText, CodeText;
-    private String phoneNumber;
+    private EditText InputPhoneNumber, InputVerificationCode, CountryCode;
+    private TextView PhoneText, CodeText, PlusText;
+    private String phoneNumber, countryCode;
 
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
     private FirebaseAuth mAuth;
@@ -54,6 +55,8 @@ public class PhoneLoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        CountryCode = (EditText) findViewById(R.id.country_code_input);
+        PlusText = (TextView) findViewById(R.id.plus_text);
         SendVerificationCodeButton = (Button) findViewById(R.id.send_ver_code_button);
         VerifyButton = (Button) findViewById(R.id.verify_button);
         InputPhoneNumber = (EditText) findViewById(R.id.phone_number_input);
@@ -67,10 +70,11 @@ public class PhoneLoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                countryCode = CountryCode.getText().toString();
                 phoneNumber = InputPhoneNumber.getText().toString();
 
-                if (TextUtils.isEmpty(phoneNumber)) {
-                    Toast.makeText(PhoneLoginActivity.this, "Please enter your phone number first...", Toast.LENGTH_SHORT).show();
+                if (TextUtils.isEmpty(phoneNumber) || TextUtils.isEmpty(countryCode)) {
+                    Toast.makeText(PhoneLoginActivity.this, "Please enter your country code and phone number first...", Toast.LENGTH_SHORT).show();
 
                 }
                 else {
@@ -79,8 +83,11 @@ public class PhoneLoginActivity extends AppCompatActivity {
                     loadingBar.setCanceledOnTouchOutside(false);
                     loadingBar.show();
 
+                    String verifyPhone = "+" + countryCode + phoneNumber;
+                    Log.d("phoneAuth", "verifyPhone = " + verifyPhone);
+
                     PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                            phoneNumber,        // Phone number to verify
+                            verifyPhone,        // Phone number to verify
                             60,                 // Timeout duration
                             TimeUnit.SECONDS,   // Unit of timeout
                             PhoneLoginActivity.this,               // Activity (for callback binding)
@@ -95,6 +102,8 @@ public class PhoneLoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 SendVerificationCodeButton.setVisibility(View.INVISIBLE);
+                PlusText.setVisibility(View.INVISIBLE);
+                CountryCode.setVisibility(View.INVISIBLE);
                 InputPhoneNumber.setVisibility(View.INVISIBLE);
                 PhoneText.setVisibility(View.INVISIBLE);
                 CodeText.setVisibility(View.VISIBLE);
@@ -103,7 +112,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
 
                 if (TextUtils.isEmpty(verificationCode))
                 {
-                    Toast.makeText(PhoneLoginActivity.this, "Please write veerification code first...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PhoneLoginActivity.this, "Please write verification code first...", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
@@ -128,7 +137,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
             @Override
             public void onVerificationFailed(FirebaseException e) {
                 loadingBar.dismiss();
-                Toast.makeText(PhoneLoginActivity.this, "Invalid Phone Number, Please enter correct phone number with your country code...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(PhoneLoginActivity.this, "Verification failed...", Toast.LENGTH_SHORT).show();
 
                 SendVerificationCodeButton.setVisibility(View.VISIBLE);
                 InputPhoneNumber.setVisibility(View.VISIBLE);
@@ -137,6 +146,16 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 VerifyButton.setVisibility(View.INVISIBLE);
                 InputVerificationCode.setVisibility(View.INVISIBLE);
                 CodeText.setVisibility(View.INVISIBLE);
+
+                if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                    // Invalid request
+                    Toast.makeText(PhoneLoginActivity.this, "Invalid request\nInvalid Phone Number...", Toast.LENGTH_SHORT).show();
+                } else if (e instanceof FirebaseTooManyRequestsException) {
+                    // The SMS quota has been exceeded for the project                     Toast.makeText(getApplicationContext(), "Quota exceeded", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PhoneLoginActivity.this, "Quota exceeded", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.d("phoneAuth", "onVerificationFailed Error: " + e.getMessage());
+                }
             }
 
             @Override
@@ -152,6 +171,8 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 SendVerificationCodeButton.setVisibility(View.INVISIBLE);
                 InputPhoneNumber.setVisibility(View.INVISIBLE);
                 PhoneText.setVisibility(View.INVISIBLE);
+                PlusText.setVisibility(View.INVISIBLE);
+                CountryCode.setVisibility(View.INVISIBLE);
 
                 VerifyButton.setVisibility(View.VISIBLE);
                 InputVerificationCode.setVisibility(View.VISIBLE);
@@ -198,3 +219,10 @@ public class PhoneLoginActivity extends AppCompatActivity {
         finish();
     }
 }
+
+// W/BiChannelGoogleApi: [FirebaseAuth: ] getGoogleApiForMethod() returned Gms
+// D/CompatibilityChangeReporter: Compat change id reported: 147798919; UID 10156; state: DISABLED
+
+// D/phoneAuth: onVerificationFailed Error: This app is not authorized to use Firebase Authentication.
+// Please verifythat the correct package name and SHA-1 are configured in the Firebase Console.
+// [ App validation failed. Is app running on a physical device? ]

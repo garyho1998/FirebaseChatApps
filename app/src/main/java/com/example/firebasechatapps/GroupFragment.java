@@ -23,6 +23,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,12 +31,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import sun.bob.mcalendarview.vo.DateData;
 
 public class GroupFragment extends Fragment {
 
@@ -47,6 +51,7 @@ public class GroupFragment extends Fragment {
     private DatabaseReference GroupRef, UserRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
+    private String sToday = "";
 
     public GroupFragment() {
         // Required empty public constructor
@@ -65,6 +70,10 @@ public class GroupFragment extends Fragment {
         UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserID);
         GroupList = (RecyclerView) groupFragmentView.findViewById(R.id.groups_list);
         GroupList.setLayoutManager(new LinearLayoutManager(this.getContext()));
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
+        sToday = currentDate.format(calendar.getTime());
 
         RetrieveAndDisplayGroups();
 
@@ -104,6 +113,42 @@ public class GroupFragment extends Fragment {
                                                 startActivityForResult(groupChatIntent, 0);
                                             }
                                         });
+
+                                        groupSnapshot.getRef().child("Message").orderByKey().limitToLast(1)
+                                                .addChildEventListener(new ChildEventListener() {
+                                                    @Override
+                                                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                                        String last_time = dataSnapshot.child("time").getValue().toString();
+                                                        String last_date = dataSnapshot.child("date").getValue().toString();
+                                                        if (last_date.equals(sToday)) {
+                                                            holder.lastSend.setText(last_time);
+                                                        } else {
+                                                            holder.lastSend.setText(last_date);
+                                                        }
+
+                                                        String type = dataSnapshot.child("type").getValue().toString();
+                                                        if (type.equals("normal")) { //text type
+                                                            String text_msg = dataSnapshot.child("message").getValue().toString();
+                                                            holder.GroupMsg.setText(text_msg);
+                                                        } else if (type.equals("image")) {
+                                                            holder.GroupMsg.setText("[Image]");
+                                                        }
+                                                    }
+                                                    @Override
+                                                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                                                    }
+                                                    @Override
+                                                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                                    }
+                                                    @Override
+                                                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                                                    }
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+                                                    }
+                                                });
+
                                     } else {
                                         dataSnapshot.getRef().removeValue();
                                         System.out.println(GroupID + " not exist anymore");
@@ -140,7 +185,7 @@ public class GroupFragment extends Fragment {
     }
 
     public static class GroupsViewHolder extends RecyclerView.ViewHolder {
-        TextView GroupName;
+        TextView GroupName, GroupMsg, lastSend;
         CircleImageView image;
 
         public GroupsViewHolder(@NonNull View itemView) {
@@ -148,8 +193,11 @@ public class GroupFragment extends Fragment {
 
             GroupName = itemView.findViewById(R.id.group_name);
             image = itemView.findViewById(R.id.group_image);
+            GroupMsg = itemView.findViewById(R.id.group_msg);
+            lastSend = itemView.findViewById(R.id.minor_info);
         }
     }
+
 }
 
 

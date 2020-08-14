@@ -1,5 +1,7 @@
 package com.example.firebasechatapps;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +20,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Contacts, ContactsViewHolder> {
     private DatabaseReference UsersRef;
+    private Context mCon;
 
-    public ContactFirebaseRecyclerAdapter(@NonNull FirebaseRecyclerOptions options, DatabaseReference UsersRef) {
+    public ContactFirebaseRecyclerAdapter(@NonNull FirebaseRecyclerOptions options, DatabaseReference UsersRef, Context mCon) {
         super(options);
         this.UsersRef = UsersRef;
+        this.mCon = mCon;
     }
 
     @NonNull
@@ -41,7 +48,7 @@ public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Cont
 
         UsersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
+            public void onDataChange(final DataSnapshot dataSnapshot)
             {
                 if (dataSnapshot.exists())
                 {
@@ -84,6 +91,41 @@ public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Cont
                         holder.userName.setText(profileName);
                         holder.userStatus.setText(profileStatus);
                     }
+
+                    if (dataSnapshot.child("userState").hasChild("state")) {
+                        String state = dataSnapshot.child("userState").child("state").getValue().toString();
+                        String date = dataSnapshot.child("userState").child("date").getValue().toString();
+
+                        if (state.equals("online")) {
+                            holder.onlineIcon.setVisibility(View.VISIBLE);
+                        } else if (state.equals("offline")) {
+                            holder.onlineIcon.setVisibility(View.INVISIBLE);
+                        }
+
+                        Calendar calendar = Calendar.getInstance();
+                        SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
+                        String today = currentDate.format(calendar.getTime());
+                        if (date.equals(today)) {
+                            holder.userState.setText( dataSnapshot.child("userState").child("time").getValue().toString() );
+                        } else {
+                            holder.userState.setText(date);
+                        }
+                    }
+                    else {
+                        holder.onlineIcon.setVisibility(View.INVISIBLE);
+                    }
+
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view)
+                        {
+                            Intent chatIntent = new Intent(mCon, ChatActivity.class);
+                            chatIntent.putExtra("visit_user_id", userIDs);
+                            chatIntent.putExtra("visit_user_name", dataSnapshot.child("name").getValue().toString());
+                            chatIntent.putExtra("visit_image", dataSnapshot.child("image").getValue().toString());
+                            mCon.startActivity(chatIntent);
+                        }
+                    });
                 }
             }
 

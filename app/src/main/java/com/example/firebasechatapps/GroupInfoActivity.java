@@ -93,10 +93,10 @@ public class GroupInfoActivity extends AppCompatActivity implements ContactRecyc
         userProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, GalleryPick);
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .setAspectRatio(1, 1)
+                        .start(GroupInfoActivity.this);
             }
         });
         loadingBar = new ProgressDialog(this);
@@ -166,10 +166,6 @@ public class GroupInfoActivity extends AppCompatActivity implements ContactRecyc
         if (requestCode == GalleryPick && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri ImageUri = data.getData();
 
-            CropImage.activity()
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(1, 1)
-                    .start(this);
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
