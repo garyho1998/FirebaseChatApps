@@ -33,18 +33,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private String rcvID;
     private Boolean inContact = false;
 
-    private List<Messages> userMessagesList;
+    private List<ChatMessage> userChatMessageList;
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
     private String last_date = "";
     private Calendar today;
     private String sToday = "";
 
-    public MessageAdapter (Context con,String rcvID, List<Messages> userMessagesList)
+    public MessageAdapter (Context con,String rcvID, List<ChatMessage> userChatMessageList)
     {
         this.mcon = con;
         this.rcvID = rcvID;
-        this.userMessagesList = userMessagesList;
+        this.userChatMessageList = userChatMessageList;
     }
 
 
@@ -219,10 +219,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, int i)
     {
         String messageSenderId = mAuth.getCurrentUser().getUid();
-        final Messages messages = userMessagesList.get(i);
+        final ChatMessage chatMessage = userChatMessageList.get(i);
 
-        String fromUserID = messages.getFrom();
-        String fromMessageType = messages.getType();
+        String fromUserID = chatMessage.getFrom();
+        String fromMessageType = chatMessage.getType();
 
         usersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(fromUserID);
 
@@ -256,21 +256,21 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         if (i>1) {
 
-            Messages pm = userMessagesList.get(i-1);
-            if ( !messages.getDate().equals(pm.getDate()) ) {
+            ChatMessage pm = userChatMessageList.get(i-1);
+            if ( !chatMessage.getDate().equals(pm.getDate()) ) {
                 messageViewHolder.dataText.setVisibility(View.VISIBLE);
-                if ( messages.getDate().equals(sToday) ) {
+                if ( chatMessage.getDate().equals(sToday) ) {
                     messageViewHolder.dataText.setText("Today");
                 } else {
-                    messageViewHolder.dataText.setText(messages.getDate());
+                    messageViewHolder.dataText.setText(chatMessage.getDate());
                 }
             }
         } else if (i==0)  { //display date view whenever this is the first message
             messageViewHolder.dataText.setVisibility(View.VISIBLE);
-            if ( messages.getDate().equals(sToday) ) {
+            if ( chatMessage.getDate().equals(sToday) ) {
                 messageViewHolder.dataText.setText("Today");
             } else {
-                messageViewHolder.dataText.setText(messages.getDate());
+                messageViewHolder.dataText.setText(chatMessage.getDate());
             }
         }
 
@@ -283,8 +283,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.sndTimeText.setVisibility(View.VISIBLE);
 
                 messageViewHolder.senderMessageText.setTextColor(Color.BLACK);
-                messageViewHolder.senderMessageText.setText(messages.getMessage());
-                messageViewHolder.sndTimeText.setText(messages.getTime());
+                messageViewHolder.senderMessageText.setText(chatMessage.getMessage());
+                messageViewHolder.sndTimeText.setText(chatMessage.getTime());
             }
             else
             {
@@ -293,29 +293,29 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                 //messageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
                 messageViewHolder.receiverMessageText.setTextColor(Color.BLACK);
-                messageViewHolder.receiverMessageText.setText(messages.getMessage());
-                messageViewHolder.rcvTimeText.setText(messages.getTime());
+                messageViewHolder.receiverMessageText.setText(chatMessage.getMessage());
+                messageViewHolder.rcvTimeText.setText(chatMessage.getTime());
             }
         } else if (fromMessageType.equals("image")) {
             if (fromUserID.equals(messageSenderId)) {
                 messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
                 messageViewHolder.sndPicTime.setVisibility(View.VISIBLE);
 
-                messageViewHolder.sndPicTime.setText(messages.getTime());
-                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
+                messageViewHolder.sndPicTime.setText(chatMessage.getTime());
+                Picasso.get().load(chatMessage.getMessage()).into(messageViewHolder.messageSenderPicture);
             } else {
                 messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
                 messageViewHolder.rcvPicTime.setVisibility(View.VISIBLE);
 
-                messageViewHolder.rcvPicTime.setText(messages.getTime());
-                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
+                messageViewHolder.rcvPicTime.setText(chatMessage.getTime());
+                Picasso.get().load(chatMessage.getMessage()).into(messageViewHolder.messageReceiverPicture);
             }
 
             messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent imageIntent = new Intent(mcon, ImageViewActivity.class);
-                    imageIntent.putExtra("imageID", messages.getMessage());
+                    imageIntent.putExtra("imageID", chatMessage.getMessage());
                     mcon.startActivity(imageIntent);
 
                 }
@@ -329,7 +329,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public int getItemCount()
     {
-        return userMessagesList.size();
+        return userChatMessageList.size();
     }
 
     private String TransferMonth(int month) {

@@ -2,16 +2,16 @@ package com.threebeebox.firebasechatapps;
 
 import androidx.annotation.Nullable;
 
-public class Messages
+public class ChatMessage
 {
     public String from, message, type, to, messageID, time, date, name;
 
-    public Messages()
+    public ChatMessage()
     {
 
     }
 
-    public Messages(String from, String message, String type, String to, String messageID, String time, String date, String name) {
+    public ChatMessage(String from, String message, String type, String to, String messageID, String time, String date, String name) {
         this.from = from;
         this.message = message;
         this.type = type;
@@ -91,8 +91,8 @@ public class Messages
     public boolean equals(@Nullable Object obj) {
         boolean isEqual = false;
 
-        if (obj!=null && obj instanceof Messages) {
-            isEqual = (this.messageID.equals(((Messages) obj).getMessageID()));
+        if (obj!=null && obj instanceof ChatMessage) {
+            isEqual = (this.messageID.equals(((ChatMessage) obj).getMessageID()));
         }
 
         return isEqual;

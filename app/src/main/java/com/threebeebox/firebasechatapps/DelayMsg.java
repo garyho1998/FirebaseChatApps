@@ -1,6 +1,6 @@
 package com.threebeebox.firebasechatapps;
 
-public class DelayMsg extends Messages{
+public class DelayMsg extends ChatMessage {
     public String displayDate;
     public String displayTime;
     public String displayTimestamp;
