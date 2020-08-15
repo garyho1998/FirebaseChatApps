@@ -12,7 +12,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ContactsViewHolder extends RecyclerView.ViewHolder
 {
-    TextView userName, userStatus;
+    TextView userName, userStatus,minorInfo;
     CircleImageView profileImage;
     ImageView onlineIcon;
     public RelativeLayout view_background, view_foreground;
@@ -26,6 +26,8 @@ public class ContactsViewHolder extends RecyclerView.ViewHolder
         userName = itemView.findViewById(R.id.user_profile_name);
         userStatus = itemView.findViewById(R.id.user_status);
         profileImage = itemView.findViewById(R.id.users_profile_image);
-        onlineIcon = (ImageView) itemView.findViewById(R.id.user_online_status);
+        onlineIcon = itemView.findViewById(R.id.user_online_status);
+        minorInfo = itemView.findViewById(R.id.minor_info);
+
     }
 }

@@ -39,16 +39,21 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
     @Override
     protected void onBindViewHolder(@NonNull final ContactsViewHolder holder, int position, @NonNull String value) {
         final String userId = getRef(position).getKey();
+        if(value.equals("Admin")){
+            holder.minorInfo.setText("Admin");
+        }else{
+            holder.minorInfo.setText("");
+        }
         System.out.println("userId:" + userId);
         GroupNameRef.child("Member").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-
                     UsersRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot userSnapshot) {
                             if (userSnapshot.exists()) {
+
                                 String profileName = userSnapshot.child("name").getValue().toString();
                                 String profileStatus = userSnapshot.child("status").getValue().toString();
                                 holder.userName.setText(profileName);
@@ -72,13 +77,13 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
                                     String userImage = userSnapshot.child("image").getValue().toString();
                                     Picasso.get().load(userImage).placeholder(R.drawable.profile_image).into(holder.profileImage);
                                 }
+
+
                             }else{
                                 dataSnapshot.getRef().removeValue();
                                 System.out.println(userId +" not exist anymore");
                             }
-
                         }
-
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
 
