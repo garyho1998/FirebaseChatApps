@@ -69,16 +69,15 @@ public class ChatFragment extends Fragment
         super.onStart();
 
 
-        FirebaseRecyclerOptions<Contacts> options =
-                new FirebaseRecyclerOptions.Builder<Contacts>()
-                        .setQuery(ContactsRef, Contacts.class)
+        FirebaseRecyclerOptions<String> options =
+                new FirebaseRecyclerOptions.Builder<String>()
+                        .setQuery(ChatsRef, String.class)
                         .build();
 
-
-        FirebaseRecyclerAdapter<Contacts, ChatsViewHolder> adapter =
-                new FirebaseRecyclerAdapter<Contacts, ChatsViewHolder>(options) {
+        FirebaseRecyclerAdapter<String, ChatsViewHolder> adapter =
+                new FirebaseRecyclerAdapter<String, ChatsViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull final ChatsViewHolder holder, int position, @NonNull Contacts model)
+                    protected void onBindViewHolder(@NonNull final ChatsViewHolder holder, int position, @NonNull String value)
                     {
                         final String usersIDs = getRef(position).getKey();
                         final String[] retImage = {"default_image"};

@@ -63,7 +63,7 @@ public class ContactFragment extends Fragment implements ContactRecyclerItemTouc
     {
         super.onStart();
 
-        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Contacts>().setQuery(ContactsRef, Contacts.class).build();
+        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<String>().setQuery(ContactsRef, String.class).build();
 
         adapter = new ContactFirebaseRecyclerAdapter(options, UsersRef);
 

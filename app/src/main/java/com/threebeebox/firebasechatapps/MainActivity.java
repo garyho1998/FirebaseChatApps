@@ -124,9 +124,6 @@ public class MainActivity extends AppCompatActivity {
         if(item.getItemId()== R.id.main_settings_option){
             SendUserToSettingsActivity();
         }
-        if(item.getItemId()== R.id.main_find_friends_option){
-            SendUserToFindFriendsActivity();
-        }
         if(item.getItemId()== R.id.main_create_group_option){
             RequestNewGroup();
         }

@@ -24,6 +24,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
     private ProgressDialog loadingBar;
     private String currentUserID, receiverUserID;
 
-    private DatabaseReference UsersRef, ContactsRef, currentUserRef;
+    private DatabaseReference RootRef, UsersRef, ContactsRef, currentUserRef;
     private FirebaseAuth mAuth;
 
     @Override
@@ -50,11 +51,13 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_fd);
 
-        UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        ContactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts");
+        RootRef = FirebaseDatabase.getInstance().getReference();
+        UsersRef = RootRef.child("Users");
+        ContactsRef = RootRef.child("Contacts");
+
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
-        currentUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserID);
+        currentUserRef = RootRef.child("Users").child(currentUserID);
 
         loadingBar = new ProgressDialog(this);
 
@@ -174,7 +177,7 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
         String input = "";
         if (type.equals("phoneNumber")) {
             input = "+" + mPhoneDistictView.getText().toString() + mPhoneNoView.getText().toString();
-            input = input.replaceAll("\\s","");
+            input = input.replaceAll("\\s", "");
         } else if (type.equals("name")) {
             input = mNameView.getText().toString();
         }
@@ -190,20 +193,28 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                             GetFriendAndDisplay(dataSnapshot);
                         }
+
                         @Override
                         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                             GetFriendAndDisplay(dataSnapshot);
                         }
+
                         @Override
-                        public void onChildRemoved(DataSnapshot dataSnapshot) {}
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        }
+
                         @Override
-                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                        }
+
                         @Override
-                        public void onCancelled(DatabaseError databaseError) {}
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
                     });
         }
     }
-    private void GetFriendAndDisplay(DataSnapshot dataSnapshot){
+
+    private void GetFriendAndDisplay(DataSnapshot dataSnapshot) {
         if (dataSnapshot.exists()) {
             final String userID = dataSnapshot.getKey();
             String userName = (String) dataSnapshot.child("name").getValue();
@@ -228,25 +239,32 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
             mAddBtn.setVisibility(View.VISIBLE);
             mResultView.setText("Found");
 
-            if (!userID.equals(currentUserRef.getKey())){
+            if (!userID.equals(currentUserRef.getKey())) {
                 ContactsRef.child(currentUserID).orderByKey().equalTo(userID)
                         .addChildEventListener(new ChildEventListener() {
                             @Override
                             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                                 CheckIfContactNotExists(dataSnapshot);
                             }
+
                             @Override
                             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                                 CheckIfContactNotExists(dataSnapshot);
                             }
+
                             @Override
-                            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                            }
+
                             @Override
-                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                            }
+
                             @Override
-                            public void onCancelled(DatabaseError databaseError) {}
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
                         });
-            }else{
+            } else {
                 mAddBtn.setText("This is you");
                 mAddBtn.setBackgroundResource(R.drawable.dull_button);
                 mAddBtn.setClickable(false);
@@ -254,30 +272,45 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
 
         }
     }
+
     private void CheckIfContactNotExists(DataSnapshot dataSnapshot) {
-        if (dataSnapshot.exists()){
+        if (dataSnapshot.exists()) {
             mAddBtn.setText("Already in your contact!");
             mAddBtn.setBackgroundResource(R.drawable.dull_button);
             mAddBtn.setClickable(false);
         }
     }
+
     private void AddFriendToContact() {
         receiverUserID = mUid.getText().toString();
 
         if (TextUtils.isEmpty(receiverUserID)) {
             Toast.makeText(this, "No target to add to contact", Toast.LENGTH_SHORT).show();
         } else {
-            ContactsRef.child(currentUserID).child(receiverUserID)
-                    .child("Contacts").setValue("Saved")
+            ContactsRef.child(currentUserID).child(receiverUserID).setValue("Saved")
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             mAddBtn.setText("Already in your contact!");
                             mAddBtn.setBackgroundResource(R.drawable.dull_button);
                             mAddBtn.setClickable(false);
+
+                            RootRef.child("Messages").child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    if(!snapshot.hasChild(receiverUserID)){
+                                        RootRef.child("Messages").child(currentUserID).child(receiverUserID).setValue("");
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
                             Toast.makeText(FindFdActivity.this, "Friend added to your contact!", Toast.LENGTH_SHORT).show();
                         }
                     });
+
         }
 
     }
