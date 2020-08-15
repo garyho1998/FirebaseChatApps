@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
  * A simple {@link Fragment} subclass.
  */
 public class ContactFragment extends Fragment implements ContactRecyclerItemTouchHelper.RecyclerItemTouchHelperListener{
+    private static final String TAG = "CalendarFragment";
     private View ContactsView;
     private RecyclerView myContactsList;
 
@@ -35,10 +37,10 @@ public class ContactFragment extends Fragment implements ContactRecyclerItemTouc
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.i(TAG, "onCreateView");
         // Inflate the layout for this fragment
         ContactsView = inflater.inflate(R.layout.fragment_contact, container, false);
 
@@ -57,12 +59,16 @@ public class ContactFragment extends Fragment implements ContactRecyclerItemTouc
         return ContactsView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume");
+    }
 
     @Override
-    public void onStart()
-    {
+    public void onStart(){
         super.onStart();
-
+        Log.i(TAG, "onStart");
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<String>().setQuery(ContactsRef, String.class).build();
 
         adapter = new ContactFirebaseRecyclerAdapter(options, UsersRef);

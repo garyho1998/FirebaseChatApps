@@ -48,8 +48,6 @@ import sun.bob.mcalendarview.vo.MarkedDates;
  * create an instance of this fragment.
  */
 public class CalendarFragment extends Fragment implements EditDelayMsgDialog.EditMsgDialogListener {
-//    implements EditDelayMsgDialog.EditMsgDialogListener
-
     private static final String TAG = "CalendarFragment";
     private ArrayList<String> groupsList = new ArrayList<String>();
     private ArrayList<DelayMsg> delayMsgList = new ArrayList<DelayMsg>();
@@ -67,7 +65,6 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
     private FirebaseAuth mAuth;
     private DatabaseReference GroupsRef, GroupNameRef, DelayMsgRef, CurrentUserRef;
     private Query query;
-
     public CalendarFragment() {
         // Required empty public constructor
     }
@@ -77,6 +74,7 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.i(TAG, "onCreateView");
         calendarFragmentView = inflater.inflate(R.layout.fragment_calendar, container, false);
 
         mCalendarView = (ExpCalendarView) calendarFragmentView.findViewById(R.id.calendarView);
@@ -87,6 +85,8 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
         mExpBtn = (Button) calendarFragmentView.findViewById(R.id.exp_button);
         DelyMessageRecyclerView = (RecyclerView) calendarFragmentView.findViewById(R.id.msgView);
         DelyMessageRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        DelyMessageRecyclerView.setAdapter(new EmptyAdapter());
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
@@ -111,12 +111,14 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
     @Override
     public void onResume() {
         super.onResume();
+        Log.i(TAG, "onResume");
         RetrieveAndMarkDelayDate();
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        Log.i(TAG, "onStart");
         RetrieveAndMarkDelayDate();
 
         mTodayBtn.setOnClickListener(new View.OnClickListener() {
@@ -158,7 +160,11 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
             public void onDateClick(View view, DateData date) {
                 final String selectedDate = TransferMonth(date.getMonth()) + " " + date.getDay() + ", " + date.getYear();
                 mDateTextView.setText(selectedDate);
-                RetrieveAndDisplayDelayMsg(selectedDate);
+                MarkedDates markedDates = mCalendarView.getMarkedDates();
+                ArrayList markDataList = markedDates.getAll();
+                if (markDataList.contains(date)){
+                    RetrieveAndDisplayDelayMsg(selectedDate);
+                }
             }
         });
     }
@@ -195,7 +201,6 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
                     //individual
                     //TODO
                 }
-
 
                 holder.editBtn.setOnClickListener(new View.OnClickListener() {
                     @Override

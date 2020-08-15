@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,7 @@ import java.util.ArrayList;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class GroupFragment extends Fragment {
-
+    private static final String TAG = "GroupFragment";
     private View groupFragmentView;
     private RecyclerView GroupList;
     private ArrayAdapter<Group> arrayAdapter;
@@ -49,6 +50,7 @@ public class GroupFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.i(TAG, "onCreateView");
         GroupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
         groupFragmentView = inflater.inflate(R.layout.fragment_group, container, false);
 
