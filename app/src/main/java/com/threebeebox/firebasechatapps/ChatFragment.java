@@ -1,49 +1,36 @@
 package com.threebeebox.firebasechatapps;
 
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChatFragment extends Fragment implements ChatsFragmentRecyclerAdapter.OnChatListener{
+public class ChatFragment extends Fragment implements ChatsFragmentRecyclerAdapter.OnChatListener {
     private static final String TAG = "ChatFragment";
+    final ArrayList<User> UserList = new ArrayList<>();
+    ChatsFragmentRecyclerAdapter chatsFragmentRecyclerAdapter;
     private View PrivateChatsView;
     private RecyclerView chatsListRecyclerView;
-    ChatsFragmentRecyclerAdapter chatsFragmentRecyclerAdapter;
-    final ArrayList<User> UserList = new ArrayList<>();
-
     private DatabaseReference ChatsRef, UsersRef, ContactsRef;
     private FirebaseAuth mAuth;
     private String currentUserID = "";
@@ -69,12 +56,13 @@ public class ChatFragment extends Fragment implements ChatsFragmentRecyclerAdapt
         return PrivateChatsView;
     }
 
-    private void initRecyclerView(){
-        chatsListRecyclerView = (RecyclerView) PrivateChatsView.findViewById(R.id.chats_list);
+    private void initRecyclerView() {
+        chatsListRecyclerView = PrivateChatsView.findViewById(R.id.chats_list);
         chatsListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        chatsFragmentRecyclerAdapter = new ChatsFragmentRecyclerAdapter(UserList, this);
+        chatsFragmentRecyclerAdapter = new ChatsFragmentRecyclerAdapter(UserList, this, currentUserID);
         chatsListRecyclerView.setAdapter(chatsFragmentRecyclerAdapter);
     }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -84,7 +72,7 @@ public class ChatFragment extends Fragment implements ChatsFragmentRecyclerAdapt
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     final String[] retImage = {"default_image"};
-                    for(DataSnapshot child : dataSnapshot.getChildren()) {
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
                         final String targetID = child.getKey();
 
                         UsersRef.child(targetID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -95,9 +83,9 @@ public class ChatFragment extends Fragment implements ChatsFragmentRecyclerAdapt
                                 target.name = userSnapshot.child("name").getValue().toString();
                                 target.status = userSnapshot.child("status").getValue().toString();
 
-                                if(userSnapshot.hasChild("image")){
+                                if (userSnapshot.hasChild("image")) {
                                     target.image = userSnapshot.child("image").getValue().toString();
-                                }else{
+                                } else {
                                     target.image = retImage[0];
                                 }
                                 if (userSnapshot.child("userState").hasChild("state")) {

@@ -133,7 +133,6 @@ public class GroupInfoActivity extends AppCompatActivity implements ContactRecyc
         adapter.deleteItem(viewHolder.getAdapterPosition());
     }
 
-
     private void RetrieveGroupInfo() {
         RootRef.child("Groups").child(currentGroupID)
                 .addValueEventListener(new ValueEventListener() {
@@ -233,5 +232,4 @@ public class GroupInfoActivity extends AppCompatActivity implements ContactRecyc
         }
 
     }
-
 }

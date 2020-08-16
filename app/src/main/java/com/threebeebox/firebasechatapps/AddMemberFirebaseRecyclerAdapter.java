@@ -16,6 +16,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AddMemberFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<String, ContactsViewHolder> {
     private DatabaseReference UsersRef, GroupNameRef;
@@ -74,6 +78,30 @@ public class AddMemberFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
                         holder.userName.setText(profileName);
                         holder.userStatus.setText(profileStatus);
                     }
+
+                    if (dataSnapshot.child("userState").hasChild("state")) {
+                        String state = dataSnapshot.child("userState").child("state").getValue().toString();
+                        String date = dataSnapshot.child("userState").child("date").getValue().toString();
+
+                        if (state.equals("online")) {
+                            holder.onlineIcon.setVisibility(View.VISIBLE);
+                        } else if (state.equals("offline")) {
+                            holder.onlineIcon.setVisibility(View.INVISIBLE);
+                        }
+
+                        Calendar calendar = Calendar.getInstance();
+                        SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
+                        String today = currentDate.format(calendar.getTime());
+                        if (date.equals(today)) {
+                            holder.minorInfo.setText( dataSnapshot.child("userState").child("time").getValue().toString() );
+                        } else {
+                            holder.minorInfo.setText(date);
+                        }
+                    }
+                    else {
+                        holder.onlineIcon.setVisibility(View.INVISIBLE);
+                    }
+
                     GroupNameRef.child("Member").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
@@ -90,7 +118,8 @@ public class AddMemberFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
                         public void onCancelled(DatabaseError databaseError) {
 
                         }
-                    });                }
+                    });
+                }
             }
 
             @Override

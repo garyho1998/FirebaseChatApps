@@ -5,12 +5,16 @@ import android.view.View;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by ravi on 29/09/17.
  */
 
 public class ContactRecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private RecyclerItemTouchHelperListener listener;
+    Set<Integer> disableSet = new HashSet<Integer>();
 
     public ContactRecyclerItemTouchHelper(int dragDirs, int swipeDirs, RecyclerItemTouchHelperListener listener) {
         super(dragDirs, swipeDirs);
@@ -68,5 +72,21 @@ public class ContactRecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallba
 
     public interface RecyclerItemTouchHelperListener {
         void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position);
+    }
+
+    @Override
+    public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder holder) {
+        System.out.println("getMovementFlags");
+        int position = holder.getAdapterPosition();
+        int dragFlags = 0; // whatever your dragFlags need to be
+        int swipeFlags = 0;
+        if(position != 0){
+            swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        }
+        return makeMovementFlags(dragFlags, swipeFlags);
+    }
+
+    public void setDisable(int position){
+        disableSet.add(position);
     }
 }

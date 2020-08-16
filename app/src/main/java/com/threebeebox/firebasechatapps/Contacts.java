@@ -15,6 +15,7 @@ public class Contacts {
         this.status = status;
         this.image = image;
         this.phoneNumber = phoneNumber;
+
     }
 
     public String getName() {

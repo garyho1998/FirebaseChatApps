@@ -15,6 +15,7 @@ public class ContactsViewHolder extends RecyclerView.ViewHolder
     TextView userName, userStatus,minorInfo;
     CircleImageView profileImage;
     ImageView onlineIcon;
+    boolean swipable = true;
     public RelativeLayout view_background, view_foreground;
 
     public ContactsViewHolder(@NonNull View itemView)

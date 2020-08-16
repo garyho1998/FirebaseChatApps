@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -41,6 +42,8 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
         final String userId = getRef(position).getKey();
         if(value.equals("Admin")){
             holder.minorInfo.setText("Admin");
+            //TODO
+            holder.swipable = false;
         }else{
             holder.minorInfo.setText("");
         }
@@ -118,4 +121,5 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
             }
         });
     }
+
 }

@@ -4,6 +4,7 @@ package com.threebeebox.firebasechatapps;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +15,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 
 import sun.bob.mcalendarview.vo.DateData;
@@ -68,17 +74,9 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
             rcvPicTime = (TextView) itemView.findViewById(R.id.rcv_time_pic);
             dataText = (TextView) itemView.findViewById(R.id.date_text);
 
-            today = Calendar.getInstance();
-            int dd = today.get(Calendar.DAY_OF_MONTH);
-            int mm = today.get(Calendar.MONTH);
-            int yyyy = today.get(Calendar.YEAR);
-            DateData todayDate = new DateData(yyyy, mm, dd);
-            int month = todayDate.getMonth()+1;
-            if (todayDate.getDay()<10) {
-                sToday = TransferMonth(month) + " 0" + todayDate.getDay() + ", " + todayDate.getYear();
-            } else {
-                sToday = TransferMonth(month) + " " + todayDate.getDay() + ", " + todayDate.getYear();
-            }
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
+            sToday = currentDate.format(calendar.getTime());
 
         }
     }
@@ -138,7 +136,7 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
                 //besides a new date view, also add a new receiver view if not from current user
                 if (!from.equals(currentUserID)) {
                     messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
-                    messageViewHolder.rcvNameText.setText(messages.getName());
+                    messageViewHolder.rcvNameText.setText( messages.getName() );
                 }
             }
         } else if (i==0)  {
@@ -152,13 +150,13 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
 
         if (i>1) {
             Messages pm = userMessagesList.get(i-1);
-            if ( !messages.getName().equals(pm.getName()) && !from.equals(currentUserID) ) {
+            if ( !messages.getFrom().equals(pm.getFrom()) && !from.equals(currentUserID) ) {
                 messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
-                messageViewHolder.rcvNameText.setText(messages.getName());
+                messageViewHolder.rcvNameText.setText( messages.getName() );
             }
         } else if (i==0)  {
             messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
-            messageViewHolder.rcvNameText.setText(messages.getName());
+            messageViewHolder.rcvNameText.setText( messages.getName() );
         }
 
 
@@ -215,45 +213,29 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
 
     }
 
-
+    private String FindUserName(String from) {
+        DatabaseReference UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(from);
+        Log.d("findUserName", "ref: " + UserRef.toString());
+        final String[] name = {""};
+        UserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                name[0] = dataSnapshot.child("name").getValue().toString();
+                Log.d("findUserName", "name: " + dataSnapshot.child("name").getValue().toString());
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+        Log.d("findUserName", "return: " + name[0]);
+        return name[0];
+    }
 
 
     @Override
     public int getItemCount()
     {
         return userMessagesList.size();
-    }
-
-    private String TransferMonth(int month) {
-        switch (month){
-            case 1:
-                return "Jan";
-            case 2:
-                return "Feb";
-            case 3:
-                return "Mar";
-            case 4:
-                return "Apr";
-            case 5:
-                return "May";
-            case 6:
-                return "Jun";
-            case 7:
-                return "Jul";
-            case 8:
-                return "Aug";
-            case 9:
-                return "Sep";
-            case 10:
-                return "Oct";
-            case 11:
-                return "Nov";
-            case 12:
-                return "Dec";
-            default:
-                return null;
-        }
-
     }
 
 }

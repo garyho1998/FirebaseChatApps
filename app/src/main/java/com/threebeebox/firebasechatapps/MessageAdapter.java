@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -59,17 +60,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         {
             super(itemView);
 
-            today = Calendar.getInstance();
-            int dd = today.get(Calendar.DAY_OF_MONTH);
-            int mm = today.get(Calendar.MONTH);
-            int yyyy = today.get(Calendar.YEAR);
-            DateData todayDate = new DateData(yyyy, mm, dd);
-            int month = todayDate.getMonth()+1;
-            if (todayDate.getDay()<10) {
-                sToday = TransferMonth(month) + " 0" + todayDate.getDay() + ", " + todayDate.getYear();
-            } else {
-                sToday = TransferMonth(month) + " " + todayDate.getDay() + ", " + todayDate.getYear();
-            }
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
+            sToday = currentDate.format(calendar.getTime());
 
 
             senderMessageText = (TextView) itemView.findViewById(R.id.sender_messsage_text);
@@ -182,7 +175,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 //                            Log.d("checkContact", "inContact = " + Boolean.toString(inContact));
                         }
                     }
-
                     @Override
                     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                         if (dataSnapshot.exists()){
@@ -190,28 +182,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 //                            Log.d("checkContact", "inContact = " + Boolean.toString(inContact));
                         }
                     }
-
                     @Override
                     public void onChildRemoved(DataSnapshot dataSnapshot) {
-
                     }
-
                     @Override
                     public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
                     }
-
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
                     }
                 });
 
 //        Log.d("checkContact", "inContact returned in func " + Boolean.toString(inContact));
         return inContact;
     }
-
-
 
 
 
@@ -243,12 +227,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             if (!checkIfInContact(rcvID)) {
 //                messageViewHolder.inContactText.setVisibility(View.VISIBLE);
-                messageViewHolder.inContactText.setText("NO, not in your contact");
-                Toast.makeText(mcon, "user NOT in your contact!", Toast.LENGTH_SHORT).show();
+//                messageViewHolder.inContactText.setText("NO, not in your contact");
+//                Toast.makeText(mcon, "user NOT in your contact!", Toast.LENGTH_SHORT).show();
             } else {
 //                messageViewHolder.inContactText.setVisibility(View.VISIBLE);
-                messageViewHolder.inContactText.setText("YES, in your contact");
-                Toast.makeText(mcon, "user IN your contact!", Toast.LENGTH_SHORT).show();
+//                messageViewHolder.inContactText.setText("YES, in your contact");
+//                Toast.makeText(mcon, "user IN your contact!", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -332,36 +316,5 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         return userMessagesList.size();
     }
 
-    private String TransferMonth(int month) {
-        switch (month){
-            case 1:
-                return "Jan";
-            case 2:
-                return "Feb";
-            case 3:
-                return "Mar";
-            case 4:
-                return "Apr";
-            case 5:
-                return "May";
-            case 6:
-                return "Jun";
-            case 7:
-                return "Jul";
-            case 8:
-                return "Aug";
-            case 9:
-                return "Sep";
-            case 10:
-                return "Oct";
-            case 11:
-                return "Nov";
-            case 12:
-                return "Dec";
-            default:
-                return null;
-        }
-
-    }
 
 }
