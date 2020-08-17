@@ -121,8 +121,10 @@ public class GroupFragment extends Fragment {
                                                         String last_time = dataSnapshot.child("time").getValue().toString();
                                                         String last_date = dataSnapshot.child("date").getValue().toString();
                                                         if (last_date.equals(sToday)) {
+                                                            holder.lastSend.setVisibility(View.VISIBLE);
                                                             holder.lastSend.setText(last_time);
                                                         } else {
+                                                            holder.lastSend.setVisibility(View.VISIBLE);
                                                             holder.lastSend.setText(last_date);
                                                         }
 

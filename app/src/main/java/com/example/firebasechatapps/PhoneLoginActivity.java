@@ -38,7 +38,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
     private Button SendVerificationCodeButton, VerifyButton;
     private EditText InputPhoneNumber, InputVerificationCode, CountryCode;
     private TextView PhoneText, CodeText, PlusText;
-    private String phoneNumber, countryCode;
+    private String phoneNumber, countryCode, verifyPhone;
 
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
     private FirebaseAuth mAuth;
@@ -83,7 +83,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                     loadingBar.setCanceledOnTouchOutside(false);
                     loadingBar.show();
 
-                    String verifyPhone = "+" + countryCode + phoneNumber;
+                    verifyPhone = "+" + countryCode + phoneNumber;
                     Log.d("phoneAuth", "verifyPhone = " + verifyPhone);
 
                     PhoneAuthProvider.getInstance().verifyPhoneNumber(
@@ -197,7 +197,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                             RootRef.child("Users").child(currentUserID).child("deviceToken").setValue(deviceToken);
                             //RootRef.child("Users").child(currentUserID).child("groups").setValue("");
                             Log.i(TAG, "phoneNumber:" + phoneNumber);
-                            RootRef.child("Users").child(currentUserID).child("phoneNumber").setValue(phoneNumber);
+                            RootRef.child("Users").child(currentUserID).child("phoneNumber").setValue(verifyPhone);
                             loadingBar.dismiss();
                             Toast.makeText(PhoneLoginActivity.this, "Congratulation, you're logged in successfully...", Toast.LENGTH_SHORT).show();
                             SendUserToMainActivity();

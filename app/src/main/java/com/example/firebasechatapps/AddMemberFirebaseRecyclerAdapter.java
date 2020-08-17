@@ -62,8 +62,17 @@ public class AddMemberFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Co
 
                         if (state.equals("online")) {
                             holder.onlineIcon.setVisibility(View.VISIBLE);
+                            holder.userState.setVisibility(View.INVISIBLE);
                         } else if (state.equals("offline")) {
                             holder.onlineIcon.setVisibility(View.INVISIBLE);
+                            Calendar calendar = Calendar.getInstance();
+                            SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
+                            String today = currentDate.format(calendar.getTime());
+                            if (date.equals(today)) {
+                                holder.userState.setText( dataSnapshot.child("userState").child("time").getValue().toString() );
+                            } else {
+                                holder.userState.setText(date);
+                            }
                         }
                     } else {
                         holder.onlineIcon.setVisibility(View.INVISIBLE);
@@ -83,29 +92,6 @@ public class AddMemberFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Co
 
                         holder.userName.setText(profileName);
                         holder.userStatus.setText(profileStatus);
-                    }
-
-                    if (dataSnapshot.child("userState").hasChild("state")) {
-                        String state = dataSnapshot.child("userState").child("state").getValue().toString();
-                        String date = dataSnapshot.child("userState").child("date").getValue().toString();
-
-                        if (state.equals("online")) {
-                            holder.onlineIcon.setVisibility(View.VISIBLE);
-                        } else if (state.equals("offline")) {
-                            holder.onlineIcon.setVisibility(View.INVISIBLE);
-                        }
-
-                        Calendar calendar = Calendar.getInstance();
-                        SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
-                        String today = currentDate.format(calendar.getTime());
-                        if (date.equals(today)) {
-                            holder.userState.setText( dataSnapshot.child("userState").child("time").getValue().toString() );
-                        } else {
-                            holder.userState.setText(date);
-                        }
-                    }
-                    else {
-                        holder.onlineIcon.setVisibility(View.INVISIBLE);
                     }
 
                     GroupNameRef.child("Member").addListenerForSingleValueEvent(new ValueEventListener() {

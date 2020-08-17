@@ -65,18 +65,20 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
 
                                     if (state.equals("online")) {
                                         holder.onlineIcon.setVisibility(View.VISIBLE);
+                                        holder.userState.setVisibility(View.INVISIBLE);
                                     } else if (state.equals("offline")) {
                                         holder.onlineIcon.setVisibility(View.INVISIBLE);
+                                        Calendar calendar = Calendar.getInstance();
+                                        SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
+                                        String today = currentDate.format(calendar.getTime());
+                                        if (date.equals(today)) {
+                                            holder.userState.setText( dataSnapshot.child("userState").child("time").getValue().toString() );
+                                        } else {
+                                            holder.userState.setText(date);
+                                        }
                                     }
 
-                                    Calendar calendar = Calendar.getInstance();
-                                    SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
-                                    String today = currentDate.format(calendar.getTime());
-                                    if (date.equals(today)) {
-                                        holder.userState.setText( userSnapshot.child("userState").child("time").getValue().toString() );
-                                    } else {
-                                        holder.userState.setText(date);
-                                    }
+
                                 }
                                 else {
                                     holder.onlineIcon.setVisibility(View.INVISIBLE);

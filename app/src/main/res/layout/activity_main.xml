@@ -19,21 +19,22 @@
             >
         </include>
 
-        <com.google.android.material.tabs.TabLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/main_tabs"
-            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
-            >
-        </com.google.android.material.tabs.TabLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.example.firebasechatapps.NoSwipeViewPager
+    <FrameLayout
+        android:id="@+id/main_tabs_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/appBarLayout"
+        android:layout_above="@+id/bottom_nav" />
+
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/main_tabs_pager"
-        android:layout_below="@+id/appBarLayout"
-        >
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_navigation"
+        android:background="?android:attr/windowBackground" />
 
-    </com.example.firebasechatapps.NoSwipeViewPager>
 </RelativeLayout>

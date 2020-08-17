@@ -13,10 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -32,9 +34,8 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
-    private NoSwipeViewPager myViewPager;
-    private TabLayout myTabLayout;
-    private TabsAccessorAdapter myTabsAccessorAdapter;
+    private BottomNavigationView bottomNav;
+//    private TabsAccessorAdapter myTabsAccessorAdapter;
 
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
@@ -50,16 +51,14 @@ public class MainActivity extends AppCompatActivity {
         currentUser = mAuth.getCurrentUser();
         RootRef = FirebaseDatabase.getInstance().getReference();
 
+
+
+
         mToolbar = (Toolbar) findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("FirebaseChatApps");
+        bottomNav = findViewById(R.id.bottom_nav);
 
-        myViewPager = (NoSwipeViewPager) findViewById(R.id.main_tabs_pager);
-        myTabsAccessorAdapter = new TabsAccessorAdapter((getSupportFragmentManager()));
-        myViewPager.setAdapter(myTabsAccessorAdapter);
-
-        myTabLayout = (TabLayout) findViewById(R.id.main_tabs);
-        myTabLayout.setupWithViewPager(myViewPager);
     }
 
     @Override
@@ -70,6 +69,36 @@ public class MainActivity extends AppCompatActivity {
         }else{
             updateUserStatus("online");
             VerifyUserExistance();
+
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_tabs_pager, new ChatFragment()).commit();
+
+            BottomNavigationView.OnNavigationItemSelectedListener navListener =
+                    new BottomNavigationView.OnNavigationItemSelectedListener() {
+                        @Override
+                        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                            Fragment selectedFragment = null;
+
+                            switch (item.getItemId()) {
+                                case R.id.nav_chat:
+                                    selectedFragment = new ChatFragment();
+                                    break;
+                                case R.id.nav_group:
+                                    selectedFragment = new GroupFragment();
+                                    break;
+                                case R.id.nav_contact:
+                                    selectedFragment = new ContactFragment();
+                                    break;
+                                case R.id.nav_calender:
+                                    selectedFragment = new CalendarFragment();
+                                    break;
+                            }
+                            getSupportFragmentManager().beginTransaction().replace(R.id.main_tabs_pager, selectedFragment).commit();
+                            return true;
+                        }
+                    };
+            bottomNav.setOnNavigationItemSelectedListener(navListener);
+
+
         }
     }
 
