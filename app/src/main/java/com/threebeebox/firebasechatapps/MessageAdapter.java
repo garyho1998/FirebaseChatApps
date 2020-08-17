@@ -94,49 +94,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         return new MessageViewHolder(view);
     }
 
-    /*
-    private Boolean checkIfInContact(final String rcvID) {
-        final Boolean[] in = {false};
-        final int[] changed = {0};
-        final DatabaseReference contactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-//        Log.d("checkContact", "contactsRef: " + contactsRef.toString());
-
-        contactsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                final Iterator<DataSnapshot> contactItems = dataSnapshot.getChildren().iterator();
-
-                while (contactItems.hasNext()) {
-                    DataSnapshot item = contactItems.next();
-                    Log.d("checkContact", "checking contact: " + item.getKey() + "   with " + rcvID + "\nresult = " + Boolean.toString(item.getKey().equals(rcvID)));
-                    if (item.getKey().equals(rcvID)) {
-//                        inContact = true;
-                        in[0] = true;
-                        changed[0] = 1;
-                        Log.d("checkContact", "in[0] after checking equal: " + Boolean.toString(in[0]));
-
-                        break;
-                    }
-                }
-                in[0] = false;
-                changed[0] = 1;
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                // yourMethod();
-
-            }
-        }, 3000);   //5 seconds
-        Log.d("checkContact", "in[0] RETURN in func: " + Boolean.toString(in[0]));
-        return in[0];
-    }*/
-
 
     private Boolean checkIfInContact(final String rcvID) {
         final Boolean[] exist = {null};
@@ -238,10 +195,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
 
 
-        if (i>1) {
+        if (i>0) {
 
             Messages pm = userMessagesList.get(i-1);
-            if ( !messages.getDate().equals(pm.getDate()) ) {
+            if ( !messages.getDate().equals(pm.getDate()) ) { //display date only if the date is different from previous
                 messageViewHolder.dataText.setVisibility(View.VISIBLE);
                 if ( messages.getDate().equals(sToday) ) {
                     messageViewHolder.dataText.setText("Today");

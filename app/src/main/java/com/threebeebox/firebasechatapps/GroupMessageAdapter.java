@@ -124,7 +124,8 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
         messageViewHolder.rcvPicTime.setVisibility(View.GONE);
         messageViewHolder.dataText.setVisibility(View.GONE);
 
-        if (i>1) {
+        // display date view
+        if (i>0) {
             Messages pm = userMessagesList.get(i-1);
             if ( !messages.getDate().equals(pm.getDate()) ) {
                 messageViewHolder.dataText.setVisibility(View.VISIBLE);
@@ -148,15 +149,18 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
             }
         }
 
-        if (i>1) {
+        //display user name view
+        if (i>0) {
             Messages pm = userMessagesList.get(i-1);
             if ( !messages.getFrom().equals(pm.getFrom()) && !from.equals(currentUserID) ) {
                 messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
                 messageViewHolder.rcvNameText.setText( messages.getName() );
             }
         } else if (i==0)  {
-            messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
-            messageViewHolder.rcvNameText.setText( messages.getName() );
+            if (!from.equals(currentUserID)) {
+                messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
+                messageViewHolder.rcvNameText.setText( messages.getName() );
+            }
         }
 
 

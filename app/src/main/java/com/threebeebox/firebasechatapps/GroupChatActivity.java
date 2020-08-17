@@ -7,7 +7,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
@@ -16,6 +18,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,7 +70,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private RecyclerView userMessagesList;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef, UserMessageKeyRef;
+    private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef, UserMessageKeyRef, NotificationRef;
 
     private String currentGroupName, currentGroupID, currentUserID, currentUserName, currentDate, currentTime;
     private String saveCurrentTime, saveCurrentDate;
@@ -91,6 +94,7 @@ public class GroupChatActivity extends AppCompatActivity {
         currentUserID = mAuth.getCurrentUser().getUid();
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupID);
+        NotificationRef = FirebaseDatabase.getInstance().getReference().child("Notifications");
 
         GetUserInfo();
         InitializeFields();
@@ -453,7 +457,60 @@ public class GroupChatActivity extends AppCompatActivity {
 
                 messageObject.put("messageID", messageKey);
                 messageObject.put("type", "normal");
-                GroupMessageKeyRef.updateChildren(messageObject);
+                messageObject.put("date", currentDate);
+                messageObject.put("time", currentTime);
+                messageObject.put("timestamp", now.getTimeInMillis());
+                GroupMessageKeyRef.updateChildren(messageObject).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful())
+                        {
+                            // find id of all group members, and push a notification...
+                            GroupNameRef.child("Member")
+                                    .addChildEventListener(new ChildEventListener() {
+                                        @Override
+                                        public void onChildAdded(DataSnapshot dataSnapshot, String s)
+                                        {
+                                            String memberID = dataSnapshot.getKey();
+                                            Log.d("notif", "memberID: " + dataSnapshot.getRef().toString() + "\nkey: " + dataSnapshot.getKey());
+
+                                            if (!memberID.equals(currentUserID)) {
+                                                HashMap<String, String> chatNotification = new HashMap<>();
+                                                chatNotification.put("from", currentGroupID);
+                                                chatNotification.put("type", "groupChat");
+
+                                                NotificationRef.child(memberID).push()
+                                                        .setValue(chatNotification)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    Toast.makeText(GroupChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            }
+                                                        });
+                                            }
+                                        }
+                                        @Override
+                                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                                        }
+                                        @Override
+                                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                        }
+                                        @Override
+                                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                                        }
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                        }
+                                    });
+
+                        } else {
+                            Toast.makeText(GroupChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                        }
+                        userMessageInput.setText("");
+                    }
+                });
             } else { //DelayChat
                 DatabaseReference GroupDelayRef = GroupNameRef.child("DelayMessage");
                 String messageKey = GroupDelayRef.push().getKey();

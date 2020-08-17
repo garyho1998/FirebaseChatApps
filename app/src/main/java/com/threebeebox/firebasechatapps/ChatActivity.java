@@ -59,7 +59,8 @@ public class ChatActivity extends AppCompatActivity {
     private CircleImageView userImage;
     private Toolbar ChatToolBar;
     private FirebaseAuth mAuth;
-    private DatabaseReference RootRef;
+    private DatabaseReference RootRef, NotificationRef;
+
     private ImageButton SendMessageButton, SendFilesButton;
     private EditText MessageInputText;
     private LinearLayoutManager linearLayoutManager;
@@ -78,6 +79,7 @@ public class ChatActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         messageSenderID = mAuth.getCurrentUser().getUid();
         RootRef = FirebaseDatabase.getInstance().getReference();
+        NotificationRef = FirebaseDatabase.getInstance().getReference().child("Notifications");
 
 
         messageReceiverID = getIntent().getExtras().get("visit_user_id").toString();
@@ -350,10 +352,27 @@ public class ChatActivity extends AppCompatActivity {
 
             RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                 @Override
-                public void onComplete(@NonNull Task task) {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(ChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
-                    } else {
+                public void onComplete(@NonNull Task task)
+                {
+                    if (task.isSuccessful())
+                    {
+                        HashMap<String, String> chatNotification = new HashMap<>();
+                        chatNotification.put("from", messageSenderID);
+                        chatNotification.put("type", "chat");
+
+                        NotificationRef.child(messageReceiverID).push()
+                                .setValue(chatNotification)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(ChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                    }
+                    else
+                    {
                         Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                     }
                     MessageInputText.setText("");
