@@ -40,7 +40,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="20dp"
                     android:text="InfoName"
-                    android:textColor="#00B8D4"
+                    android:textColor="@color/colorAccent"
                     android:textSize="20dp"
                     android:textStyle="bold" />
 
@@ -57,7 +57,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorAccent"
+                    android:background="@color/white"
                     android:orientation="vertical"
                     android:paddingTop="40dp"
                     android:paddingRight="10dp">
@@ -69,7 +69,7 @@
                         android:paddingLeft="10dp"
                         android:layout_marginLeft="10dp"
                         android:text="Member List"
-                        android:textColor="#00B8D4"
+                        android:textColor="@color/colorAccent"
                         android:textSize="16dp"
                         android:textStyle="bold" />
 
@@ -84,7 +84,7 @@
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="0dp"
                             android:layout_marginRight="10dp"
-                            android:background="#FFFFFF"
+                            android:background="@color/windowBackground"
                             android:orientation="vertical">
 
                             <de.hdodenhof.circleimageview.CircleImageView
@@ -111,7 +111,7 @@
                                     android:layout_marginLeft="80dp"
                                     android:paddingLeft="5dp"
                                     android:text="Add Members"
-                                    android:textColor="#00B8D4"
+                                    android:textColor="@color/colorAccent"
                                     android:textSize="18dp" />
 
                             </LinearLayout>
@@ -132,7 +132,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorAccent"
+                    android:background="@color/windowBackground"
                     android:orientation="vertical"
                     android:layout_marginTop="20dp"
                     android:padding="10dp"

@@ -11,7 +11,7 @@
         android:id="@+id/monthView"
         android:layout_width="match_parent"
         android:layout_height="37dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorPrimary"
         android:padding="6dp"
         android:text="month displayed"
         android:textAlignment="center"
@@ -24,11 +24,11 @@
         android:id="@+id/today_button"
         android:layout_width="75dp"
         android:layout_height="37dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorPrimary"
         android:padding="2dp"
         android:text="Today"
         android:textAllCaps="false"
-        android:textColor="@android:color/background_light"
+        android:textColor="@color/colorFourth"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="@id/monthView" />
 
@@ -36,11 +36,11 @@
         android:id="@+id/exp_button"
         android:layout_width="75dp"
         android:layout_height="37dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorPrimary"
         android:padding="2dp"
         android:text="Shrink"
         android:textAllCaps="false"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorFourth"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="@id/monthView" />
 
@@ -76,10 +76,10 @@
 
         <TextView
             android:id="@+id/dateView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/calendarView"
-            android:background="#ffffff"
+            android:background="@color/colorPrimary"
             android:text="date selected"
             android:textSize="20sp" />
 

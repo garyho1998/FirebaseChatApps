@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GroupChatActivity">
+    tools:context=".GroupChatActivity"
+    >
 
 
     <include
@@ -21,8 +22,6 @@
         android:layout_below="@+id/group_chat_bar_layout"
         android:layout_above="@+id/myLinearLayout"
         android:layout_marginBottom="0dp"
-
-        android:background="@color/colorAccent"
         >
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -77,6 +76,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="65dp"
+        app:backgroundTint="@color/white"
         android:clickable="true"
         android:src="@drawable/ic_calendar" />
 </RelativeLayout>
