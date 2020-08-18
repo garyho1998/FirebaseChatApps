@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "850580800882-thajgkovh5go6b098i30ard2orkn3o4l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.firebasechatapps",
+            "certificate_hash": "79c7cb516d1469fb090f5a3cbaa2bcf30521a28c"
+          }
+        },
+        {
           "client_id": "850580800882-1i99a4ce3ph1b92vc22mlrdd0anj2jpb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -61,20 +69,12 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:850580800882:android:95e188cb43a8ef55f449eb",
+        "mobilesdk_app_id": "1:850580800882:android:e1a0deef5c8ac1a1f449eb",
         "android_client_info": {
           "package_name": "com.threebeebox.firebasechatapps"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "850580800882-pplvpn7i74l48dtrkuutqt5c3frng6oi.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.threebeebox.firebasechatapps",
-            "certificate_hash": "e2d0730a386a703c59fb88dd8ee5f7b238836e10"
-          }
-        },
         {
           "client_id": "850580800882-hsbfhg0igconaggo5aobm7dmg2uva64j.apps.googleusercontent.com",
           "client_type": 3
