@@ -39,11 +39,6 @@
             android:parentActivityName="com.threebeebox.firebasechatapps.GroupChatActivity" />
 
         <receiver android:name="com.threebeebox.firebasechatapps.AlarmReceiver" />
-
-        <activity
-            android:name="com.threebeebox.firebasechatapps.RegisterActivity"
-            android:parentActivityName="com.threebeebox.firebasechatapps.LoginActivity" />
-        <activity android:name="com.threebeebox.firebasechatapps.LoginActivity" />
         <activity
             android:name="com.threebeebox.firebasechatapps.FindFriendsActivity"
             android:parentActivityName="com.threebeebox.firebasechatapps.MainActivity" />

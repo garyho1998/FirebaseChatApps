@@ -202,19 +202,9 @@ public class ChatActivity extends AppCompatActivity {
 
                 final StorageReference filePath = storageReference.child(messagePushID + "." + "jpg");
 
-                filePath.putBytes(bytes).addOnCompleteListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                filePath.putBytes(bytes).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                final String myUri = task.getResult().getDownloadUrl().toString();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onSuccess(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()) {
 
 

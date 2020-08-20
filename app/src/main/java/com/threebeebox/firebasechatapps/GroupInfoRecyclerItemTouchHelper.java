@@ -85,9 +85,13 @@ public class GroupInfoRecyclerItemTouchHelper extends ItemTouchHelper.SimpleCall
         System.out.println("getMovementFlags");
 
         int dragFlags = 0;
-        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
-
-        if (((TextView) viewHolder.itemView).getText().equals("Contact already in group")) {
+        int swipeFlags = ItemTouchHelper.START;
+        ContactsViewHolder holder = (ContactsViewHolder) viewHolder;
+        if(holder.minorInfo.getText().equals("Admin")){
+            return makeMovementFlags(dragFlags, 0);
+        }
+        System.out.println("SwipeSingleton.getInstance().isAdmin: "+ GroupSingleton.getInstance().isAdmin);
+        if(!GroupSingleton.getInstance().isAdmin){
             return makeMovementFlags(dragFlags, 0);
         }
         return makeMovementFlags(dragFlags, swipeFlags);

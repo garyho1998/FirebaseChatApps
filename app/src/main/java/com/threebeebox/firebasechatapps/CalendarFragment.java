@@ -1,6 +1,7 @@
 package com.threebeebox.firebasechatapps;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -64,7 +65,9 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
     private String groupName = "";
     private FirebaseAuth mAuth;
     private DatabaseReference GroupsRef, GroupNameRef, DelayMsgRef, CurrentUserRef;
+    FirebaseRecyclerAdapter<DelayMessageRef, DelayMsgViewHolder> adapter;
     private Query query;
+
     public CalendarFragment() {
         // Required empty public constructor
     }
@@ -85,7 +88,6 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
         mExpBtn = (Button) calendarFragmentView.findViewById(R.id.exp_button);
         DelyMessageRecyclerView = (RecyclerView) calendarFragmentView.findViewById(R.id.msgView);
         DelyMessageRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
         DelyMessageRecyclerView.setAdapter(new EmptyAdapter());
 
         mAuth = FirebaseAuth.getInstance();
@@ -162,9 +164,8 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
                 mDateTextView.setText(selectedDate);
                 MarkedDates markedDates = mCalendarView.getMarkedDates();
                 ArrayList markDataList = markedDates.getAll();
-                if (markDataList.contains(date)){
-                    RetrieveAndDisplayDelayMsg(selectedDate);
-                }
+                RetrieveAndDisplayDelayMsg(selectedDate);
+                adapter.notifyDataSetChanged();
             }
         });
     }
@@ -173,13 +174,13 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
         query = CurrentUserRef.child("DelayMessage").orderByChild("displayDate").equalTo(selectedDate);
         FirebaseRecyclerOptions<DelayMessageRef> options = new FirebaseRecyclerOptions.Builder<DelayMessageRef>().setQuery(query, DelayMessageRef.class).build();
 
-        FirebaseRecyclerAdapter<DelayMessageRef, DelayMsgViewHolder> adapter = new FirebaseRecyclerAdapter<DelayMessageRef, DelayMsgViewHolder>(options) {
+        adapter = new FirebaseRecyclerAdapter<DelayMessageRef, DelayMsgViewHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull final DelayMsgViewHolder holder, final int position, @NonNull final DelayMessageRef delayMessageRef) {
                 final String messageID = getRef(position).getKey();
                 System.out.println("messageID:" + messageID);
 
-                String ref = delayMessageRef.getRef(); //can be groupID or UserID of individual messages
+                final String ref = delayMessageRef.getRef(); //can be groupID or UserID of individual messages
                 String type = delayMessageRef.getType();
 
                 if (type.equals("group")) {
@@ -190,6 +191,38 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
 //                            Log.i(TAG, dataSnapshot.getKey());
                             holder.delayMsg.setText((String) dataSnapshot.child("message").getValue());
                             holder.displayTime.setText((String) dataSnapshot.child("displayTime").getValue());
+
+                            holder.editBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, ref, messageID);
+                                    dialog.show(getFragmentManager() , "edit dialog");
+                                }
+                            });
+                             holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext(), R.style.AlertDialog);
+                                    dialog.setMessage("Are you sure?");
+                                    dialog.setTitle("Delete delay message");
+                                    dialog.setPositiveButton("Yes",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog,
+                                                                    int which) {
+                                                    DelayMsgRef.child(messageID).removeValue();
+                                                    Toast.makeText(getContext(), "Delay message deleted!", Toast.LENGTH_LONG).show();
+                                                    RetrieveAndMarkDelayDate();
+                                                }
+                                            });
+                                    dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    });
+                                    AlertDialog alertDialog = dialog.create();
+                                    alertDialog.show();
+                                }
+                            });
                         }
 
                         @Override
@@ -197,24 +230,12 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
 
                         }
                     });
+
                 } else {
                     //individual
                     //TODO
                 }
 
-                holder.editBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //TODO
-                    }
-                });
-
-                holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //TODO
-                    }
-                });
             }
 
             @NonNull

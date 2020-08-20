@@ -1,17 +1,20 @@
 package com.threebeebox.firebasechatapps;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -41,18 +44,20 @@ import java.io.IOException;
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
-public class GroupInfoActivity extends AppCompatActivity implements ContactRecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
+public class GroupInfoActivity extends AppCompatActivity implements GroupInfoRecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
     private Toolbar mToolbar;
     private FirebaseAuth mAuth;
     private RecyclerView MemberList;
     private DatabaseReference RootRef, UsersRef, ContactRef, GroupNameRef;
     private String currentUserID, currentGroupName, currentGroupID;
+    public boolean isAdmin;
     private GroupInfoFirebaseRecyclerAdapter adapter;
 
     private static final int GalleryPick = 1;
     private StorageReference UserProfileImagesRef;
     private CircleImageView userProfileImage;
     private RelativeLayout Add_member_relativeLayout;
+    private LinearLayout exitGroup;
     private ProgressDialog loadingBar;
     private TextView InfoName;
 
@@ -75,7 +80,13 @@ public class GroupInfoActivity extends AppCompatActivity implements ContactRecyc
 
         MemberList = (RecyclerView) findViewById(R.id.member_list);
         MemberList.setLayoutManager(new LinearLayoutManager(this));
-
+        exitGroup = (LinearLayout) findViewById(R.id.exitGroup);
+        exitGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeUser();
+            }
+        });
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         Add_member_relativeLayout = (RelativeLayout) findViewById(R.id.add_member_relativeLayout);
 
@@ -84,24 +95,21 @@ public class GroupInfoActivity extends AppCompatActivity implements ContactRecyc
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Group Info");
 
-        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ContactRecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(MemberList);
-
         InfoName = (TextView) findViewById(R.id.infoName);
         UserProfileImagesRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
         userProfileImage = (CircleImageView) findViewById(R.id.set_profile_image);
         userProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, GalleryPick);
+                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).setAspectRatio(1, 1).start(GroupInfoActivity.this);
             }
         });
         loadingBar = new ProgressDialog(this);
 
         RetrieveGroupInfo();
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new GroupInfoRecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(MemberList);
     }
 
     public void onStart() {
@@ -129,8 +137,22 @@ public class GroupInfoActivity extends AppCompatActivity implements ContactRecyc
     }
 
     @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        adapter.deleteItem(viewHolder.getAdapterPosition());
+    public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        new AlertDialog.Builder(this)
+                .setTitle("Alert")
+                .setMessage("Do you really want to remove this user?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        adapter.deleteItem(viewHolder.getAdapterPosition());
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                    }
+                }).show();
     }
 
     private void RetrieveGroupInfo() {
@@ -204,10 +226,10 @@ public class GroupInfoActivity extends AppCompatActivity implements ContactRecyc
                         if (task.isSuccessful()) {
                             Toast.makeText(GroupInfoActivity.this, "Profile Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
 
-                            final String downloaedUrl  = task.getResult().getDownloadUrl().toString();
+                            final String downloaedUrl = task.getResult().getDownloadUrl().toString();
 
                             RootRef.child("Groups").child(currentGroupID).child("image")
-                                    .setValue(downloaedUrl )
+                                    .setValue(downloaedUrl)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
@@ -230,6 +252,45 @@ public class GroupInfoActivity extends AppCompatActivity implements ContactRecyc
                 });
             }
         }
+    }
+
+    public void removeUser() {
+        new AlertDialog.Builder(this)
+                .setTitle("Alert")
+                .setMessage("Do you really want to remove this user?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if (isAdmin) { //assign other user as admin if no other admin
+                            //TODO
+                        }
+                        GroupNameRef.child("Member").child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot userSnapshot) {
+                                if (userSnapshot.exists()) {
+                                    userSnapshot.getRef().removeValue();
+                                } else {
+                                    System.out.println(currentUserID + " not exist when deleteItem");
+                                }
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {}
+                        });
+                        UsersRef.child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot userSnapshot) {
+                                if (userSnapshot.exists()) {
+                                    userSnapshot.child("groups").child(currentGroupID).getRef().removeValue();
+                                } else {
+                                    System.out.println(currentUserID + " not exist when deleteItem");
+                                }
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {}
+                        });
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null).show();
 
     }
 }

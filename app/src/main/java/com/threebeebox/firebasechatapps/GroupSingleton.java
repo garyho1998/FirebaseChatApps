@@ -1,16 +1,15 @@
 package com.threebeebox.firebasechatapps;
 
-public class SwipeSingleton  {
+public class GroupSingleton {
 
-    private static SwipeSingleton INSTANCE = null;
-    public Boolean isSwipable = false;
+    private static GroupSingleton INSTANCE = null;
     public Boolean isAdmin = false;
 
-    private SwipeSingleton() {};
+    private GroupSingleton() {};
 
-    public static SwipeSingleton getInstance() {
+    public static GroupSingleton getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new SwipeSingleton();
+            INSTANCE = new GroupSingleton();
         }
         return(INSTANCE);
     }

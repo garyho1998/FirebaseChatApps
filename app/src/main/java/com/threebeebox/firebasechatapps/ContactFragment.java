@@ -1,9 +1,11 @@
 package com.threebeebox.firebasechatapps;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -78,9 +80,23 @@ public class ContactFragment extends Fragment implements ContactRecyclerItemTouc
     }
 
     @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+    public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction, int position) {
         if (viewHolder instanceof ContactsViewHolder) {
-            adapter.deleteItem(viewHolder.getAdapterPosition());
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Alert")
+                    .setMessage("Do you really want to remove this user?")
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            adapter.deleteItem(viewHolder.getAdapterPosition());
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            adapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                        }
+                    }).show();
         }
     }
 }

@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -73,6 +74,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef, UserMessageKeyRef, NotificationRef;
 
     private String currentGroupName, currentGroupID, currentUserID, currentUserName, currentDate, currentTime;
+    public Boolean isAdamin;
     private String saveCurrentTime, saveCurrentDate;
     private String myUri = "";
     private ProgressDialog loadingBar;
@@ -463,14 +465,12 @@ public class GroupChatActivity extends AppCompatActivity {
                 GroupMessageKeyRef.updateChildren(messageObject).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful())
-                        {
+                        if (task.isSuccessful()) {
                             // find id of all group members, and push a notification...
                             GroupNameRef.child("Member")
                                     .addChildEventListener(new ChildEventListener() {
                                         @Override
-                                        public void onChildAdded(DataSnapshot dataSnapshot, String s)
-                                        {
+                                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                                             String memberID = dataSnapshot.getKey();
                                             Log.d("notif", "memberID: " + dataSnapshot.getRef().toString() + "\nkey: " + dataSnapshot.getKey());
 
@@ -491,15 +491,19 @@ public class GroupChatActivity extends AppCompatActivity {
                                                         });
                                             }
                                         }
+
                                         @Override
                                         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                                         }
+
                                         @Override
                                         public void onChildRemoved(DataSnapshot dataSnapshot) {
                                         }
+
                                         @Override
                                         public void onChildMoved(DataSnapshot dataSnapshot, String s) {
                                         }
+
                                         @Override
                                         public void onCancelled(DatabaseError databaseError) {
                                         }

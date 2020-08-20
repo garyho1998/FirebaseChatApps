@@ -1,7 +1,9 @@
 package com.threebeebox.firebasechatapps;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -13,7 +15,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class AddMemberActivity extends AppCompatActivity implements ContactRecyclerItemTouchHelper.RecyclerItemTouchHelperListener{
+public class AddMemberActivity extends AppCompatActivity implements AddMemberRecyclerItemTouchHelper.RecyclerItemTouchHelperListener{
     private Toolbar mToolbar;
     private FirebaseAuth mAuth;
     private RecyclerView myContactsList;
@@ -46,7 +48,7 @@ public class AddMemberActivity extends AppCompatActivity implements ContactRecyc
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Add Members");
 
-        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ContactRecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new AddMemberRecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(myContactsList);
     }
 
@@ -65,8 +67,22 @@ public class AddMemberActivity extends AppCompatActivity implements ContactRecyc
     }
 
     @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        adapter.AddMember(viewHolder.getAdapterPosition());
+    public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        new AlertDialog.Builder(this)
+                .setTitle("Alert")
+                .setMessage("Add this user to group?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        adapter.AddMember(viewHolder.getAdapterPosition());
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                    }
+                }).show();
     }
 
 

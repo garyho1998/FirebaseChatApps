@@ -77,12 +77,9 @@ public class ContactRecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallba
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder holder) {
         System.out.println("getMovementFlags");
-        int position = holder.getAdapterPosition();
-        int dragFlags = 0; // whatever your dragFlags need to be
-        int swipeFlags = 0;
-        if(position != 0){
-            swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
-        }
+
+        int dragFlags = 0;
+        int swipeFlags = ItemTouchHelper.START;
         return makeMovementFlags(dragFlags, swipeFlags);
     }
 

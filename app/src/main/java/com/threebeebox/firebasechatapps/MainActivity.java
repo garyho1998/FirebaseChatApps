@@ -49,13 +49,16 @@ public class MainActivity extends AppCompatActivity {
         currentUser = mAuth.getCurrentUser();
         RootRef = FirebaseDatabase.getInstance().getReference();
 
-
-
-
         mToolbar = (Toolbar) findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("FirebaseChatApps");
         bottomNav = findViewById(R.id.bottom_nav);
+
+        if(currentUser==null){
+            SendUserToLoginActivity();
+        }else{
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_tabs_pager, new ChatFragment()).commit();
+        }
 
     }
 
@@ -67,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
         }else{
             updateUserStatus("online");
             VerifyUserExistance();
-
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_tabs_pager, new ChatFragment()).commit();
 
             BottomNavigationView.OnNavigationItemSelectedListener navListener =
                     new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -99,16 +100,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
-/*
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        if (currentUser != null) {
-            updateUserStatus("offline");
-        }
-    }*/
 
     @Override
     protected void onDestroy() {

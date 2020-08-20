@@ -19,4 +19,6 @@
     <style name="AlertDialog" parent="Base.Theme.AppCompat.Light.Dialog"></style>
 
     <style name="date_picker_theme" parent="@android:style/Widget.DatePicker"/>
+
+
 </resources>

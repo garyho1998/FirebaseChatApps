@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -14,9 +13,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<String, ContactsViewHolder> {
     private DatabaseReference UsersRef, GroupNameRef;
@@ -45,9 +41,11 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
         final String userId = getRef(position).getKey();
         if(value.equals("Admin")){
             holder.minorInfo.setText("Admin");
-            //TODO
-            holder.swipable = false;
-        }else{
+            if (userId.equals(currentUserID)){
+                GroupSingleton.getInstance().isAdmin = true;
+                System.out.println("isAdmin: true");
+            }
+        }else {
             holder.minorInfo.setText("");
         }
         System.out.println("userId:" + userId);
@@ -72,17 +70,8 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
 
                                     if (state.equals("online")) {
                                         holder.onlineIcon.setVisibility(View.VISIBLE);
-                                        holder.minorInfo.setVisibility(View.INVISIBLE);
                                     } else if (state.equals("offline")) {
                                         holder.onlineIcon.setVisibility(View.INVISIBLE);
-                                        Calendar calendar = Calendar.getInstance();
-                                        SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
-                                        String today = currentDate.format(calendar.getTime());
-                                        if (date.equals(today)) {
-                                            holder.minorInfo.setText( dataSnapshot.child("userState").child("time").getValue().toString() );
-                                        } else {
-                                            holder.minorInfo.setText(date);
-                                        }
                                     }
                                 }
                                 else {

@@ -84,13 +84,18 @@ public class AddMemberRecyclerItemTouchHelper extends ItemTouchHelper.SimpleCall
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         System.out.println("getMovementFlags");
 
-        int dragFlags = 0;
-        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        int swipeFlags = ItemTouchHelper.START;
 
-        if (((TextView) viewHolder.itemView).getText().equals("Contact already in group")) {
-            return makeMovementFlags(dragFlags, 0);
+        ContactsViewHolder holder = (ContactsViewHolder) viewHolder;
+        System.out.println("((TextView) holder.userStatus).getText(): "+ ((TextView) holder.userStatus).getText());
+        if (((TextView) holder.userStatus).getText().equals("Contact already in group")) {
+            return makeMovementFlags(0, 0);
         }
-        return makeMovementFlags(dragFlags, swipeFlags);
+        System.out.println("SwipeSingleton.getInstance().isAdmin: "+ GroupSingleton.getInstance().isAdmin);
+        if(!GroupSingleton.getInstance().isAdmin){
+            return makeMovementFlags(0, 0);
+        }
+        return makeMovementFlags(0, swipeFlags);
     }
 
     public interface RecyclerItemTouchHelperListener {
