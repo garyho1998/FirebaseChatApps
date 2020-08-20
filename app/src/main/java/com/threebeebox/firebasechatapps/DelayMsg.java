@@ -1,36 +1,41 @@
 package com.threebeebox.firebasechatapps;
 
-public class DelayMsg {
-    public String message, displayDate, displayTime, messageID;
+public class DelayMsg extends Messages{
+    public String displayDate, displayTime;
+    public String from, message, type, to, messageID, time, date, name;
+    public Long timestamp , displayTimestamp;
     public DelayMsg()
     {
-        message = "String: A default delay message";
-        displayTime = "String: A default display time";
-
     }
 
-    public DelayMsg(String messageID, String message, String displayTime, String displayDate) {
-        this.messageID = messageID;
-        this.message = message;
+    public DelayMsg(Long displayTimestamp, String displayTime, String displayDate,
+                    String from, String message, String type, String to, String messageID, String time, String date, String name, Long timestamp) {
+        super(from, message, type, to, messageID, time, date, name, timestamp);
         this.displayTime = displayTime;
         this.displayDate = displayDate;
-
+        this.displayTimestamp = displayTimestamp;
+    }
+    public Long getDisplayTimestamp() {
+        return displayTimestamp;
     }
 
-    public  String getId() { return messageID; }
-
-    public String getMessage() { return message; }
-
-    public void setMessage(String message) {
-        this.message = message;
+    public void setDisplayTimestamp(Long displayTimestamp) {
+        this.displayTimestamp = displayTimestamp;
     }
 
-    public String getDisplayTime() { return displayTime; }
+    public String getDisplayDate() {
+        return displayDate;
+    }
 
-    public void setDisplayTime(String displayTime) { this.displayTime = displayTime; }
+    public void setDisplayDate(String displayDate) {
+        this.displayDate = displayDate;
+    }
 
-    public String getDisplayDate() { return displayDate; }
+    public String getDisplayTime() {
+        return displayTime;
+    }
 
-    public void setDisplayDate(String displayDate) { this.displayDate = displayDate; }
-
+    public void setDisplayTime(String displayTime) {
+        this.displayTime = displayTime;
+    }
 }

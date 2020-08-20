@@ -5,8 +5,8 @@
     <color name="colorAccent">#4F7CAC</color>
     <color name="colorFourth">#BDEDE0</color>
     <color name="windowBackground">#FFFFFF</color>
-    <color name="delete">#FF1744</color>
-    <color name="add">#76FF03</color>
+    <color name="delete">#d11a2a</color>
+    <color name="add">#2AD11A</color>
     <color name="disable">#ff777777</color>
     <color name="grey">#B3B3B3</color>
     <color name="green">#00BFA5</color>

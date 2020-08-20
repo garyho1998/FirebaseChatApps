@@ -4,14 +4,15 @@ import androidx.annotation.Nullable;
 
 public class Messages
 {
-    private String from, message, type, to, messageID, time, date, name;
+    public String from, message, type, to, messageID, time, date, name;
+    public Long timestamp;
 
     public Messages()
     {
 
     }
 
-    public Messages(String from, String message, String type, String to, String messageID, String time, String date, String name) {
+    public Messages(String from, String message, String type, String to, String messageID, String time, String date, String name, Long timestamp) {
         this.from = from;
         this.message = message;
         this.type = type;
@@ -20,6 +21,7 @@ public class Messages
         this.time = time;
         this.date = date;
         this.name = name;
+        this.timestamp = timestamp;
     }
 
     public String getFrom() {
@@ -86,6 +88,13 @@ public class Messages
         this.name = name;
     }
 
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
 
     @Override
     public boolean equals(@Nullable Object obj) {

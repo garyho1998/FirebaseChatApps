@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
 
         mToolbar = (Toolbar) findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("FirebaseChatApps");
+        getSupportActionBar().setTitle("3BeeBox");
         bottomNav = findViewById(R.id.bottom_nav);
 
         if(currentUser==null){
@@ -270,8 +270,17 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
 
     }
 
+    //For edit msg in CalendarFragment
     @Override
     public void applyEdit(String groupID, String msgID, String msg, String date, String time) {
+        Toast.makeText(MainActivity.this, "Delay message edited" + msg, Toast.LENGTH_SHORT).show();
 
+        DatabaseReference msgRef = RootRef.child("Groups").child(groupID).child("DelayMessage").child(msgID);
+        msgRef.child("message").setValue(msg);
+        msgRef.child("displayDate").setValue(date);
+        msgRef.child("displayTime").setValue(time);
+
+        RootRef.child("Users").child(currentUserID).child("DelayMessage").child(msgID).child("displayDate").setValue(date);
+        onResume();
     }
 }

@@ -25,16 +25,17 @@ public class EditDelayMsgDialog extends AppCompatDialogFragment {
 
     private EditText editMsg, editDate, editTime;
     private TextView textID;
-    private String groupID, msgID;
+    private String groupID, msgID, currentUserID;
     private Boolean isAct;
     private EditMsgDialogListener listener;
 
-    private DatabaseReference GroupRef;
+    private DatabaseReference GroupRef, UserRef;
 
     public EditDelayMsgDialog(Boolean isAct, String groupID, String msgID) {
         this.isAct = isAct;
         this.groupID = groupID;
         this.msgID = msgID;
+        this.currentUserID = currentUserID;
     }
 //    @NonNull
     @Override
@@ -59,7 +60,6 @@ public class EditDelayMsgDialog extends AppCompatDialogFragment {
                 editDate.setText(msg.getDisplayDate());
                 editTime.setText(msg.getDisplayTime());
                 textID.setText(msg.messageID);
-
             }
 
             @Override
@@ -82,7 +82,6 @@ public class EditDelayMsgDialog extends AppCompatDialogFragment {
                         String msg = editMsg.getText().toString();
                         String date = editDate.getText().toString();
                         String time = editTime.getText().toString();
-                        String id = textID.getText().toString();
                         listener.applyEdit(groupID, msgID, msg, date, time);
                     }
                 });

@@ -48,7 +48,7 @@ import sun.bob.mcalendarview.vo.MarkedDates;
  * Use the  factory method to
  * create an instance of this fragment.
  */
-public class CalendarFragment extends Fragment implements EditDelayMsgDialog.EditMsgDialogListener {
+public class CalendarFragment extends Fragment{
     private static final String TAG = "CalendarFragment";
     private ArrayList<String> groupsList = new ArrayList<String>();
     private ArrayList<DelayMsg> delayMsgList = new ArrayList<DelayMsg>();
@@ -192,37 +192,38 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
                             holder.delayMsg.setText((String) dataSnapshot.child("message").getValue());
                             holder.displayTime.setText((String) dataSnapshot.child("displayTime").getValue());
 
-//                            holder.editBtn.setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, ref, messageID);
-//                                    dialog.show(getChildFragmentManager() , "edit dialog");
-//                                }
-//                            });
-//                             holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext(), R.style.AlertDialog);
-//                                    dialog.setMessage("Are you sure?");
-//                                    dialog.setTitle("Delete delay message");
-//                                    dialog.setPositiveButton("Yes",
-//                                            new DialogInterface.OnClickListener() {
-//                                                public void onClick(DialogInterface dialog,
-//                                                                    int which) {
-//                                                    DelayMsgRef.child(messageID).removeValue();
-//                                                    Toast.makeText(getContext(), "Delay message deleted!", Toast.LENGTH_LONG).show();
-//                                                    RetrieveAndMarkDelayDate();
-//                                                }
-//                                            });
-//                                    dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(DialogInterface dialog, int which) {
-//                                        }
-//                                    });
-//                                    AlertDialog alertDialog = dialog.create();
-//                                    alertDialog.show();
-//                                }
-//                            });
+                            holder.editBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, ref, messageID);
+                                    dialog.show(getChildFragmentManager() , "edit dialog");
+                                }
+                            });
+                             holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext(), R.style.AlertDialog);
+                                    dialog.setMessage("Are you sure?");
+                                    dialog.setTitle("Delete delay message");
+                                    dialog.setPositiveButton("Yes",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog,
+                                                                    int which) {
+                                                    GroupsRef.child(ref).child("DelayMessage").child(messageID).removeValue();
+                                                    CurrentUserRef.child("DelayMessage").child(messageID).removeValue();
+                                                    Toast.makeText(getContext(), "Delay message deleted!", Toast.LENGTH_LONG).show();
+                                                    RetrieveAndMarkDelayDate();
+                                                }
+                                            });
+                                    dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    });
+                                    AlertDialog alertDialog = dialog.create();
+                                    alertDialog.show();
+                                }
+                            });
                         }
 
                         @Override
@@ -250,19 +251,6 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
         adapter.startListening();
     }
 
-    @Override
-    public void applyEdit(String groupID, String msgID, String msg, String date, String time) {
-        Toast.makeText(getContext(), "Delay message edited" + msg, Toast.LENGTH_SHORT).show();
-
-        DatabaseReference msgRef = GroupNameRef.child("DelayMessage").child(msgID);
-        msgRef.child("message").setValue(msg);
-        msgRef.child("displayDate").setValue(date);
-        msgRef.child("displayTime").setValue(time);
-
-        onResume();
-    }
-
-
     private void RetrieveAndMarkDelayDate() {
         unMarkDate();
         CurrentUserRef.child("groups").addChildEventListener(new ChildEventListener() {
@@ -278,12 +266,12 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                LoadGroupsListAndMarkLater(dataSnapshot);
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+                LoadGroupsListAndMarkLater(dataSnapshot);
             }
 
             @Override

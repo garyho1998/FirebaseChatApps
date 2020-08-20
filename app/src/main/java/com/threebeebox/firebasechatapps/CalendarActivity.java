@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,10 +52,10 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
     private ExpCalendarView mCalendarView;
     private TextView mdateView, mMonthTextView;
     private Button mTodayBtn, mExpBtn;
-    private String currentGroupName, currentGroupID;
+    private String currentGroupName, currentGroupID, currentUserID;
     private RecyclerView mDelayMsgRecyclerList;
 
-    private DatabaseReference GroupsRef, GroupNameRef, DelayMsgRef;
+    private DatabaseReference GroupsRef, GroupNameRef, DelayMsgRef, CurrentUserRef;
     private Query query;
 
     final String TAG = "CalendarActivity";
@@ -73,12 +74,15 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
 
         travelToToday();
 
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        currentUserID = mAuth.getCurrentUser().getUid();
         currentGroupName = getIntent().getExtras().get("groupName").toString();
         currentGroupID = getIntent().getExtras().get("groupID").toString();
 
         GroupsRef = FirebaseDatabase.getInstance().getReference().child("Groups");
         GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupID);
         DelayMsgRef = GroupNameRef.child("DelayMessage");
+        CurrentUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserID);
 
         mToolbar = (Toolbar) findViewById(R.id.calendar_toolbar);
         setSupportActionBar(mToolbar);
@@ -178,7 +182,7 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
                                 holder.editBtn.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, currentGroupID, model.getId());
+                                        EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, currentGroupID, model.getMessageID());
                                         dialog.show(getSupportFragmentManager(), "edit dialog");
                                     }
                                 });
@@ -193,7 +197,7 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog,
                                                                         int which) {
-                                                        DelayMsgRef.child(model.getId()).removeValue();
+                                                        DelayMsgRef.child(model.getMessageID()).removeValue();
                                                         Toast.makeText(getApplicationContext(), "Delay message deleted!", Toast.LENGTH_LONG).show();
 
                                                         // check marked date
@@ -237,6 +241,7 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
         msgRef.child("displayDate").setValue(date);
         msgRef.child("displayTime").setValue(time);
 
+        CurrentUserRef.child("DelayMessage").child(msgID).child("displayDate").setValue(date);
         onResume();
         RetrieveAndMarkDelayDate();
     }
