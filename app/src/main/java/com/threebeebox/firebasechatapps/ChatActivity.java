@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -201,12 +202,21 @@ public class ChatActivity extends AppCompatActivity {
 
                 final StorageReference filePath = storageReference.child(messagePushID + "." + "jpg");
 
-                filePath.putBytes(bytes).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                filePath.putBytes(bytes).addOnCompleteListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                final String myUri = task.getResult().getDownloadUrl().toString();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onSuccess(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()) {
-                            final String downloadUri = task.getResult().getDownloadUrl().toString();
-                            myUri = downloadUri;
+
 
                             Map messageTextBody = new HashMap();
                             messageTextBody.put("message", myUri);
