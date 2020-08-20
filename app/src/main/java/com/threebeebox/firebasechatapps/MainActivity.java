@@ -30,7 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EditDelayMsgDialog.EditMsgDialogListener {
     private Toolbar mToolbar;
     private BottomNavigationView bottomNav;
 //    private TabsAccessorAdapter myTabsAccessorAdapter;
@@ -270,4 +270,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void applyEdit(String groupID, String msgID, String msg, String date, String time) {
+
+    }
 }

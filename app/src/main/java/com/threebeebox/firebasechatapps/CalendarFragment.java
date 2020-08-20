@@ -192,37 +192,37 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
                             holder.delayMsg.setText((String) dataSnapshot.child("message").getValue());
                             holder.displayTime.setText((String) dataSnapshot.child("displayTime").getValue());
 
-                            holder.editBtn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, ref, messageID);
-                                    dialog.show(getFragmentManager() , "edit dialog");
-                                }
-                            });
-                             holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext(), R.style.AlertDialog);
-                                    dialog.setMessage("Are you sure?");
-                                    dialog.setTitle("Delete delay message");
-                                    dialog.setPositiveButton("Yes",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog,
-                                                                    int which) {
-                                                    DelayMsgRef.child(messageID).removeValue();
-                                                    Toast.makeText(getContext(), "Delay message deleted!", Toast.LENGTH_LONG).show();
-                                                    RetrieveAndMarkDelayDate();
-                                                }
-                                            });
-                                    dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                        }
-                                    });
-                                    AlertDialog alertDialog = dialog.create();
-                                    alertDialog.show();
-                                }
-                            });
+//                            holder.editBtn.setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View v) {
+//                                    EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, ref, messageID);
+//                                    dialog.show(getChildFragmentManager() , "edit dialog");
+//                                }
+//                            });
+//                             holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View v) {
+//                                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext(), R.style.AlertDialog);
+//                                    dialog.setMessage("Are you sure?");
+//                                    dialog.setTitle("Delete delay message");
+//                                    dialog.setPositiveButton("Yes",
+//                                            new DialogInterface.OnClickListener() {
+//                                                public void onClick(DialogInterface dialog,
+//                                                                    int which) {
+//                                                    DelayMsgRef.child(messageID).removeValue();
+//                                                    Toast.makeText(getContext(), "Delay message deleted!", Toast.LENGTH_LONG).show();
+//                                                    RetrieveAndMarkDelayDate();
+//                                                }
+//                                            });
+//                                    dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(DialogInterface dialog, int which) {
+//                                        }
+//                                    });
+//                                    AlertDialog alertDialog = dialog.create();
+//                                    alertDialog.show();
+//                                }
+//                            });
                         }
 
                         @Override
