@@ -226,16 +226,23 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
     private void GetFriendAndDisplay(DataSnapshot dataSnapshot) {
         if (dataSnapshot.exists()) {
             final String userID = dataSnapshot.getKey();
-            String userName = (String) dataSnapshot.child("name").getValue();
-            String userStatus = (String) dataSnapshot.child("status").getValue();
+            mUid.setText(userID);
+            if (dataSnapshot.hasChild("name")) {
+                String userName = (String) dataSnapshot.child("name").getValue();
+                String userStatus = (String) dataSnapshot.child("status").getValue();
+                mUsrName.setText(userName);
+                mUsrStatus.setText(userStatus);
+            } else {
+                if (dataSnapshot.hasChild("phoneNumber")) {
+                    String phoneNumber = (String) dataSnapshot.child("phoneNumber").getValue();
+                    mUsrName.setText(phoneNumber);
+                }
+            }
             String imageUrl = (String) dataSnapshot.child("image").getValue();
             String userPhone = (String) dataSnapshot.child("phoneNumber").getValue();
 
             mUsrName.setVisibility(View.VISIBLE);
-            mUsrName.setText(userName);
             mUsrStatus.setVisibility(View.VISIBLE);
-            mUsrStatus.setText(userStatus);
-            mUid.setText(userID);
             mUserProfileImage.setVisibility(View.VISIBLE);
             mUsrPhone.setVisibility(View.VISIBLE);
             mUsrPhone.setText(userPhone);

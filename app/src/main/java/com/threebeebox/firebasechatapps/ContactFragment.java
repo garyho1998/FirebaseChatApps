@@ -28,12 +28,10 @@ public class ContactFragment extends Fragment implements ContactRecyclerItemTouc
     private static final String TAG = "CalendarFragment";
     private View ContactsView;
     private RecyclerView myContactsList;
-
     private DatabaseReference ContactsRef, UsersRef, GroupNameRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
     private ContactFirebaseRecyclerAdapter adapter;
-
 
     public ContactFragment() {
         // Required empty public constructor

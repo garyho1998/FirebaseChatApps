@@ -69,32 +69,43 @@ public class ChatFragment extends Fragment implements ChatsFragmentRecyclerAdapt
         Log.i(TAG, "onStart");
         ChatsRef.child(currentUserID).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(final DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     final String[] retImage = {"default_image"};
-                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    for (final DataSnapshot child : dataSnapshot.getChildren()) {
                         final String targetID = child.getKey();
 
                         UsersRef.child(targetID).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot userSnapshot) {
-                                User target = new User();
-                                target.userId = targetID;
-                                target.name = userSnapshot.child("name").getValue().toString();
-                                target.status = userSnapshot.child("status").getValue().toString();
+                                if(userSnapshot.exists()){
+                                    User target = new User();
+                                    target.userId = targetID;
+                                    if(userSnapshot.hasChild("name")){
+                                        target.name = userSnapshot.child("name").getValue().toString();
+                                        target.status = userSnapshot.child("status").getValue().toString();
+                                    }else{
+                                        if(userSnapshot.hasChild("phoneNumber")){
+                                            target.name = userSnapshot.child("phoneNumber").getValue().toString();
+                                        }
+                                    }
 
-                                if (userSnapshot.hasChild("image")) {
-                                    target.image = userSnapshot.child("image").getValue().toString();
-                                } else {
-                                    target.image = retImage[0];
+                                    if (userSnapshot.hasChild("image")) {
+                                        target.image = userSnapshot.child("image").getValue().toString();
+                                    } else {
+                                        target.image = retImage[0];
+                                    }
+                                    if (userSnapshot.child("userState").hasChild("state")) {
+                                        target.state = userSnapshot.child("userState").child("state").getValue().toString();
+                                        target.date = userSnapshot.child("userState").child("date").getValue().toString();
+                                        target.time = userSnapshot.child("userState").child("time").getValue().toString();
+                                    }
+                                    UserList.add(target);
+                                    chatsFragmentRecyclerAdapter.notifyDataSetChanged();
+                                }else{
+                                    child.getRef().removeValue();
                                 }
-                                if (userSnapshot.child("userState").hasChild("state")) {
-                                    target.state = userSnapshot.child("userState").child("state").getValue().toString();
-                                    target.date = userSnapshot.child("userState").child("date").getValue().toString();
-                                    target.time = userSnapshot.child("userState").child("time").getValue().toString();
-                                }
-                                UserList.add(target);
-                                chatsFragmentRecyclerAdapter.notifyDataSetChanged();
+
                             }
 
                             @Override

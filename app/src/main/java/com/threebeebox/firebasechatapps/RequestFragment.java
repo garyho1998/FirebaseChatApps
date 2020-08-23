@@ -101,11 +101,12 @@ public class RequestFragment extends Fragment {
                                                     Picasso.get().load(requestProfileImage).into(holder.profileImage);
                                                 }
 
-                                                final String requestUserName = dataSnapshot.child("name").getValue().toString();
-                                                final String requestUserStatus = dataSnapshot.child("status").getValue().toString();
+                                                if (dataSnapshot.hasChild("name")){
+                                                    final String requestUserName = dataSnapshot.child("name").getValue().toString();
+                                                    holder.userName.setText(requestUserName);
+                                                    holder.userStatus.setText("wants to connect with you.");
+                                                }
 
-                                                holder.userName.setText(requestUserName);
-                                                holder.userStatus.setText("wants to connect with you.");
                                                 View.OnClickListener acceptListener = new View.OnClickListener() {
                                                     @Override
                                                     public void onClick(View view) {
@@ -191,17 +192,12 @@ public class RequestFragment extends Fragment {
                                             public void onDataChange(DataSnapshot dataSnapshot) {
                                                 if (dataSnapshot.hasChild("image")) {
                                                     final String requestProfileImage = dataSnapshot.child("image").getValue().toString();
-
                                                     Picasso.get().load(requestProfileImage).into(holder.profileImage);
                                                 }
-
-                                                final String requestUserName = dataSnapshot.child("name").getValue().toString();
-                                                final String requestUserStatus = dataSnapshot.child("status").getValue().toString();
-
-                                                holder.userName.setText(requestUserName);
-                                                holder.userStatus.setText("you have sent a request to " + requestUserName);
-
-
+                                                if(dataSnapshot.hasChild("name")){
+                                                    final String requestUserName = dataSnapshot.child("name").getValue().toString();
+                                                    holder.userName.setText(requestUserName);
+                                                }
                                                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                                                     @Override
                                                     public void onClick(View view) {

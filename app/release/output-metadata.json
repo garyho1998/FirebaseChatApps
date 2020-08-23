@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.example.firebasechatapps",
+  "applicationId": "com.threebeebox.firebasechatapps",
   "variantName": "release",
   "elements": [
     {

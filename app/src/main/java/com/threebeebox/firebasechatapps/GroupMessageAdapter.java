@@ -224,8 +224,11 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
         UserRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                name[0] = dataSnapshot.child("name").getValue().toString();
-                Log.d("findUserName", "name: " + dataSnapshot.child("name").getValue().toString());
+                if(dataSnapshot.hasChild("name")){
+                    name[0] = dataSnapshot.child("name").getValue().toString();
+                }else{
+                    name[0] = dataSnapshot.child("phoneNumber").getValue().toString();
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {

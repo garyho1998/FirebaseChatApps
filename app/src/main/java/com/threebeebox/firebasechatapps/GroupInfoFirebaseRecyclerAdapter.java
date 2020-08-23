@@ -32,7 +32,7 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
     @NonNull
     @Override
     public ContactsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.user_display_layout_with_delete, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.user_display_layout_with_delete_withno_divider, viewGroup, false);
         return new ContactsViewHolder(view);
     }
 
@@ -67,15 +67,6 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
                                     String state = userSnapshot.child("userState").child("state").getValue().toString();
                                     String date = userSnapshot.child("userState").child("date").getValue().toString();
                                     String time = userSnapshot.child("userState").child("time").getValue().toString();
-
-                                    if (state.equals("online")) {
-                                        holder.onlineIcon.setVisibility(View.VISIBLE);
-                                    } else if (state.equals("offline")) {
-                                        holder.onlineIcon.setVisibility(View.INVISIBLE);
-                                    }
-                                }
-                                else {
-                                    holder.onlineIcon.setVisibility(View.INVISIBLE);
                                 }
                                 if (userSnapshot.hasChild("image")) {
                                     String userImage = userSnapshot.child("image").getValue().toString();

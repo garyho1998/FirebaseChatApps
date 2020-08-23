@@ -61,15 +61,6 @@ public class PhoneLoginActivity extends AppCompatActivity {
         CodeText = (TextView) findViewById(R.id.code_text);
         RootRef = FirebaseDatabase.getInstance().getReference();
         loadingBar = new ProgressDialog(this);
-        phoneRegister = (TextView) findViewById(R.id.phone_register_link);
-        phoneRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("SendUserToRegisterActivity");
-                Intent registerIntent = new Intent(PhoneLoginActivity.this, RegisterActivity.class);
-                startActivity(registerIntent);
-            }
-        });
         SendVerificationCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,6 +129,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
             public void onVerificationFailed(FirebaseException e) {
                 loadingBar.dismiss();
                 Toast.makeText(PhoneLoginActivity.this, "Verification failed...", Toast.LENGTH_SHORT).show();
+                System.out.println(e.toString());
                 SendVerificationCodeButton.setVisibility(View.VISIBLE);
                 InputPhoneNumber.setVisibility(View.VISIBLE);
                 PhoneText.setVisibility(View.VISIBLE);

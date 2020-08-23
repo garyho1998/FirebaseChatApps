@@ -67,26 +67,20 @@ public class ProfileActivity extends AppCompatActivity {
                 if ((dataSnapshot.exists())  &&  (dataSnapshot.hasChild("image")))
                 {
                     String userImage = dataSnapshot.child("image").getValue().toString();
-                    String userName = dataSnapshot.child("name").getValue().toString();
-                    String userstatus = dataSnapshot.child("status").getValue().toString();
-
                     Picasso.get().load(userImage).placeholder(R.drawable.profile_image).into(userProfileImage);
-                    userProfileName.setText(userName);
-                    userProfileStatus.setText(userstatus);
-
-
-                    ManageChatRequests();
                 }
-                else
-                {
+
+                ManageChatRequests();
+                if (dataSnapshot.hasChild("name")) {
                     String userName = dataSnapshot.child("name").getValue().toString();
                     String userstatus = dataSnapshot.child("status").getValue().toString();
-
                     userProfileName.setText(userName);
                     userProfileStatus.setText(userstatus);
-
-
-                    ManageChatRequests();
+                } else {
+                    if (dataSnapshot.hasChild("phoneNumber")) {
+                        String phoneNumber = (String) dataSnapshot.child("phoneNumber").getValue();
+                        userProfileName.setText(phoneNumber);
+                    }
                 }
 
             }

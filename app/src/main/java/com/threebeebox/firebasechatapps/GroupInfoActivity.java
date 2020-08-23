@@ -17,12 +17,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -40,6 +42,8 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
@@ -57,7 +61,7 @@ public class GroupInfoActivity extends AppCompatActivity implements GroupInfoRec
     private StorageReference UserProfileImagesRef;
     private CircleImageView userProfileImage;
     private RelativeLayout Add_member_relativeLayout;
-    private LinearLayout exitGroup;
+    private CardView exitGroup;
     private ProgressDialog loadingBar;
     private TextView InfoName;
 
@@ -80,7 +84,7 @@ public class GroupInfoActivity extends AppCompatActivity implements GroupInfoRec
 
         MemberList = (RecyclerView) findViewById(R.id.member_list);
         MemberList.setLayoutManager(new LinearLayoutManager(this));
-        exitGroup = (LinearLayout) findViewById(R.id.exitGroup);
+        exitGroup = (CardView) findViewById(R.id.exitGroup);
         exitGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -218,36 +222,30 @@ public class GroupInfoActivity extends AppCompatActivity implements GroupInfoRec
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
                 final byte[] bytes = byteArrayOutputStream.toByteArray();
 
-                StorageReference filePath = UserProfileImagesRef.child(currentUserID + ".jpg");
-
-                filePath.putBytes(bytes).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                final StorageReference filePath = UserProfileImagesRef.child(currentUserID + ".jpg");
+                filePath.putBytes(bytes).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(GroupInfoActivity.this, "Profile Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
-
-                            final String downloaedUrl = task.getResult().getDownloadUrl().toString();
-
-                            RootRef.child("Groups").child(currentGroupID).child("image")
-                                    .setValue(downloaedUrl)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                Toast.makeText(GroupInfoActivity.this, "Image save in Database, Successfully...", Toast.LENGTH_SHORT).show();
-                                                loadingBar.dismiss();
-                                            } else {
-                                                String message = task.getException().toString();
-                                                Toast.makeText(GroupInfoActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
-                                                loadingBar.dismiss();
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                RootRef.child("Groups").child(currentGroupID).child("image")
+                                        .setValue(uri.toString())
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Toast.makeText(GroupInfoActivity.this, "Image save in Database, Successfully...", Toast.LENGTH_SHORT).show();
+                                                    loadingBar.dismiss();
+                                                } else {
+                                                    String message = task.getException().toString();
+                                                    Toast.makeText(GroupInfoActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                                                    loadingBar.dismiss();
+                                                }
                                             }
-                                        }
-                                    });
-                        } else {
-                            String message = task.getException().toString();
-                            Toast.makeText(GroupInfoActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
-                            loadingBar.dismiss();
-                        }
+                                        });
+                            }
+                        });
                     }
                 });
             }

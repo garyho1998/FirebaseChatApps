@@ -29,6 +29,7 @@ import android.widget.ImageButton;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.threebeebox.firebasechatapps.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -182,48 +183,41 @@ public class GroupChatActivity extends AppCompatActivity {
                 final String messagePushID = userMessageKeyRef.getKey();
 
                 final StorageReference filePath = storageReference.child(messagePushID + "." + "jpg");
-
-                filePath.putBytes(bytes).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                filePath.putBytes(bytes).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            final String downloadUri = task.getResult().getDownloadUrl().toString();
-                            myUri = downloadUri.toString();
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Map messageTextBody = new HashMap();
+                                messageTextBody.put("message", uri);
+                                messageTextBody.put("name", currentUserName);
+                                messageTextBody.put("type", "image");
+                                //name is the sender user name, here is the sender user id
+                                messageTextBody.put("from", currentUserID);
+                                messageTextBody.put("messageID", messagePushID);
+                                messageTextBody.put("time", saveCurrentTime);
+                                messageTextBody.put("date", saveCurrentDate);
 
-                            Map messageTextBody = new HashMap();
-                            messageTextBody.put("message", myUri);
-                            messageTextBody.put("name", currentUserName);
-                            messageTextBody.put("type", "image");
-                            //name is the sender user name, here is the sender user id
-                            messageTextBody.put("from", currentUserID);
-                            messageTextBody.put("messageID", messagePushID);
-                            messageTextBody.put("time", saveCurrentTime);
-                            messageTextBody.put("date", saveCurrentDate);
+                                Map messageBodyDetails = new HashMap();
+                                messageBodyDetails.put("/Message/" + messagePushID, messageTextBody);
 
-                            Map messageBodyDetails = new HashMap();
-                            messageBodyDetails.put("/Message/" + messagePushID, messageTextBody);
-
-                            GroupNameRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
-                                @Override
-                                public void onComplete(@NonNull Task task) {
-                                    if (task.isSuccessful()) {
-                                        loadingBar.dismiss();
-                                        Toast.makeText(GroupChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        loadingBar.dismiss();
-                                        Toast.makeText(GroupChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                GroupNameRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
+                                    @Override
+                                    public void onComplete(@NonNull Task task) {
+                                        if (task.isSuccessful()) {
+                                            loadingBar.dismiss();
+                                            Toast.makeText(GroupChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            loadingBar.dismiss();
+                                            Toast.makeText(GroupChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
-                                }
-                            });
-
-                        } else {
-                            String message = task.getException().toString();
-                            Toast.makeText(GroupChatActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
-                            loadingBar.dismiss();
-                        }
+                                });
+                            }
+                        });
                     }
                 });
-
             }
         }
 
@@ -271,7 +265,7 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         });
 
-        GroupNameRef.child("Message")
+        GroupNameRef.child("Message").orderByChild("timestamp")
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -290,7 +284,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
                     @Override
                     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
                     }
 
                     @Override
@@ -390,9 +383,16 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private void SetAlarmFromDelayMessage(DataSnapshot dataSnapshot) {
         String id = dataSnapshot.getKey();
+        String userName = "";
+        if (dataSnapshot.hasChild("name")) {
+            userName = (String) dataSnapshot.child("name").getValue();
+        } else {
+            if (dataSnapshot.hasChild("phoneNumber")) {
+                userName = (String) dataSnapshot.child("phoneNumber").getValue();
+            }
+        }
         String date = (String) dataSnapshot.child("date").getValue();
         String message = (String) dataSnapshot.child("message").getValue();
-        String name = (String) dataSnapshot.child("name").getValue();
         String time = (String) dataSnapshot.child("time").getValue();
         Long displayTimestamp = (Long) dataSnapshot.child("displayTimestamp").getValue();
 
@@ -401,7 +401,7 @@ public class GroupChatActivity extends AppCompatActivity {
             messageObject.put("timestamp", displayTimestamp);
             messageObject.put("date", date);
             messageObject.put("message", message);
-            messageObject.put("name", name);
+            messageObject.put("name", userName);
             messageObject.put("time", time);
 
             Map<String, Object> childUpdates = new HashMap<>();

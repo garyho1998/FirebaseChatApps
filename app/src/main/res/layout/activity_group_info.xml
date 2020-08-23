@@ -29,9 +29,7 @@
                     android:id="@+id/set_profile_image"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:src="@drawable/profile_image"
-                    app:civ_border_color="@color/colorAccent"
-                    app:civ_border_width="5dp" />
+                    android:src="@drawable/profile_image" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -45,7 +43,11 @@
                     android:textStyle="bold" />
 
             </LinearLayout>
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/lightGrey"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,7 +97,11 @@
                                 android:layout_marginTop="10dp"
                                 android:layout_marginRight="16dp"
                                 android:layout_marginBottom="10dp"
-                                android:src="@drawable/add_user_icon2" />
+                                android:src="@drawable/add_user_icon_white"
+                                app:civ_circle_background_color ="@color/colorPrimaryDark"
+                                app:civ_border_color="@color/colorPrimaryDark"
+                                app:civ_border_width="8dp"
+                                />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -129,15 +135,19 @@
                         android:paddingRight="10dp"
                         android:paddingBottom="10dp" />
                 </LinearLayout>
-
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/lightGrey"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/windowBackground"
                     android:orientation="vertical"
                     android:layout_marginTop="15dp"
                     android:padding="10dp"
                     android:id="@+id/exitGroup"
+                    android:elevation="20dp"
+                    android:background="@color/windowBackground"
                     >
 
                     <TextView

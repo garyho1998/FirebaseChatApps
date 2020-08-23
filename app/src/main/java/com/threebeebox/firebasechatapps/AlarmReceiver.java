@@ -54,7 +54,14 @@ public class AlarmReceiver extends BroadcastReceiver
         String id = dataSnapshot.getKey();
         String date = (String) dataSnapshot.child("date").getValue();
         String message = (String) dataSnapshot.child("message").getValue();
-        String name = (String) dataSnapshot.child("name").getValue();
+        String name = "";
+        if(dataSnapshot.hasChild("name")){
+            name = (String) dataSnapshot.child("name").getValue();
+        }else{
+            if(dataSnapshot.hasChild("phoneNumber")){
+                name = (String) dataSnapshot.child("phoneNumber").getValue();
+            }
+        }
         String time = (String) dataSnapshot.child("time").getValue();
         Long displayTimestamp = (Long) dataSnapshot.child("displayTimestamp").getValue();
 //        Log.i(TAG, "id: "+id+", message:"+message);

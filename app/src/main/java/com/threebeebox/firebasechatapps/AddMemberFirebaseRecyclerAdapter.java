@@ -49,31 +49,23 @@ public class AddMemberFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    if(dataSnapshot.hasChild("name")){
+                        holder.userName.setText(dataSnapshot.child("name").getValue().toString());
+                        holder.userStatus.setText(dataSnapshot.child("status").getValue().toString());
+                    }else{
+                        if(dataSnapshot.hasChild("phoneNumber")){
+                            holder.userName.setText(dataSnapshot.child("phoneNumber").getValue().toString());
+                        }
+                    }
+
                     if (dataSnapshot.hasChild("image")) {
                         String userImage = dataSnapshot.child("image").getValue().toString();
-                        String profileName = dataSnapshot.child("name").getValue().toString();
-                        String profileStatus = dataSnapshot.child("status").getValue().toString();
-
-                        holder.userName.setText(profileName);
-                        holder.userStatus.setText(profileStatus);
                         Picasso.get().load(userImage).placeholder(R.drawable.profile_image).into(holder.profileImage);
-                    } else {
-                        String profileName = dataSnapshot.child("name").getValue().toString();
-                        String profileStatus = dataSnapshot.child("status").getValue().toString();
-
-                        holder.userName.setText(profileName);
-                        holder.userStatus.setText(profileStatus);
                     }
 
                     if (dataSnapshot.child("userState").hasChild("state")) {
                         String state = dataSnapshot.child("userState").child("state").getValue().toString();
                         String date = dataSnapshot.child("userState").child("date").getValue().toString();
-
-                        if (state.equals("online")) {
-                            holder.onlineIcon.setVisibility(View.VISIBLE);
-                        } else if (state.equals("offline")) {
-                            holder.onlineIcon.setVisibility(View.INVISIBLE);
-                        }
 
                         Calendar calendar = Calendar.getInstance();
                         SimpleDateFormat currentDate = new SimpleDateFormat(("MMM dd, yyyy"));
@@ -83,9 +75,6 @@ public class AddMemberFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
                         } else {
                             holder.minorInfo.setText(date);
                         }
-                    }
-                    else {
-                        holder.onlineIcon.setVisibility(View.INVISIBLE);
                     }
 
                     GroupNameRef.child("Member").addListenerForSingleValueEvent(new ValueEventListener() {
