@@ -32,7 +32,7 @@
             android:parentActivityName="com.threebeebox.firebasechatapps.MainActivity" />
         <activity
             android:name="com.threebeebox.firebasechatapps.GroupFinishCreateActivity"
-            android:parentActivityName="com.threebeebox.firebasechatapps.GroupCreateActivity" />
+            android:parentActivityName="com.threebeebox.firebasechatapps.MainActivity" />
         <activity
             android:name="com.threebeebox.firebasechatapps.GroupChatActivity"
             android:launchMode="singleTop"

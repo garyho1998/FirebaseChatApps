@@ -98,4 +98,13 @@ public class GroupFinishCreateActivity extends AppCompatActivity implements AddM
         adapter.AddMember(viewHolder.getAdapterPosition());
         adapter.notifyItemChanged(viewHolder.getAdapterPosition());
     }
+
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        startActivity(new Intent(GroupFinishCreateActivity.this, MainActivity.class));
+        finish();
+
+    }
 }

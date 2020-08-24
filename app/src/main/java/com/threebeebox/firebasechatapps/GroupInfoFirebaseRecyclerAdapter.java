@@ -32,7 +32,7 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
     @NonNull
     @Override
     public ContactsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.user_display_layout_with_delete_withno_divider, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.user_display_layout_with_delete, viewGroup, false);
         return new ContactsViewHolder(view);
     }
 
