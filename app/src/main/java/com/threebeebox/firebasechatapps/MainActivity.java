@@ -165,7 +165,8 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
             SendUserToSettingsActivity();
         }
         if (item.getItemId() == R.id.main_create_group_option) {
-            RequestNewGroup();
+            Intent intent = new Intent(MainActivity.this, GroupCreateActivity.class);
+            startActivity(intent);
         }
         if (item.getItemId() == R.id.main_fd_option) {
             SendUserToFindFirendActivity();
@@ -223,14 +224,9 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
                             GroupRef.child(groupID).child("GroupName").setValue(groupName);
                             RootRef.child("Users").child(currentUserID).child("groups").child(groupID).setValue(groupName);
                             Toast.makeText(MainActivity.this, groupName + " group is Created Successfully...", Toast.LENGTH_SHORT).show();
-//                            Intent intent = new Intent(MainActivity.this, AddMemberActivity.class);
-//                            intent.putExtra("groupName", groupName);
-//                            intent.putExtra("groupID", groupID);
-//                            startActivity(intent);
                         }
                     }
                 });
-
     }
 
     private void updateUserStatus(String state) {

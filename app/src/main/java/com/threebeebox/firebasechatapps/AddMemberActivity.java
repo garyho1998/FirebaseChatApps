@@ -68,7 +68,9 @@ public class AddMemberActivity extends AppCompatActivity implements AddMemberRec
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.getValue().toString().equals("Admin")){
                     GroupSingleton.getInstance().isAdmin = true;
-
+                    Toast toast = Toast.makeText(AddMemberActivity.this,"Swipe Left To Add Members", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 150);
+                    toast.show();
                 }else{
                     GroupSingleton.getInstance().isAdmin = false;
                 }

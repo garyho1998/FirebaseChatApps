@@ -110,7 +110,7 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
         }
 
         msgRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupID).child("Message");
-        
+
         messageViewHolder.rcvNameText.setVisibility(View.GONE);
         messageViewHolder.receiverMessageText.setVisibility(View.GONE);
         messageViewHolder.rcvTimeText.setVisibility(View.GONE);

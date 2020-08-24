@@ -23,8 +23,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.concurrent.TimeUnit;
@@ -50,6 +53,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_phone_login);
 
         mAuth = FirebaseAuth.getInstance();
+        RootRef = FirebaseDatabase.getInstance().getReference();
 
         CountryCode = (EditText) findViewById(R.id.country_code_input);
         PlusText = (TextView) findViewById(R.id.plus_text);
@@ -59,7 +63,6 @@ public class PhoneLoginActivity extends AppCompatActivity {
         InputVerificationCode = (EditText) findViewById(R.id.verification_code_input);
         PhoneText = (TextView) findViewById(R.id.phone_number_text);
         CodeText = (TextView) findViewById(R.id.code_text);
-        RootRef = FirebaseDatabase.getInstance().getReference();
         loadingBar = new ProgressDialog(this);
         SendVerificationCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,14 +74,11 @@ public class PhoneLoginActivity extends AppCompatActivity {
                     Toast.makeText(PhoneLoginActivity.this, "Please enter your country code and phone number first...", Toast.LENGTH_SHORT).show();
                 }
                 else {
+                    verifyPhone = "+" + countryCode + phoneNumber;
                     loadingBar.setTitle("Phone Verification");
                     loadingBar.setMessage("please wait, while we are authenticating your phone...");
                     loadingBar.setCanceledOnTouchOutside(false);
                     loadingBar.show();
-
-                    verifyPhone = "+" + countryCode + phoneNumber;
-                    Log.d("phoneAuth", "verifyPhone = " + verifyPhone);
-
                     PhoneAuthProvider.getInstance().verifyPhoneNumber(
                             verifyPhone,        // Phone number to verify
                             60,                 // Timeout duration
