@@ -118,6 +118,20 @@ public class GroupInfoActivity extends AppCompatActivity implements GroupInfoRec
 
     public void onStart() {
         super.onStart();
+        GroupNameRef.child("Member").child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getValue().toString().equals("Admin")){
+                    GroupSingleton.getInstance().isAdmin = true;
+                }else{
+                    GroupSingleton.getInstance().isAdmin = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
 
         FirebaseRecyclerOptions options =
                 new FirebaseRecyclerOptions.Builder<String>()

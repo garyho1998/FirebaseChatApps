@@ -91,7 +91,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
         currentGroupName = getIntent().getExtras().get("groupName").toString();
         currentGroupID = getIntent().getExtras().get("groupID").toString();
-        Toast.makeText(GroupChatActivity.this, currentGroupName, Toast.LENGTH_SHORT).show();
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
@@ -270,16 +269,14 @@ public class GroupChatActivity extends AppCompatActivity {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         Messages messages = dataSnapshot.getValue(Messages.class);
-
-                        //add message only if the message does not exist in messageList already...
-                        if (!messagesList.contains(messages)) {
-                            messagesList.add(messages);
-                            // Log.d("myTag", "size of messagesList: " + Integer.toString(messagesList.size()));
-
-                            gpMsgAdapter.notifyDataSetChanged();
+                        if(messages!=null){
+                            if (!messagesList.contains(messages)) {
+                                messagesList.add(messages);
+                                gpMsgAdapter.notifyDataSetChanged();
+                            }
+                            userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
                         }
 
-                        userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
                     }
 
                     @Override

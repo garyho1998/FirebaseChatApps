@@ -25,7 +25,6 @@ public class AlarmController {
             Long alarmTime = timestamp;
             //Long alarmTime = System.currentTimeMillis()+2000;
             alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);
-            Toast.makeText(context, num+ ":Alarm ("+id+") set in " + (alarmTime - System.currentTimeMillis())/1000 + " seconds",Toast.LENGTH_SHORT).show();
             num++;
             alarmIDlist.add(id);
         }

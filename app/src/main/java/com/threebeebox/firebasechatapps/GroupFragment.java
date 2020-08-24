@@ -183,21 +183,24 @@ public class GroupFragment extends Fragment {
     }
 
     public void setLastTimeAndMsg(DataSnapshot dataSnapshot, GroupsViewHolder holder){
-        String last_time = dataSnapshot.child("time").getValue().toString();
-        String last_date = dataSnapshot.child("date").getValue().toString();
-        if (last_date.equals(sToday)) {
-            holder.lastSend.setText(last_time);
-        } else {
-            holder.lastSend.setText(last_date);
+        if(dataSnapshot.hasChild("type")){
+            String last_time = dataSnapshot.child("time").getValue().toString();
+            String last_date = dataSnapshot.child("date").getValue().toString();
+            if (last_date.equals(sToday)) {
+                holder.lastSend.setText(last_time);
+            } else {
+                holder.lastSend.setText(last_date);
+            }
+
+            String type = dataSnapshot.child("type").getValue().toString();
+            if (type.equals("normal")) { //text type
+                String text_msg = dataSnapshot.child("message").getValue().toString();
+                holder.GroupMsg.setText(text_msg);
+            } else if (type.equals("image")) {
+                holder.GroupMsg.setText("[Image]");
+            }
         }
 
-        String type = dataSnapshot.child("type").getValue().toString();
-        if (type.equals("normal")) { //text type
-            String text_msg = dataSnapshot.child("message").getValue().toString();
-            holder.GroupMsg.setText(text_msg);
-        } else if (type.equals("image")) {
-            holder.GroupMsg.setText("[Image]");
-        }
     }
 
 }

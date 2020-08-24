@@ -100,7 +100,7 @@ public class Messages
     public boolean equals(@Nullable Object obj) {
         boolean isEqual = false;
 
-        if (obj!=null && obj instanceof Messages) {
+        if (obj!=null && obj instanceof Messages && this.messageID!=null) {
             isEqual = (this.messageID.equals(((Messages) obj).getMessageID()));
         }
 

@@ -2,7 +2,10 @@ package com.threebeebox.firebasechatapps;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -12,8 +15,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import javax.xml.datatype.Duration;
 
 public class AddMemberActivity extends AppCompatActivity implements AddMemberRecyclerItemTouchHelper.RecyclerItemTouchHelperListener{
     private Toolbar mToolbar;
@@ -55,13 +63,28 @@ public class AddMemberActivity extends AppCompatActivity implements AddMemberRec
     public void onStart() {
         super.onStart();
 
+        GroupNameRef.child("Member").child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getValue().toString().equals("Admin")){
+                    GroupSingleton.getInstance().isAdmin = true;
+
+                }else{
+                    GroupSingleton.getInstance().isAdmin = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
         FirebaseRecyclerOptions options =
                 new FirebaseRecyclerOptions.Builder<String>()
                         .setQuery(ContactRef, String.class)
                         .build();
 
         adapter = new AddMemberFirebaseRecyclerAdapter(options, UsersRef, GroupNameRef, currentGroupName, currentGroupID);
-
         myContactsList.setAdapter(adapter);
         adapter.startListening();
     }
