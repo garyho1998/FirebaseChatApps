@@ -1,7 +1,9 @@
 package com.threebeebox.firebasechatapps;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,9 +14,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,6 +55,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +74,7 @@ public class ChatActivity extends AppCompatActivity
     private FirebaseAuth mAuth;
     private DatabaseReference RootRef, NotificationRef;
 
-    private ImageButton SendMessageButton, SendFilesButton;
+    private ImageButton SendMessageButton, SendFilesButton, DelayBtn;
     private EditText MessageInputText;
 
     private final List<Messages> messagesList = new ArrayList<>();
@@ -77,6 +82,7 @@ public class ChatActivity extends AppCompatActivity
     private MessageAdapter messageAdapter;
     private RecyclerView userMessagesList;
 
+    IndAlarmController alarmController;
 
     private String saveCurrentTime, saveCurrentDate;
     private String myUri="";
@@ -99,7 +105,7 @@ public class ChatActivity extends AppCompatActivity
 
         messageReceiverID = getIntent().getExtras().get("visit_user_id").toString();
         messageReceiverName = getIntent().getExtras().get("visit_user_name").toString();
-        messageReceiverImage = getIntent().getExtras().get("visit_image").toString();
+        messageReceiverImage = (String) getIntent().getExtras().get("visit_image");
 
 
         IntializeControllers();
@@ -113,7 +119,7 @@ public class ChatActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                SendMessage();
+                SendMessage(null);
             }
         });
 
@@ -129,9 +135,43 @@ public class ChatActivity extends AppCompatActivity
             }
         });
 
+        DelayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String message = MessageInputText.getText().toString();
+                if (!TextUtils.isEmpty(message)) {
+                    showDateTimeDialogAndSend();
+                }
+            }
+        });
+
     }
 
+    private void showDateTimeDialogAndSend() {
+        final Calendar calendar = Calendar.getInstance();
+        final Date date;
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
+                TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy-MM-dd HH:mm");
+                        SendMessage(calendar);
+                    }
+                };
+                new TimePickerDialog(ChatActivity.this, timeSetListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();
+            }
+        };
+        new DatePickerDialog(ChatActivity.this, dateSetListener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+
+    }
 
 
     private void IntializeControllers()
@@ -151,6 +191,7 @@ public class ChatActivity extends AppCompatActivity
         userLastSeen = (TextView) findViewById(R.id.custom_user_last_seen);
         userImage = (CircleImageView) findViewById(R.id.custom_profile_image);
 
+        DelayBtn = (ImageButton) findViewById(R.id.send_delay_btn);
         SendMessageButton = (ImageButton) findViewById(R.id.send_message_btn);
         SendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
         MessageInputText = (EditText) findViewById(R.id.input_message);
@@ -170,6 +211,8 @@ public class ChatActivity extends AppCompatActivity
 
         SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
         saveCurrentTime = currentTime.format(calendar.getTime());
+
+        alarmController = new IndAlarmController();
     }
 
 
@@ -315,7 +358,7 @@ public class ChatActivity extends AppCompatActivity
         super.onStart();
 //        messagesList.clear();
 
-        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
+        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Chat")
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s)
@@ -355,11 +398,70 @@ public class ChatActivity extends AppCompatActivity
 
                     }
                 });
+
+
+        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Delay")
+                .addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (dataSnapshot.exists()) {
+                    SetAlarmFromDelayMessage(dataSnapshot);
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                if (dataSnapshot.exists()) {
+                    SetAlarmFromDelayMessage(dataSnapshot);
+                }
+            }
+
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+    }
+
+    private void SetAlarmFromDelayMessage(DataSnapshot dataSnapshot) {
+        String id = dataSnapshot.getKey();
+        String date = (String) dataSnapshot.child("displayDate").getValue();
+        String message = (String) dataSnapshot.child("message").getValue();
+        String time = (String) dataSnapshot.child("displayTime").getValue();
+        String from = (String) dataSnapshot.child("from").getValue();
+        String to = (String) dataSnapshot.child("to").getValue();
+        Long displayTimestamp = (Long) dataSnapshot.child("displayTimestamp").getValue();
+
+        if ((displayTimestamp - System.currentTimeMillis()) <= 0) {
+            Map<String, Object> messageObject = new HashMap<String, Object>();
+            messageObject.put("timestamp", displayTimestamp);
+            messageObject.put("date", date);
+            messageObject.put("message", message);
+            messageObject.put("time", time);
+            messageObject.put("from", from);
+            messageObject.put("to", to);
+            messageObject.put("type", "text");
+            messageObject.put("messageID", id);
+
+
+            Map<String, Object> childUpdates = new HashMap<>();
+            Map<String, Object> childDelete = new HashMap<>();
+            childUpdates.put(id, messageObject);
+
+            RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Chat").updateChildren(childUpdates);
+            RootRef.child("Messages").child(messageReceiverID).child(messageSenderID).child("Chat").updateChildren(childUpdates);
+            childDelete.put(id, null);
+            RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Delay").updateChildren(childDelete);
+            RootRef.child("Messages").child(messageReceiverID).child(messageSenderID).child("Delay").updateChildren(childDelete);
+
+        } else {
+            alarmController.addAlarm(this, id, displayTimestamp, messageSenderID);
+        }
     }
 
 
-
-    private void SendMessage()
+    private void SendMessage(Calendar calendar)
     {
         String messageText = MessageInputText.getText().toString();
 
@@ -369,11 +471,14 @@ public class ChatActivity extends AppCompatActivity
         }
         else
         {
-            String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
-            String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
+            SimpleDateFormat currentDateFormat = new SimpleDateFormat("MMM dd, yyyy");
+            SimpleDateFormat currentTimeFormat = new SimpleDateFormat("hh:mm a");
+
+            String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID + "/Chat";
+            String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID + "/Chat";
 
             DatabaseReference userMessageKeyRef = RootRef.child("Messages")
-                    .child(messageSenderID).child(messageReceiverID).push();
+                    .child(messageSenderID).child(messageReceiverID).child("Chat").push();
 
             String messagePushID = userMessageKeyRef.getKey();
 
@@ -386,39 +491,63 @@ public class ChatActivity extends AppCompatActivity
             messageTextBody.put("time", saveCurrentTime);
             messageTextBody.put("date", saveCurrentDate);
 
-            Map messageBodyDetails = new HashMap();
-            messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
-            messageBodyDetails.put( messageReceiverRef + "/" + messagePushID, messageTextBody);
+            if (calendar==null) {
+                Map messageBodyDetails = new HashMap();
+                messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
+                messageBodyDetails.put( messageReceiverRef + "/" + messagePushID, messageTextBody);
 
-            RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
-                @Override
-                public void onComplete(@NonNull Task task)
-                {
-                    if (task.isSuccessful())
+                RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
+                    @Override
+                    public void onComplete(@NonNull Task task)
                     {
-                        Toast.makeText(ChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
-                        HashMap<String, String> chatNotification = new HashMap<>();
-                        chatNotification.put("from", messageSenderID);
-                        chatNotification.put("type", "chat");
+                        if (task.isSuccessful())
+                        {
+                            Toast.makeText(ChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
+                            HashMap<String, String> chatNotification = new HashMap<>();
+                            chatNotification.put("from", messageSenderID);
+                            chatNotification.put("type", "chat");
 
-                        NotificationRef.child(messageReceiverID).push()
-                                .setValue(chatNotification)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Toast.makeText(ChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
+                            NotificationRef.child(messageReceiverID).push()
+                                    .setValue(chatNotification)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Toast.makeText(ChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                        }
+                        else
+                        {
+                            Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                        }
+                        MessageInputText.setText("");
                     }
-                    else
-                    {
-                        Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
-                    }
-                    MessageInputText.setText("");
-                }
-            });
+                });
+            } else {
+                DatabaseReference SndDelayRef = RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Delay");
+                DatabaseReference RcvDelayRef = RootRef.child("Messages").child(messageReceiverID).child(messageSenderID).child("Delay");
+                String messageKey = SndDelayRef.push().getKey();
+                DatabaseReference SndMessageKeyRef = SndDelayRef.child(messageKey);
+                DatabaseReference RcvMessageKeyRef = RcvDelayRef.child(messageKey);
+
+                messageTextBody.put("messageID", messageKey);
+                messageTextBody.put("type", "delay");
+                messageTextBody.put("displayDate", currentDateFormat.format(calendar.getTime()));
+                messageTextBody.put("displayTime", currentTimeFormat.format(calendar.getTime()));
+                messageTextBody.put("displayTimestamp", calendar.getTimeInMillis());
+                SndMessageKeyRef.updateChildren(messageTextBody);
+                RcvMessageKeyRef.updateChildren(messageTextBody);
+
+
+                DatabaseReference UserDelayRef = RootRef.child("Users").child(messageSenderID).child("DelayMessage");
+                UserDelayRef.child(messageKey).setValue("");
+                UserDelayRef.child(messageKey).child("type").setValue("chat");
+                UserDelayRef.child(messageKey).child("ref").setValue(messageReceiverID);
+                UserDelayRef.child(messageKey).child("displayDate").setValue(currentDateFormat.format(calendar.getTime()));
+            }
+
         }
     }
 }

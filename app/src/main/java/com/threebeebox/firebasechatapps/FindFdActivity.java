@@ -31,7 +31,8 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FindFdActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class FindFdActivity extends AppCompatActivity{
+// implements AdapterView.OnItemSelectedListener
 
     private ArrayList<String> contactsList = new ArrayList<String>();
 
@@ -76,11 +77,13 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
         mPlusText = (TextView) findViewById(R.id.plus_text);
         mPhoneDistictView = (EditText) findViewById(R.id.distict_input);
 
+        /*
         Spinner dropdown = findViewById(R.id.spinner1);
         String[] items = new String[]{"click to choose...", "phone number", "user name"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
         dropdown.setAdapter(adapter);
         dropdown.setOnItemSelectedListener(this);
+        */
 
         mToolbar = (Toolbar) findViewById(R.id.find_fd_toolbar);
         setSupportActionBar(mToolbar);
@@ -93,6 +96,7 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
         contactsList.clear();
     }
 
+    /*
     @Override
     public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
 
@@ -158,15 +162,31 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
 
         }
     }
+    */
 
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        mSearchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SearchFriend("phoneNumber");
+
+                if (mResultView.getText().equals("Not found")) {
+                    mReminderView.setVisibility(View.VISIBLE);
+                    mResultView.setVisibility(View.VISIBLE);
+                    mUserProfileImage.setVisibility(View.INVISIBLE);
+                    mUsrName.setVisibility(View.INVISIBLE);
+                    mUsrPhone.setVisibility(View.INVISIBLE);
+                    mUsrStatus.setVisibility(View.INVISIBLE);
+                    mAddBtn.setVisibility(View.INVISIBLE);
+                    loadingBar.dismiss();
+                }
+
+            }
+        });
 
         mAddBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,7 +208,7 @@ public class FindFdActivity extends AppCompatActivity implements AdapterView.OnI
 
         mResultView.setText("Not found");
 
-        if (TextUtils.isEmpty(input)) {
+        if (TextUtils.isEmpty(input) || TextUtils.isEmpty(mPhoneNoView.getText().toString())) {
             Toast.makeText(this, "Please enter to search...", Toast.LENGTH_SHORT).show();
         } else {
             loadingBar.setTitle("Finding Friend");

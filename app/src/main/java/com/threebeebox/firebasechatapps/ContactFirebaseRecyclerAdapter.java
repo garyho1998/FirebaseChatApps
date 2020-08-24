@@ -104,7 +104,9 @@ public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Stri
                             Intent chatIntent = new Intent(mCon, ChatActivity.class);
                             chatIntent.putExtra("visit_user_id", userIDs);
                             chatIntent.putExtra("visit_user_name", dataSnapshot.child("name").getValue().toString());
-                            chatIntent.putExtra("visit_image", dataSnapshot.child("image").getValue().toString());
+                            if ( dataSnapshot.child("image").getValue()!=null ) {
+                                chatIntent.putExtra("visit_image", dataSnapshot.child("image").getValue().toString());
+                            }
                             mCon.startActivity(chatIntent);
                         }
                     });
