@@ -98,7 +98,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
         userName.setText(messageReceiverName);
-        Picasso.get().load(messageReceiverImage).placeholder(R.drawable.profile_image).into(userImage);
+        Picasso.get().load(messageReceiverImage).placeholder(R.drawable.user_icon).into(userImage);
 
 
         SendMessageButton.setOnClickListener(new View.OnClickListener() {

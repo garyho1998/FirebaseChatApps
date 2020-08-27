@@ -67,7 +67,7 @@ public class ProfileActivity extends AppCompatActivity {
                 if ((dataSnapshot.exists())  &&  (dataSnapshot.hasChild("image")))
                 {
                     String userImage = dataSnapshot.child("image").getValue().toString();
-                    Picasso.get().load(userImage).placeholder(R.drawable.profile_image).into(userProfileImage);
+                    Picasso.get().load(userImage).placeholder(R.drawable.user_icon).into(userProfileImage);
                 }
 
                 ManageChatRequests();

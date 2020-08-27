@@ -8,10 +8,6 @@
     <color name="windowBackground">#FFFFFF</color>
     <color name="delete">#d11a2a</color>
     <color name="add">#2AD11A</color>
-    <color name="disable">#ff777777</color>
-    <color name="darkGrey">#838383</color>
-    <color name="grey">#D3D3D3</color>
     <color name="lightGrey">#F1F1F1</color>
-    <color name="green">#00BFA5</color>
     <color name="white">#FFFFFF</color>
 </resources>

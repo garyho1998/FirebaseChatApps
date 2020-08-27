@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".CalendarFragment">
 
-
     <TextView
         android:id="@+id/monthView"
         android:layout_width="match_parent"
@@ -45,7 +44,6 @@
         app:layout_constraintEnd_toEndOf="@id/monthView" />
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/monthView"
