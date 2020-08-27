@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -76,6 +77,7 @@ public class ChatActivity extends AppCompatActivity
 
     private ImageButton SendMessageButton, SendFilesButton, DelayBtn;
     private EditText MessageInputText;
+    private FloatingActionButton mcalendarButton;
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
@@ -145,6 +147,18 @@ public class ChatActivity extends AppCompatActivity
             }
         });
 
+        mcalendarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent calendarIntent = new Intent(ChatActivity.this, CalendarActivity.class);
+                calendarIntent.putExtra("type", "chat");
+                calendarIntent.putExtra("sndID", messageSenderID);
+                calendarIntent.putExtra("rcvID", messageReceiverID);
+                calendarIntent.putExtra("name", messageReceiverName);
+                startActivity(calendarIntent);
+            }
+        });
+
     }
 
     private void showDateTimeDialogAndSend() {
@@ -195,6 +209,7 @@ public class ChatActivity extends AppCompatActivity
         SendMessageButton = (ImageButton) findViewById(R.id.send_message_btn);
         SendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
         MessageInputText = (EditText) findViewById(R.id.input_message);
+        mcalendarButton = (FloatingActionButton) findViewById(R.id.calendarButton);
 
         messageAdapter = new MessageAdapter(this, messageReceiverID, messagesList);
         userMessagesList = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
@@ -356,6 +371,19 @@ public class ChatActivity extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
+
+        userMessagesList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0 && mcalendarButton.getVisibility() == View.VISIBLE) {
+                    mcalendarButton.hide();
+                } else if (dy < 0 && mcalendarButton.getVisibility() != View.VISIBLE) {
+                    mcalendarButton.show();
+                }
+            }
+        });
+
 //        messagesList.clear();
 
         RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Chat")

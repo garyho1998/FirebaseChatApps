@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
     }
 
     @Override
-    public void applyEdit(String groupID, String msgID, String msg, String date, String time) {
+    public void applyEdit(String type, String sndID, String rcvID, String groupID, String msgID, String msg, String date, String time) {
 
     }
 }

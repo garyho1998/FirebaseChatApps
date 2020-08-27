@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,10 +52,10 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
     private ExpCalendarView mCalendarView;
     private TextView mdateView, mMonthTextView;
     private Button mTodayBtn, mExpBtn;
-    private String currentGroupName, currentGroupID;
+    private String chatTitleName, currentGroupID, type, sndID, rcvID;
     private RecyclerView mDelayMsgRecyclerList;
 
-    private DatabaseReference GroupsRef, GroupNameRef, DelayMsgRef;
+    private DatabaseReference GroupsRef, GroupNameRef, DelayMsgRef, ChatRef;
     private Query query;
 
     final String TAG = "CalendarActivity";
@@ -73,16 +74,27 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
 
         travelToToday();
 
-        currentGroupName = getIntent().getExtras().get("groupName").toString();
-        currentGroupID = getIntent().getExtras().get("groupID").toString();
+        type = getIntent().getExtras().get("type").toString();
+        if (type.equals("chat")) {
+            sndID = getIntent().getExtras().get("sndID").toString();
+            rcvID = getIntent().getExtras().get("rcvID").toString();
+            chatTitleName = getIntent().getExtras().get("name").toString();
 
-        GroupsRef = FirebaseDatabase.getInstance().getReference().child("Groups");
-        GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupID);
-        DelayMsgRef = GroupNameRef.child("DelayMessage");
+            ChatRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(sndID).child(rcvID);
+            DelayMsgRef = ChatRef.child("Delay");
+        } else if (type.equals("group")) {
+            chatTitleName = getIntent().getExtras().get("groupName").toString();
+            currentGroupID = getIntent().getExtras().get("groupID").toString();
+
+            GroupsRef = FirebaseDatabase.getInstance().getReference().child("Groups");
+            GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupID);
+            DelayMsgRef = GroupNameRef.child("DelayMessage");
+        }
+
 
         mToolbar = (Toolbar) findViewById(R.id.calendar_toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Calendar of " + currentGroupName);
+        getSupportActionBar().setTitle("Calendar of " + chatTitleName);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -178,8 +190,15 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
                                 holder.editBtn.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, currentGroupID, model.getId());
-                                        dialog.show(getSupportFragmentManager(), "edit dialog");
+//                                        EditDelayMsgDialog dialog = new EditDelayMsgDialog(true, currentGroupID, model.getId());
+                                        EditDelayMsgDialog dialog;
+                                        if (type.equals("chat")) {
+                                            dialog = new EditDelayMsgDialog(true, type, sndID, rcvID, null, model.getId());
+                                            dialog.show(getSupportFragmentManager(), "edit dialog");
+                                        } else if (type.equals("group")) {
+                                            dialog = new EditDelayMsgDialog(true, type, null, null, currentGroupID, model.getId());
+                                            dialog.show(getSupportFragmentManager(), "edit dialog");
+                                        }
                                     }
                                 });
 
@@ -194,6 +213,17 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
                                                     public void onClick(DialogInterface dialog,
                                                                         int which) {
                                                         DelayMsgRef.child(model.getId()).removeValue();
+
+                                                        if (type.equals("chat")) {
+                                                            DatabaseReference rcvMsgRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(rcvID).child(sndID).child("Delay");
+                                                            rcvMsgRef.child(model.getId()).removeValue();
+                                                        }
+
+                                                        // also delete the delay message in user reference
+                                                        String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                                        DatabaseReference userDelayRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserID).child("DelayMessage");
+                                                        userDelayRef.child(model.getId()).removeValue();
+
                                                         Toast.makeText(getApplicationContext(), "Delay message deleted!", Toast.LENGTH_LONG).show();
 
                                                         // check marked date
@@ -229,16 +259,22 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
     }
 
     @Override
-    public void applyEdit(String groupID, String msgID, String msg, String date, String time) {
-        Toast.makeText(this, "Delay message edited" + msg, Toast.LENGTH_SHORT).show();
+    public void applyEdit(String type, String sndID, String rcvID, String groupID, String msgID, String msg, String date, String time) {
         //apply change to firebase...
-        DatabaseReference msgRef = GroupNameRef.child("DelayMessage").child(msgID);
+        if (type.equals("chat")) {
+            DatabaseReference rcvMsgRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(rcvID).child(sndID).child("Delay").child(msgID);
+            rcvMsgRef.child("message").setValue(msg);
+            rcvMsgRef.child("displayDate").setValue(date);
+            rcvMsgRef.child("displayTime").setValue(time);
+        }
+        DatabaseReference msgRef = DelayMsgRef.child(msgID);
         msgRef.child("message").setValue(msg);
         msgRef.child("displayDate").setValue(date);
         msgRef.child("displayTime").setValue(time);
 
         onResume();
         RetrieveAndMarkDelayDate();
+        Toast.makeText(this, "Delay message edited" + msg, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -267,7 +303,7 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
 
         //mCalendarView.invalidate();
 
-        GroupNameRef.child("DelayMessage").addValueEventListener(new ValueEventListener() {
+        DelayMsgRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterator<DataSnapshot> items = dataSnapshot.getChildren().iterator();

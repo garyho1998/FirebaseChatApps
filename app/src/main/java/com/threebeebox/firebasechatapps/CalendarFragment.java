@@ -251,7 +251,7 @@ public class CalendarFragment extends Fragment implements EditDelayMsgDialog.Edi
     }
 
     @Override
-    public void applyEdit(String groupID, String msgID, String msg, String date, String time) {
+    public void applyEdit(String type, String sndID, String rcvID, String groupID, String msgID, String msg, String date, String time) {
         Toast.makeText(getContext(), "Delay message edited" + msg, Toast.LENGTH_SHORT).show();
 
         DatabaseReference msgRef = GroupNameRef.child("DelayMessage").child(msgID);
