@@ -71,15 +71,19 @@ public class ChatsFragmentRecyclerAdapter extends RecyclerView.Adapter<ChatsFrag
             holder.minorInfo.setText("offline");
         }
 
-        final Query lastQuery = ChatsRef.child(currentUserId).child(target.userId).orderByKey().limitToLast(1);
+        final Query lastQuery = ChatsRef.child(currentUserId).child(target.userId).child("Chat").orderByKey().limitToLast(1);
         lastQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                setUserMsg(dataSnapshot, holder);
+                if (dataSnapshot.exists()) {
+                    setUserMsg(dataSnapshot, holder);
+                }
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                setUserMsg(dataSnapshot, holder);
+                if (dataSnapshot.exists()) {
+                    setUserMsg(dataSnapshot, holder);
+                }
             }
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {}
@@ -123,11 +127,13 @@ public class ChatsFragmentRecyclerAdapter extends RecyclerView.Adapter<ChatsFrag
 
     private void setUserMsg(DataSnapshot dataSnapshot, ChatsViewHolder holder){
         String type = (String) dataSnapshot.child("type").getValue();
-        if (type.equals("text")) {
-            String text_msg = dataSnapshot.child("message").getValue().toString();
-            holder.userMsg.setText(text_msg);
-        } else if (type.equals("image")) {
-            holder.userMsg.setText("[Image]");
+        if (type!=null) {
+            if (type.equals("text")) {
+                String text_msg = dataSnapshot.child("message").getValue().toString();
+                holder.userMsg.setText(text_msg);
+            } else if (type.equals("image")) {
+                holder.userMsg.setText("[Image]");
+            }
         }
     }
 }

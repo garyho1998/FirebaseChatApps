@@ -245,6 +245,11 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
                             intent.putExtra("groupID", groupID);
                             startActivity(intent);
                             Toast.makeText(MainActivity.this, groupName + " group is Created Successfully...", Toast.LENGTH_SHORT).show();
+
+                            Intent intent = new Intent(MainActivity.this, AddMemberActivity.class);
+                            intent.putExtra("groupName", groupName);
+                            intent.putExtra("groupID", groupID);
+                            startActivity(intent);
                         }
                     }
                 });

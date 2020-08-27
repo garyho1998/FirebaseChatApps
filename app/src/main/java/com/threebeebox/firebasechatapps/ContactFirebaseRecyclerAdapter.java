@@ -83,9 +83,13 @@ public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Stri
 
                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(View view) {
-                            chatIntent.putExtra("visit_image", dataSnapshot.child("image").getValue().toString());
+                        public void onClick(View view)
+                        {
                             chatIntent.putExtra("visit_user_id", userIDs);
+                            chatIntent.putExtra("visit_user_name", dataSnapshot.child("name").getValue().toString());
+                            if ( dataSnapshot.child("image").getValue()!=null ) {
+                                chatIntent.putExtra("visit_image", dataSnapshot.child("image").getValue().toString());
+                            }
                             mCon.startActivity(chatIntent);
                         }
                     });
