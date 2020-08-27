@@ -268,9 +268,9 @@ public class FindFdActivity extends AppCompatActivity{
             mUsrPhone.setText(userPhone);
 
             if (imageUrl != null) {
-                Picasso.get().load(imageUrl).placeholder(R.drawable.profile_image).into(mUserProfileImage);
+                Picasso.get().load(imageUrl).placeholder(R.drawable.user_icon).into(mUserProfileImage);
             } else {
-                Picasso.get().load(R.drawable.profile_image).into(mUserProfileImage);
+                Picasso.get().load(R.drawable.user_icon).into(mUserProfileImage);
             }
             mAddBtn.setText("Add to contact");
             mAddBtn.setBackgroundResource(R.drawable.buttons);

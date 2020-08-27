@@ -118,11 +118,7 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
-                if ((dataSnapshot.child("name").exists()))
-                {
-                    Toast.makeText(MainActivity.this, "Welcome" + dataSnapshot.child("name"), Toast.LENGTH_SHORT).show();
-                }
-                else
+                if (!(dataSnapshot.child("name").exists()))
                 {
                     SendUserToSettingsActivity();
                 }
@@ -245,11 +241,6 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
                             intent.putExtra("groupID", groupID);
                             startActivity(intent);
                             Toast.makeText(MainActivity.this, groupName + " group is Created Successfully...", Toast.LENGTH_SHORT).show();
-
-                            Intent intent = new Intent(MainActivity.this, AddMemberActivity.class);
-                            intent.putExtra("groupName", groupName);
-                            intent.putExtra("groupID", groupID);
-                            startActivity(intent);
                         }
                     }
                 });

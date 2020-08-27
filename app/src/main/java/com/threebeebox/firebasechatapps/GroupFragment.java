@@ -93,7 +93,7 @@ public class GroupFragment extends Fragment {
 
                                         if (groupSnapshot.hasChild("image")) {
                                             String image = groupSnapshot.child("image").getValue().toString();
-                                            Picasso.get().load(image).placeholder(R.drawable.profile_image).into(holder.image);
+                                            Picasso.get().load(image).placeholder(R.drawable.group_icon).into(holder.image);
                                         }
 
                                         holder.itemView.setOnClickListener(new View.OnClickListener() {

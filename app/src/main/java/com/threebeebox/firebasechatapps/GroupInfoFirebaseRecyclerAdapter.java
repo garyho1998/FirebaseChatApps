@@ -70,7 +70,7 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
                                 }
                                 if (userSnapshot.hasChild("image")) {
                                     String userImage = userSnapshot.child("image").getValue().toString();
-                                    Picasso.get().load(userImage).placeholder(R.drawable.profile_image).into(holder.profileImage);
+                                    Picasso.get().load(userImage).placeholder(R.drawable.user_icon).into(holder.profileImage);
                                 }
 
 

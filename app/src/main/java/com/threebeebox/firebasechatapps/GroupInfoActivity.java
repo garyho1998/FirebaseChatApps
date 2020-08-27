@@ -199,6 +199,7 @@ public class GroupInfoActivity extends AppCompatActivity implements GroupInfoRec
                 });
     }
 
+    //save Image
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -227,13 +228,13 @@ public class GroupInfoActivity extends AppCompatActivity implements GroupInfoRec
                     bitmap = new Compressor(this)
                             .setMaxWidth(200)
                             .setMaxHeight(200)
-                            .setQuality(50)
+                            .setQuality(20)
                             .compressToBitmap(filePathUri);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 20, byteArrayOutputStream);
                 final byte[] bytes = byteArrayOutputStream.toByteArray();
 
                 final StorageReference filePath = UserProfileImagesRef.child(currentUserID + ".jpg");
