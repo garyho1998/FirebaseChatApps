@@ -114,7 +114,7 @@ public class ChatsFragmentRecyclerAdapter extends RecyclerView.Adapter<ChatsFrag
             profileImage = itemView.findViewById(R.id.users_profile_image);
             minorInfo = itemView.findViewById(R.id.minor_info);
             userName = itemView.findViewById(R.id.user_profile_name);
-            userMsg = itemView.findViewById(R.id.user_msg);
+            userMsg = itemView.findViewById(R.id.user_status);
             mOnChatListener = onChatListener;
             itemView.setOnClickListener(this);
         }

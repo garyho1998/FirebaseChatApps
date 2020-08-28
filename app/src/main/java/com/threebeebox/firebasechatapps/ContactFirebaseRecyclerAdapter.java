@@ -80,19 +80,6 @@ public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Stri
                         String userImage = dataSnapshot.child("image").getValue().toString();
                         Picasso.get().load(userImage).placeholder(R.drawable.user_icon).into(holder.profileImage);
                     }
-
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view)
-                        {
-                            chatIntent.putExtra("visit_user_id", userIDs);
-                            chatIntent.putExtra("visit_user_name", dataSnapshot.child("name").getValue().toString());
-                            if ( dataSnapshot.child("image").getValue()!=null ) {
-                                chatIntent.putExtra("visit_image", dataSnapshot.child("image").getValue().toString());
-                            }
-                            mCon.startActivity(chatIntent);
-                        }
-                    });
                 }else{
                     getRef(position).removeValue();
                 }

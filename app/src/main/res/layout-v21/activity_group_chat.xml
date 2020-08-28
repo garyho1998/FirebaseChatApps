@@ -24,59 +24,9 @@
         android:paddingTop="10dp"
         android:layout_marginBottom="0dp" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView_groupChat"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:elevation="3dp"
-        app:cardCornerRadius="3dp"
-        app:cardPreventCornerOverlap="false"
-        app:cardUseCompatPadding="true">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="100">
-
-            <ImageButton
-                android:id="@+id/send_files_btn"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="0dp"
-                android:layout_weight="13"
-                android:layout_height="50dp"
-                android:src="@drawable/add_image"
-                android:scaleType="fitXY"
-                />
-            <EditText
-                android:id="@+id/input_group_message"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="61"
-                android:hint="Type here..." />
-
-            <ImageButton
-                android:id="@+id/send_message_button"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="0dp"
-                android:layout_weight="13"
-                android:layout_height="50dp"
-                android:src="@drawable/send_message"
-                android:scaleType="fitXY"
-                />
-
-            <ImageButton
-                android:id="@+id/send_delay_button"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="0dp"
-                android:layout_weight="13"
-                android:layout_height="50dp"
-                android:src="@drawable/delay_msg_icon"
-                android:scaleType="fitXY"
-                />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    <include
+        android:id="@+id/chat_input_field"
+        layout="@layout/chat_input_field" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/calendarButton"
@@ -85,7 +35,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="65dp"
+        android:layout_marginBottom="85dp"
         android:clickable="true"
         android:src="@drawable/ic_calendar"
         app:backgroundTint="@color/white" />

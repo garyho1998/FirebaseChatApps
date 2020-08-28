@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,12 +52,13 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
     private Toolbar mToolbar;
     private ExpCalendarView mCalendarView;
     private TextView mdateView, mMonthTextView;
-    private Button mTodayBtn, mExpBtn;
+    private ImageButton mExpBtn;
     private String currentGroupName, currentGroupID, currentUserID;
     private RecyclerView mDelayMsgRecyclerList;
     private DatabaseReference GroupsRef, GroupNameRef, DelayMsgRef, CurrentUserRef, ChatRef;
     private String chatTitleName, type, sndID, rcvID;
     private Query query;
+    boolean expSeleted;
 
     final String TAG = "CalendarActivity";
 
@@ -69,9 +71,6 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
 
         mdateView = (TextView) findViewById(R.id.dateView);
         mMonthTextView = (TextView) findViewById(R.id.monthView);
-        mTodayBtn = (Button) findViewById(R.id.today_button);
-        mExpBtn = (Button) findViewById(R.id.exp_button);
-
         travelToToday();
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -130,8 +129,9 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
             mCalendarView.unMarkDate((DateData) markData.get(k));
         }
         RetrieveAndMarkDelayDate();
+        expSeleted = true;
+        mExpBtn.setImageResource(R.drawable.down);
         mCalendarView.expand();
-        mExpBtn.setText("Shrink");
         travelToToday();
         System.out.println("onResume");
     }
@@ -140,29 +140,25 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
     protected void onStart() {
         super.onStart();
         RetrieveAndMarkDelayDate();
-
-        mTodayBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int m = selectedDate.getMonth() + 1;
-                mCalendarView.travelTo(new DateData(selectedDate.getYear(), m, selectedDate.getDay()));
-                selectedDate.setMonth(--m);
-            }
-        });
-
+        expSeleted = true;
+        mExpBtn = (ImageButton) findViewById(R.id.exp_button);
         mExpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mExpBtn.getText().equals("Shrink")) {
+                if (expSeleted) {
+                    System.out.println("isSelected");
                     CellConfig.Month2WeekPos = CellConfig.middlePosition;
                     CellConfig.ifMonth = false;
                     mCalendarView.shrink();
-                    mExpBtn.setText("Expand");
-                } else if (mExpBtn.getText().equals("Expand")) {
+                    mExpBtn.setImageResource(R.drawable.down);
+                    expSeleted = false;
+                } else {
+                    System.out.println("isNOTSelected");
                     CellConfig.Week2MonthPos = CellConfig.middlePosition;
                     CellConfig.ifMonth = true;
                     mCalendarView.expand();
-                    mExpBtn.setText("Shrink");
+                    mExpBtn.setImageResource(R.drawable.up_grey);
+                    expSeleted = true;
                 }
             }
         });

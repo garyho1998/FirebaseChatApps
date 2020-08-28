@@ -135,11 +135,9 @@ public class ChatActivity extends AppCompatActivity {
     {
         ChatToolBar = (Toolbar) findViewById(R.id.chat_toolbar);
         setSupportActionBar(ChatToolBar);
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
-
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View actionBarView = layoutInflater.inflate(R.layout.custom_chat_bar, null);
         actionBar.setCustomView(actionBarView);
@@ -151,7 +149,7 @@ public class ChatActivity extends AppCompatActivity {
         DelayBtn = (ImageButton) findViewById(R.id.send_delay_button);
         SendMessageButton = (ImageButton) findViewById(R.id.send_message_button);
         SendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
-        MessageInputText = (EditText) findViewById(R.id.input_meessage);
+        MessageInputText = (EditText) findViewById(R.id.input_message);
         mcalendarButton = (FloatingActionButton) findViewById(R.id.calendarButton);
 
         messageAdapter = new MessageAdapter(this, messageReceiverID, messagesList);

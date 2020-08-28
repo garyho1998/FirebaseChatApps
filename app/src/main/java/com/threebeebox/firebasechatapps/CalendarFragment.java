@@ -59,7 +59,7 @@ public class CalendarFragment extends Fragment{
     private View calendarFragmentView;
     private ExpCalendarView mCalendarView;
     private TextView mDateTextView, mMonthTextView;
-    private Button mTodayBtn, mExpBtn;
+    private ImageButton mExpBtn;
     private RecyclerView DelyMessageRecyclerView;
 
     private String currentUserID;
@@ -85,8 +85,8 @@ public class CalendarFragment extends Fragment{
 
         mDateTextView = (TextView) calendarFragmentView.findViewById(R.id.dateView);
         mMonthTextView = (TextView) calendarFragmentView.findViewById(R.id.monthView);
-        mTodayBtn = (Button) calendarFragmentView.findViewById(R.id.today_button);
-        mExpBtn = (Button) calendarFragmentView.findViewById(R.id.exp_button);
+        // mTodayBtn = (Button) calendarFragmentView.findViewById(R.id.today_button);
+        mExpBtn = (ImageButton) calendarFragmentView.findViewById(R.id.exp_button);
         DelyMessageRecyclerView = (RecyclerView) calendarFragmentView.findViewById(R.id.msgView);
         DelyMessageRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         DelyMessageRecyclerView.setAdapter(new EmptyAdapter());
@@ -125,29 +125,29 @@ public class CalendarFragment extends Fragment{
         Log.i(TAG, "onStart");
         RetrieveAndMarkDelayDate();
 
-        mTodayBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int m = selectedDate.getMonth() + 1;
-                mCalendarView.travelTo(new DateData(selectedDate.getYear(), m, selectedDate.getDay()));
-                m--;
-                selectedDate.setMonth(m);
-            }
-        });
-
+//        mTodayBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                int m = selectedDate.getMonth() + 1;
+//                mCalendarView.travelTo(new DateData(selectedDate.getYear(), m, selectedDate.getDay()));
+//                m--;
+//                selectedDate.setMonth(m);
+//            }
+//        });
+        mExpBtn.setSelected(mExpBtn.isSelected());
         mExpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mExpBtn.getText().equals("Shrink")) {
+                if (mExpBtn.isSelected()) {
                     CellConfig.Month2WeekPos = CellConfig.middlePosition;
                     CellConfig.ifMonth = false;
                     mCalendarView.shrink();
-                    mExpBtn.setText("Expand");
-                } else if (mExpBtn.getText().equals("Expand")) {
+                    mExpBtn.setSelected(!mExpBtn.isSelected());
+                } else {
                     CellConfig.Week2MonthPos = CellConfig.middlePosition;
                     CellConfig.ifMonth = true;
                     mCalendarView.expand();
-                    mExpBtn.setText("Shrink");
+                    mExpBtn.setSelected(mExpBtn.isSelected());
                 }
             }
         });

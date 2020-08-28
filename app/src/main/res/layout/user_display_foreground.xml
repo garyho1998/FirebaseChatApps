@@ -2,17 +2,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/view_foreground"
     android:layout_width="match_parent"
     android:layout_height="70dp"
+    android:background="@color/windowBackground"
     android:orientation="vertical">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/group_image"
+        android:id="@+id/users_profile_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
-        android:src="@drawable/group_icon"
+        android:src="@drawable/user_icon"
         app:civ_circle_background_color="@color/lightGrey"
         />
 
@@ -23,8 +25,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="56dp"
         android:layout_marginBottom="10dp"
-        android:orientation="vertical"
-        android:gravity="center_vertical">
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,16 +33,17 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/group_name"
+                android:id="@+id/user_profile_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="26dp"
                 android:ellipsize="marquee"
                 android:fontFamily="sans-serif"
                 android:singleLine="true"
-                android:text="group name"
+                android:text="user name"
                 android:textFontWeight="500"
                 android:textSize="20sp" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -50,31 +52,30 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id = "@+id/group_msg"
-                android:layout_width = "220dp"
-                android:layout_height = "wrap_content"
+                android:id="@+id/user_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:ellipsize="marquee"
-                android:singleLine="true"
-                android:textSize = "14sp"
                 android:fontFamily="sans-serif"
-                tools:text = "A message from the group" />
+                android:singleLine="true"
+                android:textSize="14sp"
+                tools:text="This is the second line" />
         </LinearLayout>
 
     </LinearLayout>
 
     <TextView
-        android:id = "@+id/minor_info"
-        android:layout_width = "80dp"
-        android:layout_height = "wrap_content"
-        android:layout_alignParentEnd = "true"
-        android:layout_marginEnd = "16dp"
-        android:layout_marginTop = "20dp"
-        android:maxLines = "1"
-        android:maxWidth = "40dp"
-        android:text = "20 min"
-        android:textSize = "14sp"
+        android:id="@+id/minor_info"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
         android:fontFamily="sans-serif"
-        android:visibility="invisible"/>
+        android:maxWidth="40dp"
+        android:maxLines="1"
+        android:text=""
+        android:textSize="12sp" />
 
     <View
         android:layout_width="match_parent"
