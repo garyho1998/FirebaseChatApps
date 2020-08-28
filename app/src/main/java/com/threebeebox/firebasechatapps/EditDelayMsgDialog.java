@@ -25,17 +25,18 @@ public class EditDelayMsgDialog extends AppCompatDialogFragment {
 
     private EditText editMsg, editDate, editTime;
     private TextView textID;
-    private String groupID, msgID, currentUserID;
+    private String type, sndID, rcvID, groupID, msgID;
     private Boolean isAct;
     private EditMsgDialogListener listener;
+    private DatabaseReference msgRef;
 
-    private DatabaseReference GroupRef, UserRef;
-
-    public EditDelayMsgDialog(Boolean isAct, String groupID, String msgID) {
+    public EditDelayMsgDialog(Boolean isAct, String type, String sndID, String rcvID, String groupID, String msgID) {
         this.isAct = isAct;
+        this.type = type;
+        this.sndID = sndID;
+        this.rcvID = rcvID;
         this.groupID = groupID;
         this.msgID = msgID;
-        this.currentUserID = currentUserID;
     }
 //    @NonNull
     @Override
@@ -50,8 +51,16 @@ public class EditDelayMsgDialog extends AppCompatDialogFragment {
         editTime = view.findViewById(R.id.edit_time);
         textID = view.findViewById(R.id.text_id);
 
-        GroupRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupID);
-        DatabaseReference msgRef = GroupRef.child("DelayMessage").child(msgID);
+        if (type.equals("chat")) {
+            DatabaseReference sndChatRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(sndID).child(rcvID);
+//            DatabaseReference rcvChatRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(rcvID).child(sndID);
+            msgRef = sndChatRef.child("Delay").child(msgID);
+
+        } else if (type.equals("group")) {
+            DatabaseReference GroupRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupID);
+            msgRef = GroupRef.child("DelayMessage").child(msgID);
+        }
+
         msgRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -82,7 +91,8 @@ public class EditDelayMsgDialog extends AppCompatDialogFragment {
                         String msg = editMsg.getText().toString();
                         String date = editDate.getText().toString();
                         String time = editTime.getText().toString();
-                        listener.applyEdit(groupID, msgID, msg, date, time);
+                        String id = textID.getText().toString();
+                        listener.applyEdit(type, sndID, rcvID, groupID, msgID, msg, date, time);
                     }
                 });
 
@@ -112,7 +122,7 @@ public class EditDelayMsgDialog extends AppCompatDialogFragment {
 
 
     public interface EditMsgDialogListener{
-        void applyEdit(String groupID, String msgID, String msg, String date, String time);
+        void applyEdit(String type, String sndID, String rcvID, String groupID, String msgID, String msg, String date, String time);
     }
 
 }

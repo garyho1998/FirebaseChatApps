@@ -7,29 +7,21 @@
     android:background="@color/windowBackground"
     tools:context=".MainActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height='wrap_content'
-        android:id="@+id/appBarLayout"
-        >
+    <include
+        android:id="@+id/main_page_toolbar"
+        layout="@layout/app_bar_layout_transparent" />
+    <View android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/toolbar_drop_shadow"
+        android:layout_below="@id/main_page_toolbar"
+        android:id="@+id/toolbar_drop_shadow"/>
 
-        <include
-            android:id="@+id/main_page_toolbar"
-            layout="@layout/app_bar_layout"
-            >
-        </include>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-<!--    <com.threebeebox.firebasechatapps.NoSwipeViewPager-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content">-->
     <FrameLayout
         android:id="@+id/main_tabs_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/appBarLayout"
-        android:layout_above="@+id/bottom_nav" />
+        android:layout_above="@+id/bottom_nav"
+        android:layout_below="@+id/toolbar_drop_shadow" />
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -37,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        app:menu="@menu/bottom_navigation"
-        android:background="?android:attr/windowBackground" />
-<!--    </com.threebeebox.firebasechatapps.NoSwipeViewPager>-->
+        android:background="?android:attr/windowBackground"
+        app:menu="@menu/bottom_navigation" />
+    <!--    </com.threebeebox.firebasechatapps.NoSwipeViewPager>-->
 </RelativeLayout>

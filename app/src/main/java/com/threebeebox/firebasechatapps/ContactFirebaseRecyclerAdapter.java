@@ -78,7 +78,7 @@ public class ContactFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Stri
                     }
                     if (dataSnapshot.hasChild("image")) {
                         String userImage = dataSnapshot.child("image").getValue().toString();
-                        Picasso.get().load(userImage).placeholder(R.drawable.profile_image).into(holder.profileImage);
+                        Picasso.get().load(userImage).placeholder(R.drawable.user_icon).into(holder.profileImage);
                     }
 
                     holder.itemView.setOnClickListener(new View.OnClickListener() {

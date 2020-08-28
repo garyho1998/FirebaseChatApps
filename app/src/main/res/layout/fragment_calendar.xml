@@ -4,56 +4,63 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CalendarFragment">
+    tools:context=".CalendarActivity">
 
     <TextView
         android:id="@+id/monthView"
         android:layout_width="match_parent"
-        android:layout_height="37dp"
-        android:background="@color/colorPrimary"
+        android:layout_height="40dp"
+        android:layout_below="@+id/calendar_toolbar"
+        android:background="@color/white"
         android:padding="6dp"
         android:text="month displayed"
         android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/today_button"
         android:layout_width="75dp"
-        android:layout_height="37dp"
-        android:background="@color/colorPrimary"
+        android:layout_height="40dp"
+        android:layout_marginLeft="1dp"
+        android:background="@drawable/calendar_button"
         android:padding="2dp"
         android:text="Today"
         android:textAllCaps="false"
-        android:textColor="@color/colorFourth"
+        android:textColor="@color/colorPrimary"
         android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="@id/monthView" />
+        app:layout_constraintStart_toStartOf="@id/monthView"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <Button
         android:id="@+id/exp_button"
         android:layout_width="75dp"
         android:layout_height="37dp"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/calendar_button"
         android:padding="2dp"
         android:text="Shrink"
         android:textAllCaps="false"
-        android:textColor="@color/colorFourth"
+        android:textColor="@color/colorPrimary"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="@id/monthView" />
+        app:layout_constraintEnd_toEndOf="@id/monthView"
+        app:layout_constraintTop_toTopOf="parent"
+        style="?attr/materialButtonOutlinedStyle"
+        />
+
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/monthView"
-        android:layout_marginTop="37dp"
-        android:background="#ffffff"
+        android:layout_width="409dp"
+        android:layout_height="0dp"
+        android:layout_below="@+id/monthView"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/monthView">
+        app:layout_constraintTop_toBottomOf="@+id/monthView">
+
 
         <sun.bob.mcalendarview.views.WeekColumnView
             android:layout_width="match_parent"
@@ -74,19 +81,24 @@
 
         <TextView
             android:id="@+id/dateView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/calendarView"
-            android:background="@color/colorPrimary"
             android:text="date selected"
-            android:textSize="20sp" />
+            android:layout_gravity="center"
+            android:textSize="20sp"
+            />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/msgView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="160dp"
             android:layout_below="@+id/dateView"
             android:background="#ffffff"
             />
+
+
     </LinearLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -69,6 +70,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private ImageButton SendMessageButton, SendFilesButton, DelayBtn;
     private EditText MessageInputText;
+    private FloatingActionButton mcalendarButton;
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
@@ -99,43 +101,8 @@ public class ChatActivity extends AppCompatActivity {
         messageReceiverName = getIntent().getExtras().get("visit_user_name").toString();
         messageReceiverImage = (String) getIntent().getExtras().get("visit_image");
 
-
         IntializeControllers();
-
-
-        userName.setText(messageReceiverName);
-        Picasso.get().load(messageReceiverImage).placeholder(R.drawable.user_icon).into(userImage);
-
-
-        SendMessageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view)
-            {
-                SendMessage(null);
-            }
-        });
-
         DisplayLastSeen();
-
-        SendFilesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(ChatActivity.this);
-            }
-        });
-
-        DelayBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = MessageInputText.getText().toString();
-                if (!TextUtils.isEmpty(message)) {
-                    showDateTimeDialogAndSend();
-                }
-            }
-        });
-
     }
 
     private void showDateTimeDialogAndSend() {
@@ -181,10 +148,11 @@ public class ChatActivity extends AppCompatActivity {
         userLastSeen = (TextView) findViewById(R.id.custom_user_last_seen);
         userImage = (CircleImageView) findViewById(R.id.custom_profile_image);
 
-        DelayBtn = (ImageButton) findViewById(R.id.send_delay_btn);
-        SendMessageButton = (ImageButton) findViewById(R.id.send_message_btn);
+        DelayBtn = (ImageButton) findViewById(R.id.send_delay_button);
+        SendMessageButton = (ImageButton) findViewById(R.id.send_message_button);
         SendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
-        MessageInputText = (EditText) findViewById(R.id.input_message);
+        MessageInputText = (EditText) findViewById(R.id.input_meessage);
+        mcalendarButton = (FloatingActionButton) findViewById(R.id.calendarButton);
 
         messageAdapter = new MessageAdapter(this, messageReceiverID, messagesList);
         userMessagesList = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
@@ -194,6 +162,44 @@ public class ChatActivity extends AppCompatActivity {
 
         loadingBar = new ProgressDialog(this);
 
+        userName.setText(messageReceiverName);
+        Picasso.get().load(messageReceiverImage).placeholder(R.drawable.user_icon).into(userImage);
+
+        SendMessageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                SendMessage(null);
+            }
+        });
+        SendFilesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .start(ChatActivity.this);
+            }
+        });
+        DelayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String message = MessageInputText.getText().toString();
+                if (!TextUtils.isEmpty(message)) {
+                    showDateTimeDialogAndSend();
+                }
+            }
+        });
+        mcalendarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent calendarIntent = new Intent(ChatActivity.this, CalendarActivity.class);
+                calendarIntent.putExtra("type", "chat");
+                calendarIntent.putExtra("sndID", messageSenderID);
+                calendarIntent.putExtra("rcvID", messageReceiverID);
+                calendarIntent.putExtra("name", messageReceiverName);
+                startActivity(calendarIntent);
+            }
+        });
         Calendar calendar = Calendar.getInstance();
 
         SimpleDateFormat currentDate = new SimpleDateFormat("MMM dd, yyyy");
@@ -323,6 +329,19 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        userMessagesList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0 && mcalendarButton.getVisibility() == View.VISIBLE) {
+                    mcalendarButton.hide();
+                } else if (dy < 0 && mcalendarButton.getVisibility() != View.VISIBLE) {
+                    mcalendarButton.show();
+                }
+            }
+        });
+
 //        messagesList.clear();
         RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Chat")
                 .addChildEventListener(new ChildEventListener() {
@@ -504,8 +523,9 @@ public class ChatActivity extends AppCompatActivity {
                 UserDelayRef.child(messageKey).child("type").setValue("chat");
                 UserDelayRef.child(messageKey).child("ref").setValue(messageReceiverID);
                 UserDelayRef.child(messageKey).child("displayDate").setValue(currentDateFormat.format(calendar.getTime()));
+                UserDelayRef.child(messageKey).child("displayTimestamp").setValue(calendar.getTimeInMillis());
             }
-
+            MessageInputText.setText("");
         }
     }
 }

@@ -3,6 +3,7 @@ package com.threebeebox.firebasechatapps;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,11 +15,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -51,23 +52,24 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
 
         mToolbar = (Toolbar) findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("3BeeBox");
-        bottomNav = findViewById(R.id.bottom_nav);
+        getSupportActionBar().setTitle(Html.fromHtml("<font color=\"#FF9800\">" + getString(R.string.app_name) + "</font>"));
+        getSupportActionBar().setElevation(20);
 
-        if(currentUser==null){
+        bottomNav = findViewById(R.id.bottom_nav);
+        if (currentUser == null) {
             SendUserToLoginActivity();
-        }else{
+        } else {
             getSupportFragmentManager().beginTransaction().replace(R.id.main_tabs_pager, new ChatFragment()).commit();
         }
 
     }
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
-        if(currentUser==null){
+        if (currentUser == null) {
             SendUserToLoginActivity();
-        }else{
+        } else {
             updateUserStatus("online");
             VerifyUserExistance();
 
@@ -110,16 +112,13 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
         }
     }
 
-    private void VerifyUserExistance()
-    {
+    private void VerifyUserExistance() {
         currentUserID = mAuth.getCurrentUser().getUid();
 
         RootRef.child("Users").child(currentUserID).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                if (!(dataSnapshot.child("name").exists()))
-                {
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!(dataSnapshot.child("name").exists())) {
                     SendUserToSettingsActivity();
                 }
             }
@@ -131,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
         });
     }
 
-    private void SendUserToLoginActivity(){
+    private void SendUserToLoginActivity() {
         updateUserStatus("offline");
         currentUser = null;
 
@@ -141,15 +140,16 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
         finish();
     }
 
-    private void SendUserToSettingsActivity(){
+    private void SendUserToSettingsActivity() {
         Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(intent);
     }
 
-    private void SendUserToFindFriendsActivity(){
+    private void SendUserToFindFriendsActivity() {
         Intent intent = new Intent(MainActivity.this, FindFriendsActivity.class);
         startActivity(intent);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -160,17 +160,17 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         super.onOptionsItemSelected(item);
-        if(item.getItemId()== R.id.main_logout_option){
+        if (item.getItemId() == R.id.main_logout_option) {
             mAuth.signOut();
             SendUserToLoginActivity();
         }
-        if(item.getItemId()== R.id.main_settings_option){
+        if (item.getItemId() == R.id.main_settings_option) {
             SendUserToSettingsActivity();
         }
-        if(item.getItemId()== R.id.main_create_group_option){
+        if (item.getItemId() == R.id.main_create_group_option) {
             RequestNewGroup();
         }
-        if(item.getItemId()== R.id.main_fd_option){
+        if (item.getItemId() == R.id.main_fd_option) {
             SendUserToFindFirendActivity();
         }
         return true;
@@ -181,8 +181,7 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
         startActivity(intent);
     }
 
-    private void RequestNewGroup()
-    {
+    private void RequestNewGroup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
         builder.setTitle("Enter Group Name :");
 
@@ -192,16 +191,12 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
 
         builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i)
-            {
+            public void onClick(DialogInterface dialogInterface, int i) {
                 String groupName = groupNameField.getText().toString();
 
-                if (TextUtils.isEmpty(groupName))
-                {
+                if (TextUtils.isEmpty(groupName)) {
                     Toast.makeText(MainActivity.this, "Please write Group Name...", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
+                } else {
                     CreateNewGroup(groupName);
 
                 }
@@ -210,8 +205,7 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
 
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i)
-            {
+            public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.cancel();
             }
         });
@@ -219,17 +213,14 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
         builder.show();
     }
 
-    private void CreateNewGroup(final String groupName)
-    {
+    private void CreateNewGroup(final String groupName) {
         final DatabaseReference GroupRef = RootRef.child("Groups");
         final String groupID = GroupRef.push().getKey();
         GroupRef.child(groupID).setValue("")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<Void> task)
-                    {
-                        if (task.isSuccessful())
-                        {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
                             GroupRef.child(groupID).child("DelayMessage").setValue("");
                             GroupRef.child(groupID).child("Message").setValue("");
                             GroupRef.child(groupID).child("Member").child(currentUserID).setValue("Admin");
@@ -247,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
 
     }
 
-    private void updateUserStatus (String state) {
+    private void updateUserStatus(String state) {
         String saveCurrentTime, saveCurrentDate;
 
         Calendar calendar = Calendar.getInstance();
@@ -263,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
         onlineState.put("date", saveCurrentDate);
         onlineState.put("state", state);
 
-        if (currentUser!=null) {
+        if (currentUser != null) {
             currentUserID = currentUser.getUid();
 
             RootRef.child("Users").child(currentUserID).child("userState")
@@ -274,15 +265,18 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
 
     //For edit msg in CalendarFragment
     @Override
-    public void applyEdit(String groupID, String msgID, String msg, String date, String time) {
+    public void applyEdit(String type, String sndID, String rcvID, String groupID, String msgID, String msg, String date, String time) {
         Toast.makeText(MainActivity.this, "Delay message edited" + msg, Toast.LENGTH_SHORT).show();
-
-        DatabaseReference msgRef = RootRef.child("Groups").child(groupID).child("DelayMessage").child(msgID);
-        msgRef.child("message").setValue(msg);
-        msgRef.child("displayDate").setValue(date);
-        msgRef.child("displayTime").setValue(time);
-
-        RootRef.child("Users").child(currentUserID).child("DelayMessage").child(msgID).child("displayDate").setValue(date);
+        if(groupID!=null){
+            DatabaseReference groupMsgRef = RootRef.child("Groups").child(groupID).child("DelayMessage").child(msgID);
+            groupMsgRef.child("message").setValue(msg);
+            groupMsgRef.child("displayDate").setValue(date);
+            groupMsgRef.child("displayTime").setValue(time);
+        }
+        DatabaseReference userMsgRef = RootRef.child("Users").child(currentUserID).child("DelayMessage").child(msgID);
+        userMsgRef.child("displayDate").setValue(date);
+        userMsgRef.child("message").setValue(msg);
+        userMsgRef.child("displayTime").setValue(time);
         onResume();
     }
 }

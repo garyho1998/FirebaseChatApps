@@ -124,6 +124,7 @@ public class GroupChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent calendarIntent = new Intent(GroupChatActivity.this, CalendarActivity.class);
+                calendarIntent.putExtra("type", "group");
                 calendarIntent.putExtra("groupName", currentGroupName);
                 calendarIntent.putExtra("groupID", currentGroupID);
                 startActivity(calendarIntent);
@@ -529,7 +530,11 @@ public class GroupChatActivity extends AppCompatActivity {
                 UserDelayRef.child(messageKey).child("type").setValue("group");
                 UserDelayRef.child(messageKey).child("ref").setValue(currentGroupID);
                 UserDelayRef.child(messageKey).child("displayDate").setValue(currentDateFormat.format(calendar.getTime()));
+                UserDelayRef.child(messageKey).child("displayTimestamp").setValue(calendar.getTimeInMillis());
+
+
             }
+            userMessageInput.setText("");
         }
     }
 

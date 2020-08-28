@@ -9,72 +9,86 @@
 
     <include
         android:id="@+id/chat_toolbar"
-        layout="@layout/app_bar_layout">
-    </include>
-
+        layout="@layout/app_bar_layout_transparent" />
+    <View android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/toolbar_drop_shadow"
+        android:layout_below="@id/chat_toolbar"
+        android:id="@+id/toolbar_drop_shadow"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/private_messages_list_of_users"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/chat_toolbar"
-        android:layout_above="@+id/chat_linear_layout"
+        android:layout_above="@+id/cardView_chat"
         android:layout_marginBottom="0dp"
         >
     </androidx.recyclerview.widget.RecyclerView>
 
-
-    <RelativeLayout
-        android:id="@+id/chat_linear_layout"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_chat"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/background_light"
-        android:orientation="horizontal"
-        >
-
+        android:elevation="3dp"
+        app:cardCornerRadius="3dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="true">
         <LinearLayout
-            android:id="@+id/myLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true">
+            android:weightSum="100">
 
             <ImageButton
                 android:id="@+id/send_files_btn"
-                android:layout_width="60dp"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="0dp"
+                android:layout_weight="13"
+                android:layout_height="50dp"
+                android:src="@drawable/add_image"
+                android:scaleType="fitXY"
+                />
+            <EditText
+                android:id="@+id/input_meessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="61"
+                android:hint="Type here..." />
+
+            <ImageButton
+                android:id="@+id/send_message_button"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="0dp"
+                android:layout_weight="13"
                 android:layout_height="50dp"
                 android:src="@drawable/send_message"
-                android:layout_alignParentStart="true"
-                android:backgroundTint="@android:color/white"
-                />
-
-            <EditText
-                android:id="@+id/input_message"
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:hint="write your message here..."
-                android:padding="17dp"
-                android:layout_toEndOf="@id/send_files_btn"
-                android:layout_toStartOf="@+id/send_message_btn"
-                />
-            <ImageButton
-                android:id="@+id/send_message_btn"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/send_message"
+                android:scaleType="fitXY"
                 />
 
             <ImageButton
-                android:id="@+id/send_delay_btn"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/send_message"
+                android:id="@+id/send_delay_button"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="0dp"
+                android:layout_weight="13"
+                android:layout_height="50dp"
+                android:src="@drawable/delay_msg_icon"
+                android:scaleType="fitXY"
                 />
         </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-    </RelativeLayout>
-
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/calendarButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="65dp"
+        app:backgroundTint="@color/white"
+        android:clickable="true"
+        android:src="@drawable/ic_calendar" />
 </RelativeLayout>

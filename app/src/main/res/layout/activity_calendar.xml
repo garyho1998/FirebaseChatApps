@@ -7,7 +7,7 @@
     tools:context=".CalendarActivity">
 
     <include
-        layout="@layout/app_bar_layout"
+        layout="@layout/app_bar_layout_transparent"
         android:id="@+id/calendar_toolbar"
         >
     </include>
@@ -18,11 +18,11 @@
         android:layout_height="40dp"
         android:layout_below="@+id/calendar_toolbar"
         android:layout_marginTop="55dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/white"
         android:padding="6dp"
         android:text="month displayed"
         android:textAlignment="center"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/colorPrimaryDark"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent" />
@@ -31,29 +31,33 @@
         android:id="@+id/today_button"
         android:layout_width="75dp"
         android:layout_height="40dp"
+        android:layout_marginLeft="1dp"
         android:layout_marginTop="55dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@drawable/calendar_button"
         android:padding="2dp"
         android:text="Today"
         android:textAllCaps="false"
-        android:textColor="@android:color/background_light"
+        android:textColor="@color/colorPrimary"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="@id/monthView"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <Button
         android:id="@+id/exp_button"
         android:layout_width="75dp"
         android:layout_height="37dp"
         android:layout_marginTop="55dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@drawable/calendar_button"
         android:padding="2dp"
         android:text="Shrink"
         android:textAllCaps="false"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorPrimary"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="@id/monthView"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        style="?attr/materialButtonOutlinedStyle"
+        />
 
 
     <LinearLayout
