@@ -104,7 +104,7 @@ public class CalendarFragment extends Fragment{
         int yyyy = today.get(Calendar.YEAR);
         selectedDate = new DateData(yyyy, mm, dd);
         int month = selectedDate.getMonth() + 1;
-        String sDate = TransferMonth(mm + 1) + " " + dd + ", " + yyyy;
+        String sDate = TransformMonth(mm + 1) + " " + TransformDay(dd) + ", " + yyyy;
         mDateTextView.setText(sDate);
         mMonthTextView.setText(Integer.toString(yyyy) + "-" + Integer.toString(++(mm)));
         mCalendarView.travelTo(new DateData(yyyy, mm, dd));
@@ -168,7 +168,7 @@ public class CalendarFragment extends Fragment{
         mCalendarView.setOnDateClickListener(new OnDateClickListener() {
             @Override
             public void onDateClick(View view, DateData date) {
-                final String selectedDate = TransferMonth(date.getMonth()) + " " + date.getDay() + ", " + date.getYear();
+                final String selectedDate = TransformMonth(date.getMonth()) + " " + TransformDay(date.getDay()) + ", " + date.getYear();
                 mDateTextView.setText(selectedDate);
                 MarkedDates markedDates = mCalendarView.getMarkedDates();
                 ArrayList markDataList = markedDates.getAll();
@@ -385,7 +385,7 @@ public class CalendarFragment extends Fragment{
         }
     }
 
-    private String TransferMonth(int month) {
+    private String TransformMonth(int month) {
         switch (month) {
             case 1:
                 return "Jan";
@@ -414,6 +414,13 @@ public class CalendarFragment extends Fragment{
             default:
                 return null;
         }
+    }
 
+    private String TransformDay(int day){
+        if (day<10){
+            return "0"+ Integer.toString(day);
+        }else{
+            return  Integer.toString(day);
+        }
     }
 }

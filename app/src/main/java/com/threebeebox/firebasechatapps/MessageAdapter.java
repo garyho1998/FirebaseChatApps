@@ -193,8 +193,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             }
         }
 
-
-
         if (i>0) {
             Messages pm = userMessagesList.get(i-1);
             if ( !messages.getDate().equals(pm.getDate()) ) { //display date only if the date is different from previous

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -111,7 +112,7 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
         int yyyy = today.get(Calendar.YEAR);
         selectedDate = new DateData(yyyy, mm, dd);
         int month = selectedDate.getMonth() + 1;
-        String sDate = TransferMonth(month) + " " + selectedDate.getDay() + ", " + selectedDate.getYear();
+        String sDate = TransformMonth(month) + " " + TransformDay(selectedDate.getDay()) + ", " + selectedDate.getYear();
         mdateView.setText(sDate);
         mMonthTextView.setText(Integer.toString(yyyy) + "-" + Integer.toString(++(mm)));
         mCalendarView.travelTo(new DateData(yyyy, mm, dd));
@@ -173,7 +174,7 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
             @Override
             public void onDateClick(View view, DateData date) {
 
-                final String sDate = TransferMonth(date.getMonth()) + " " + date.getDay() + ", " + date.getYear();
+                final String sDate = TransformMonth(date.getMonth()) + " " + TransformDay(date.getDay()) + ", " + date.getYear();
                 mdateView.setText(sDate);
 
                 query = DelayMsgRef.orderByChild("displayDate").equalTo(sDate);
@@ -343,7 +344,7 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
 
     }
 
-    private String TransferMonth(int month) {
+    private String TransformMonth(int month) {
         switch (month) {
             case 1:
                 return "Jan";
@@ -372,6 +373,13 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
             default:
                 return null;
         }
+    }
 
+    private String TransformDay(int day){
+        if (day<10){
+            return "0"+ Integer.toString(day);
+        }else{
+            return  Integer.toString(day);
+        }
     }
 }
