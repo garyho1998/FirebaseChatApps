@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,7 +14,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,7 +56,7 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
     private DatabaseReference GroupsRef, GroupNameRef, DelayMsgRef, CurrentUserRef, ChatRef;
     private String chatTitleName, type, sndID, rcvID;
     private Query query;
-    boolean expSeleted;
+    boolean expSeleted = true;
 
     final String TAG = "CalendarActivity";
 
@@ -68,7 +66,6 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
         setContentView(R.layout.activity_calendar);
 
         mCalendarView = (ExpCalendarView) findViewById(R.id.calendarView);
-
         mdateView = (TextView) findViewById(R.id.dateView);
         mMonthTextView = (TextView) findViewById(R.id.monthView);
         travelToToday();
@@ -130,7 +127,7 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
         }
         RetrieveAndMarkDelayDate();
         expSeleted = true;
-        mExpBtn.setImageResource(R.drawable.down);
+        mExpBtn.setImageResource(R.drawable.up_grey);
         mCalendarView.expand();
         travelToToday();
         System.out.println("onResume");
@@ -140,8 +137,10 @@ public class CalendarActivity extends AppCompatActivity implements EditDelayMsgD
     protected void onStart() {
         super.onStart();
         RetrieveAndMarkDelayDate();
+
         expSeleted = true;
         mExpBtn = (ImageButton) findViewById(R.id.exp_button);
+        mExpBtn.setImageResource(R.drawable.up_grey);
         mExpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

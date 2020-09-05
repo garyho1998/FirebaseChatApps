@@ -139,7 +139,6 @@ public class GroupChatActivity extends AppCompatActivity {
                         .start(GroupChatActivity.this);
             }
         });
-
     }
 
     @Override
@@ -160,7 +159,6 @@ public class GroupChatActivity extends AppCompatActivity {
                 loadingBar.show();
 
                 final Uri resultUri = result.getUri();
-
                 File filePathUri = new File(resultUri.getPath());
                 Bitmap bitmap = null;
                 try {
@@ -190,7 +188,7 @@ public class GroupChatActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Uri uri) {
                                 Map messageTextBody = new HashMap();
-                                messageTextBody.put("message", uri);
+                                messageTextBody.put("message", uri.toString());
                                 messageTextBody.put("name", currentUserName);
                                 messageTextBody.put("type", "image");
                                 //name is the sender user name, here is the sender user id
@@ -265,19 +263,29 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         });
 
-        GroupNameRef.child("Message").orderByChild("timestamp")
+        GroupNameRef.child("Message").orderByChild("displayTimestamp")
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        Messages messages = dataSnapshot.getValue(Messages.class);
-                        if(messages!=null){
-                            if (!messagesList.contains(messages)) {
-                                messagesList.add(messages);
-                                gpMsgAdapter.notifyDataSetChanged();
+                        if(dataSnapshot.child("type").getValue().equals("delay")){
+                            DelayMsg messages = dataSnapshot.getValue(DelayMsg.class);
+                            if(messages!=null){
+                                if (!messagesList.contains(messages.toParent())) {
+                                    messagesList.add(messages.toParent());
+                                    gpMsgAdapter.notifyDataSetChanged();
+                                }
+                                userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
                             }
-                            userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
+                        }else{
+                            Messages messages = dataSnapshot.getValue(Messages.class);
+                            if(messages!=null){
+                                if (!messagesList.contains(messages)) {
+                                    messagesList.add(messages);
+                                    gpMsgAdapter.notifyDataSetChanged();
+                                }
+                                userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
+                            }
                         }
-
                     }
 
                     @Override
@@ -355,7 +363,7 @@ public class GroupChatActivity extends AppCompatActivity {
         SendFilesButton = (ImageButton) findViewById(R.id.send_files_btn);
         SendMessageButton = (ImageButton) findViewById(R.id.send_message_button);
         DelyButton = (ImageButton) findViewById(R.id.send_delay_button);
-        userMessageInput = (EditText) findViewById(R.id.input_group_message);
+        userMessageInput = (EditText) findViewById(R.id.input_message);
         mcalendarButton = (FloatingActionButton) findViewById(R.id.calendarButton);
 
         // Log.d("myTag", "currentUserName passed to msgAdapter: " + currentUserName + "     currentUserID: " + currentUserID);
@@ -380,42 +388,31 @@ public class GroupChatActivity extends AppCompatActivity {
 
 
     private void SetAlarmFromDelayMessage(DataSnapshot dataSnapshot) {
-        String id = dataSnapshot.getKey();
-        String userName = "";
-        if (dataSnapshot.hasChild("name")) {
-            userName = (String) dataSnapshot.child("name").getValue();
-        } else {
-            if (dataSnapshot.hasChild("phoneNumber")) {
-                userName = (String) dataSnapshot.child("phoneNumber").getValue();
-            }
-        }
-        String date = (String) dataSnapshot.child("date").getValue();
-        String message = (String) dataSnapshot.child("message").getValue();
-        String time = (String) dataSnapshot.child("time").getValue();
+        final String messageID = dataSnapshot.getKey();
         Long displayTimestamp = (Long) dataSnapshot.child("displayTimestamp").getValue();
 
         if ((displayTimestamp - System.currentTimeMillis()) <= 0) {
-            Map<String, Object> messageObject = new HashMap<String, Object>();
-            messageObject.put("timestamp", displayTimestamp);
-            messageObject.put("date", date);
-            messageObject.put("message", message);
-            messageObject.put("name", userName);
-            messageObject.put("time", time);
-
-            Map<String, Object> childUpdates = new HashMap<>();
-            Map<String, Object> childDelete = new HashMap<>();
-            childUpdates.put(id, messageObject);
-            GroupNameRef.child("Message").updateChildren(childUpdates);
-            childDelete.put(id, null);
-            GroupNameRef.child("DelayMessage").updateChildren(childDelete);
-
+            GroupNameRef.child("DelayMessage").child(messageID).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    GroupNameRef.child("Message").child(messageID).setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            GroupNameRef.child("DelayMessage").child(messageID).removeValue();
+                        }
+                    });
+                }
+                @Override
+                public void onCancelled(DatabaseError error) {
+                }
+            });
         } else {
-            alarmController.addAlarm(this, id, displayTimestamp, currentGroupName);
+            alarmController.addAlarm(this, messageID, displayTimestamp, currentGroupID);
         }
     }
 
     private void GetUserInfo() {
-        UsersRef.child(currentUserID).addValueEventListener(new ValueEventListener() {
+        UsersRef.child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -459,7 +456,9 @@ public class GroupChatActivity extends AppCompatActivity {
                 messageObject.put("type", "normal");
                 messageObject.put("date", currentDate);
                 messageObject.put("time", currentTime);
-                messageObject.put("timestamp", now.getTimeInMillis());
+                messageObject.put("displayDate", currentDate);
+                messageObject.put("displayTime", currentTime);
+                messageObject.put("displayTimestamp", now.getTimeInMillis());
                 GroupMessageKeyRef.updateChildren(messageObject).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -531,8 +530,6 @@ public class GroupChatActivity extends AppCompatActivity {
                 UserDelayRef.child(messageKey).child("ref").setValue(currentGroupID);
                 UserDelayRef.child(messageKey).child("displayDate").setValue(currentDateFormat.format(calendar.getTime()));
                 UserDelayRef.child(messageKey).child("displayTimestamp").setValue(calendar.getTimeInMillis());
-
-
             }
             userMessageInput.setText("");
         }

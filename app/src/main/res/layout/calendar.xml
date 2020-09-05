@@ -10,7 +10,6 @@
         android:id="@+id/monthView"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_below="@+id/calendar_toolbar"
         android:background="@color/white"
         android:paddingTop="6dp"
         android:text="month displayed"
@@ -25,16 +24,15 @@
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:src="@drawable/up_grey"
-        android:padding="1dp"
-        android:background="@drawable/exp_btn"
         android:layout_gravity="center"
-        android:scaleType="fitCenter"
-        android:layout_marginRight="15dp"
         android:layout_marginTop="5dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/up_grey"
+        android:background="@drawable/up_button_shape"
+        android:padding="1dp"
+        android:scaleType="fitCenter"
         app:layout_constraintEnd_toEndOf="@id/monthView"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:layout_width="409dp"

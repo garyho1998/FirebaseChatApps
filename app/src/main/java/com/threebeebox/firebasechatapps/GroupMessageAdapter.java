@@ -150,7 +150,7 @@ public class GroupMessageAdapter extends RecyclerView.Adapter<GroupMessageAdapte
         //display user name view
         if (i>0) {
             Messages pm = userMessagesList.get(i-1);
-            if ( !messages.getFrom().equals(pm.getFrom()) && !from.equals(currentUserID) ) {
+            if ( !messages.getFrom().equals(pm.getFrom()) && !messages.getFrom().equals(currentUserID) ) {
                 messageViewHolder.rcvNameText.setVisibility(View.VISIBLE);
                 messageViewHolder.rcvNameText.setText( messages.getName() );
             }

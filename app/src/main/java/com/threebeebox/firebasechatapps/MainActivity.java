@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
     }
 
     private void SendUserToFindFriendsActivity() {
-        Intent intent = new Intent(MainActivity.this, FindFriendsActivity.class);
+        Intent intent = new Intent(MainActivity.this, FindFdActivity    .class);
         startActivity(intent);
     }
 

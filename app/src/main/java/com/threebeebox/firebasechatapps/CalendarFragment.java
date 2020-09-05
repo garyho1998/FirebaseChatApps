@@ -56,6 +56,7 @@ public class CalendarFragment extends Fragment{
     private ArrayList<DateData> dateList = new ArrayList<DateData>();
     private Calendar today;
     private DateData selectedDate;
+    boolean expSeleted = true;
     private View calendarFragmentView;
     private ExpCalendarView mCalendarView;
     private TextView mDateTextView, mMonthTextView;
@@ -117,37 +118,42 @@ public class CalendarFragment extends Fragment{
         super.onResume();
         Log.i(TAG, "onResume");
         RetrieveAndMarkDelayDate();
+        expSeleted = true;
+        mExpBtn.setImageResource(R.drawable.up_grey);
+        mCalendarView.expand();
+
+        mCalendarView.travelTo(new DateData(selectedDate.getYear(), selectedDate.getMonth() + 1, selectedDate.getDay()));
+        selectedDate.setMonth(selectedDate.getMonth());
     }
 
     @Override
     public void onStart() {
         super.onStart();
         Log.i(TAG, "onStart");
+        mCalendarView.travelTo(new DateData(selectedDate.getYear(), selectedDate.getMonth() + 1, selectedDate.getDay()));
+        selectedDate.setMonth(selectedDate.getMonth());
         RetrieveAndMarkDelayDate();
 
-//        mTodayBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                int m = selectedDate.getMonth() + 1;
-//                mCalendarView.travelTo(new DateData(selectedDate.getYear(), m, selectedDate.getDay()));
-//                m--;
-//                selectedDate.setMonth(m);
-//            }
-//        });
-        mExpBtn.setSelected(mExpBtn.isSelected());
+        expSeleted = true;
+        mExpBtn.setImageResource(R.drawable.up_grey);
+        mExpBtn = (ImageButton) getActivity().findViewById(R.id.exp_button);
         mExpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mExpBtn.isSelected()) {
+                if (expSeleted) {
+                    System.out.println("isSelected");
                     CellConfig.Month2WeekPos = CellConfig.middlePosition;
                     CellConfig.ifMonth = false;
                     mCalendarView.shrink();
-                    mExpBtn.setSelected(!mExpBtn.isSelected());
+                    mExpBtn.setImageResource(R.drawable.down);
+                    expSeleted = false;
                 } else {
+                    System.out.println("isNOTSelected");
                     CellConfig.Week2MonthPos = CellConfig.middlePosition;
                     CellConfig.ifMonth = true;
                     mCalendarView.expand();
-                    mExpBtn.setSelected(mExpBtn.isSelected());
+                    mExpBtn.setImageResource(R.drawable.up_grey);
+                    expSeleted = true;
                 }
             }
         });

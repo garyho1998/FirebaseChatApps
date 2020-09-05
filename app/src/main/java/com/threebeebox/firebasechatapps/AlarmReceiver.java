@@ -7,6 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseError;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,15 +36,20 @@ public class AlarmReceiver extends BroadcastReceiver
         wl.acquire();
 
         //Update firebase
-        String id = intent.getStringExtra("id");
-        String groupName = intent.getStringExtra("groupName");
+        final String messageID = intent.getStringExtra("messageID");
+        String groupID = intent.getStringExtra("groupID");
 
         mAuth = FirebaseAuth.getInstance();
-        GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupName);
-        GroupNameRef.child("DelayMessage").child(id).addValueEventListener(new ValueEventListener() {
+        GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupID);
+        GroupNameRef.child("DelayMessage").child(messageID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                UpdateFirebaseFromAlarm(dataSnapshot);
+                GroupNameRef.child("Message").child(messageID).setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        GroupNameRef.child("DelayMessage").child(messageID).removeValue();
+                    }
+                });
             }
             @Override
             public void onCancelled(DatabaseError error) {
@@ -48,39 +58,6 @@ public class AlarmReceiver extends BroadcastReceiver
             }
         });
         wl.release();
-    }
-    private void UpdateFirebaseFromAlarm(DataSnapshot dataSnapshot) {
-//        Log.i(TAG, "UpdateFirebaseFromAlarm");
-        String id = dataSnapshot.getKey();
-        String date = (String) dataSnapshot.child("date").getValue();
-        String message = (String) dataSnapshot.child("message").getValue();
-        String name = "";
-        if(dataSnapshot.hasChild("name")){
-            name = (String) dataSnapshot.child("name").getValue();
-        }else{
-            if(dataSnapshot.hasChild("phoneNumber")){
-                name = (String) dataSnapshot.child("phoneNumber").getValue();
-            }
-        }
-        String time = (String) dataSnapshot.child("time").getValue();
-        Long displayTimestamp = (Long) dataSnapshot.child("displayTimestamp").getValue();
-//        Log.i(TAG, "id: "+id+", message:"+message);
-        if(message!=null){
-            Map<String, Object> messageObject = new HashMap<String, Object>();
-            messageObject.put("timestamp", displayTimestamp);
-            messageObject.put("date", date);
-            messageObject.put("message", message);
-            messageObject.put("name", name);
-            messageObject.put("time", time);
-//            Log.i(TAG, "messageObject: "+convertWithIteration(messageObject));
-
-            Map<String, Object> childUpdates = new HashMap<>();
-            Map<String, Object> childDelete = new HashMap<>();
-            childUpdates.put(id, messageObject);
-            GroupNameRef.child("Message").updateChildren(childUpdates);
-            childDelete.put(id, null);
-            GroupNameRef.child("DelayMessage").updateChildren(childDelete);
-        }
     }
 
     public void setAlarm(Context context)

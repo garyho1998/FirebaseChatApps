@@ -13,20 +13,20 @@ public class AlarmController {
     int num = 0;
     static final String TAG = "AlarmController";
 
-    public void addAlarm(Context context, String id, Long timestamp, String groupName){
-        if(alarmIDlist.contains(id)){
+    public void addAlarm(Context context, String messageID, Long timestamp, String groupID){
+        if(alarmIDlist.contains(messageID)){
 //            Log.i(TAG,"alarmIDlist.contains(id)");
         }else{
             Intent intent = new Intent(context, AlarmReceiver.class);
-            intent.putExtra("id", id);
-            intent.putExtra("groupName", groupName);
+            intent.putExtra("messageID", messageID);
+            intent.putExtra("groupID", groupID);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 23131+num, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(context.ALARM_SERVICE);
             Long alarmTime = timestamp;
             //Long alarmTime = System.currentTimeMillis()+2000;
             alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);
             num++;
-            alarmIDlist.add(id);
+            alarmIDlist.add(messageID);
         }
     }
 }

@@ -38,4 +38,8 @@ public class DelayMsg extends Messages{
     public void setDisplayTime(String displayTime) {
         this.displayTime = displayTime;
     }
+
+    public Messages toParent(){
+        return new Messages(super.from, super.message, super.type, super.to, super.messageID, this.displayTime, this.displayDate, super.name, this.displayTimestamp);
+    };
 }

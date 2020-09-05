@@ -33,10 +33,10 @@
         android:layout_gravity="center"
         android:layout_marginTop="60dp"
         android:layout_marginRight="15dp"
-        android:background="@drawable/exp_btn"
+        android:src="@drawable/up_grey"
+        android:background="@drawable/up_button_shape"
         android:padding="1dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/up_grey"
         app:layout_constraintEnd_toEndOf="@id/monthView"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -83,7 +83,8 @@
             android:layout_width="match_parent"
             android:layout_height="160dp"
             android:layout_below="@+id/dateView"
-            android:background="#ffffff" />
+            android:background="#ffffff"
+            android:paddingTop="15dp"/>
 
 
     </LinearLayout>

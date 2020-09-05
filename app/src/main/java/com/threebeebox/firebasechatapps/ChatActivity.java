@@ -202,7 +202,6 @@ public class ChatActivity extends AppCompatActivity {
 
         SimpleDateFormat currentDate = new SimpleDateFormat("MMM dd, yyyy");
         saveCurrentDate = currentDate.format(calendar.getTime());
-
         SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
         saveCurrentTime = currentTime.format(calendar.getTime());
 
@@ -263,7 +262,7 @@ public class ChatActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Uri uri) {
                                 Map messageTextBody = new HashMap();
-                                messageTextBody.put("message", uri);
+                                messageTextBody.put("message", uri.toString());
                                 messageTextBody.put("name", resultUri.getLastPathSegment());
                                 messageTextBody.put("type", "image");
                                 messageTextBody.put("from", messageSenderID);
@@ -341,18 +340,29 @@ public class ChatActivity extends AppCompatActivity {
         });
 
 //        messagesList.clear();
-        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Chat")
+        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Chat").orderByChild("displayTimestamp")
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        Messages messages = dataSnapshot.getValue(Messages.class);
-
-                        //add message only if the message does not exist in messageList already...
-                        if (!messagesList.contains(messages)) {
-                            messagesList.add(messages);
-                            messageAdapter.notifyDataSetChanged();
+                        if(dataSnapshot.child("type").getValue().equals("delay")){
+                            DelayMsg messages = dataSnapshot.getValue(DelayMsg.class);
+                            if(messages!=null){
+                                if (!messagesList.contains(messages.toParent())) {
+                                    messagesList.add(messages.toParent());
+                                    messageAdapter.notifyDataSetChanged();
+                                }
+                                userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
+                            }
+                        }else{
+                            Messages messages = dataSnapshot.getValue(Messages.class);
+                            if(messages!=null){
+                                if (!messagesList.contains(messages)) {
+                                    messagesList.add(messages);
+                                    messageAdapter.notifyDataSetChanged();
+                                }
+                                userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
+                            }
                         }
-                        userMessagesList.smoothScrollToPosition(userMessagesList.getAdapter().getItemCount());
                     }
 
                     @Override
@@ -446,6 +456,7 @@ public class ChatActivity extends AppCompatActivity {
         }
         else
         {
+            Calendar now = Calendar.getInstance();
             SimpleDateFormat currentDateFormat = new SimpleDateFormat("MMM dd, yyyy");
             SimpleDateFormat currentTimeFormat = new SimpleDateFormat("hh:mm a");
 
@@ -457,17 +468,24 @@ public class ChatActivity extends AppCompatActivity {
 
             String messagePushID = userMessageKeyRef.getKey();
 
+
+            String currentDate = currentDateFormat.format(now.getTime());
+            String currentTime = currentTimeFormat.format(now.getTime());
             Map messageTextBody = new HashMap();
             messageTextBody.put("message", messageText);
             messageTextBody.put("type", "text");
             messageTextBody.put("from", messageSenderID);
             messageTextBody.put("to", messageReceiverID);
             messageTextBody.put("messageID", messagePushID);
-            messageTextBody.put("time", saveCurrentTime);
-            messageTextBody.put("date", saveCurrentDate);
+            messageTextBody.put("time", currentTime);
+            messageTextBody.put("date", currentDate);
+            messageTextBody.put("timestamp", now.getTimeInMillis());
 
             if (calendar==null) {
                 Map messageBodyDetails = new HashMap();
+                messageTextBody.put("displayDate", currentDate);
+                messageTextBody.put("displayTime", currentTime);
+                messageTextBody.put("displayTimestamp", now.getTimeInMillis());
                 messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
                 messageBodyDetails.put( messageReceiverRef + "/" + messagePushID, messageTextBody);
 
@@ -514,7 +532,6 @@ public class ChatActivity extends AppCompatActivity {
                 messageTextBody.put("displayTimestamp", calendar.getTimeInMillis());
                 SndMessageKeyRef.updateChildren(messageTextBody);
                 RcvMessageKeyRef.updateChildren(messageTextBody);
-
 
                 DatabaseReference UserDelayRef = RootRef.child("Users").child(messageSenderID).child("DelayMessage");
                 UserDelayRef.child(messageKey).setValue("");

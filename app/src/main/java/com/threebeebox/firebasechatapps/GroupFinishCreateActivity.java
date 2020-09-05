@@ -102,6 +102,7 @@ public class GroupFinishCreateActivity extends AppCompatActivity implements AddM
                 groupChatIntent.putExtra("groupName", currentGroupName);
                 groupChatIntent.putExtra("groupID", currentGroupID);
                 startActivity(groupChatIntent);
+                finish();
             }
         });
         userProfileImage.setOnClickListener(new View.OnClickListener() {

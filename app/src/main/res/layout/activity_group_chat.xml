@@ -4,71 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GroupChatActivity">
-
+    tools:context=".GroupChatActivity"
+    android:background="@color/lightGrey">
 
     <include
         android:id="@+id/group_chat_bar_layout"
-        layout="@layout/app_bar_layout" />
-
-
+        layout="@layout/app_bar_layout_white" />
+    <View android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/toolbar_drop_shadow"
+        android:layout_below="@id/group_chat_bar_layout"
+        android:id="@+id/toolbar_drop_shadow"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messages_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/cardView_groupChat"
+        android:layout_above="@+id/chat_input_field"
         android:layout_below="@+id/group_chat_bar_layout"
-        android:background="@color/lightGrey"
+        android:paddingTop="10dp"
         android:layout_marginBottom="0dp" />
 
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView_groupChat"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        app:cardCornerRadius="3dp">
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="100">
-
-            <ImageButton
-                android:id="@+id/send_files_btn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_weight="14"
-                android:src="@drawable/send_message" />
-
-            <EditText
-                android:id="@+id/input_group_message"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_toStartOf="@+id/send_message_btn"
-                android:layout_toEndOf="@id/send_files_btn"
-                android:layout_weight="58"
-                android:hint="Type here..." />
-
-            <ImageButton
-                android:id="@+id/send_message_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="14"
-                android:src="@drawable/send_message" />
-
-            <ImageButton
-                android:id="@+id/send_delay_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="14"
-                android:src="@drawable/send_message" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    <include
+        android:id="@+id/chat_input_field"
+        layout="@layout/chat_input_field" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/calendarButton"
@@ -77,7 +35,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="65dp"
+        android:layout_marginBottom="85dp"
         android:clickable="true"
         android:src="@drawable/ic_calendar"
         app:backgroundTint="@color/white" />
