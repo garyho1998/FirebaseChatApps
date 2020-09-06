@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -63,6 +64,10 @@ public class FindFdActivity extends AppCompatActivity{
         loadingBar = new ProgressDialog(this);
 
         mPhoneNoView = (EditText) findViewById(R.id.phone_input);
+        mPhoneNoView.requestFocus();
+        if(mPhoneNoView.requestFocus()) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
         mUserProfileImage = (CircleImageView) findViewById(R.id.usr_image_view);
         mUsrName = (TextView) findViewById(R.id.usr_name_view);
         mUsrStatus = (TextView) findViewById(R.id.usr_status_view);

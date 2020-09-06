@@ -112,7 +112,6 @@ public class CalendarFragment extends Fragment{
         return calendarFragmentView;
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
