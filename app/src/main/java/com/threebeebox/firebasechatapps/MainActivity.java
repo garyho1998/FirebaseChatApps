@@ -1,5 +1,6 @@
 package com.threebeebox.firebasechatapps;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -198,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
                     Toast.makeText(MainActivity.this, "Please write Group Name...", Toast.LENGTH_SHORT).show();
                 } else {
                     CreateNewGroup(groupName);
-
                 }
             }
         });
@@ -209,8 +210,14 @@ public class MainActivity extends AppCompatActivity implements EditDelayMsgDialo
                 dialogInterface.cancel();
             }
         });
-
-        builder.show();
+        AlertDialog dialog = builder.create();
+        groupNameField.requestFocus();
+        if(groupNameField.requestFocus()) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
+        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE  | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        dialog.show();
     }
 
     private void CreateNewGroup(final String groupName) {

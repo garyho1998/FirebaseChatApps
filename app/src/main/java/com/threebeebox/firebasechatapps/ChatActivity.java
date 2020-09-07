@@ -96,7 +96,6 @@ public class ChatActivity extends AppCompatActivity {
         RootRef = FirebaseDatabase.getInstance().getReference();
         NotificationRef = FirebaseDatabase.getInstance().getReference().child("Notifications");
 
-
         messageReceiverID = getIntent().getExtras().get("visit_user_id").toString();
         messageReceiverName = getIntent().getExtras().get("visit_user_name").toString();
         messageReceiverImage = (String) getIntent().getExtras().get("visit_image");
@@ -184,6 +183,8 @@ public class ChatActivity extends AppCompatActivity {
                 String message = MessageInputText.getText().toString();
                 if (!TextUtils.isEmpty(message)) {
                     showDateTimeDialogAndSend();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Please write your message...", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -452,10 +453,11 @@ public class ChatActivity extends AppCompatActivity {
         String messageText = MessageInputText.getText().toString();
 
         if (TextUtils.isEmpty(messageText)) {
-            Toast.makeText(this, "first write your message...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please write your message...", Toast.LENGTH_SHORT).show();
         }
         else
         {
+            System.out.println("NotEmpty");
             Calendar now = Calendar.getInstance();
             SimpleDateFormat currentDateFormat = new SimpleDateFormat("MMM dd, yyyy");
             SimpleDateFormat currentTimeFormat = new SimpleDateFormat("hh:mm a");

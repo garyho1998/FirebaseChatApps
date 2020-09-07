@@ -116,6 +116,8 @@ public class GroupChatActivity extends AppCompatActivity {
                 String message = userMessageInput.getText().toString();
                 if (!TextUtils.isEmpty(message)) {
                     showDateTimeDialogAndSend();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Please write your message...", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -431,7 +433,7 @@ public class GroupChatActivity extends AppCompatActivity {
         String message = userMessageInput.getText().toString();
 
         if (TextUtils.isEmpty(message)) {
-            Toast.makeText(this, "Please write message first...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please write your message ...", Toast.LENGTH_SHORT).show();
         } else {
             SimpleDateFormat currentDateFormat = new SimpleDateFormat("MMM dd, yyyy");
             SimpleDateFormat currentTimeFormat = new SimpleDateFormat("hh:mm a");
