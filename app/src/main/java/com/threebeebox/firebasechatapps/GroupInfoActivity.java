@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -27,6 +28,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,7 +56,6 @@ public class GroupInfoActivity extends AppCompatActivity implements GroupInfoRec
     private RecyclerView MemberList;
     private DatabaseReference RootRef, UsersRef, ContactRef, GroupNameRef;
     private String currentUserID, currentGroupName, currentGroupID;
-    public boolean isAdmin;
     private GroupInfoFirebaseRecyclerAdapter adapter;
 
     private static final int GalleryPick = 1;
@@ -267,6 +268,7 @@ public class GroupInfoActivity extends AppCompatActivity implements GroupInfoRec
         }
     }
 
+    //Exit group
     public void removeUser() {
         new AlertDialog.Builder(this)
                 .setTitle("Alert")
@@ -274,8 +276,25 @@ public class GroupInfoActivity extends AppCompatActivity implements GroupInfoRec
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        if (isAdmin) { //assign other user as admin if no other admin
-                            //TODO
+                        Log.i(TAG, GroupSingleton.getInstance().isAdmin.toString());
+                        if (GroupSingleton.getInstance().isAdmin) { //assign other user as admin if no other admin
+                            GroupNameRef.child("Member").addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                                            if(!postSnapshot.getKey().equals(currentUserID)){
+                                                postSnapshot.getRef().setValue("Admin");
+                                                break;
+                                            }
+                                            Log.e("Get Data", snapshot.getKey());
+                                        }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
                         }
                         GroupNameRef.child("Member").child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
