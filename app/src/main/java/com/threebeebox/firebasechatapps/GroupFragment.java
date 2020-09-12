@@ -106,7 +106,7 @@ public class GroupFragment extends Fragment {
                                             }
                                         });
 
-                                        groupSnapshot.getRef().child("Message").orderByKey().limitToLast(1)
+                                        groupSnapshot.getRef().child("Message").orderByChild("timestamp").limitToLast(1)
                                                 .addChildEventListener(new ChildEventListener() {
                                                     @Override
                                                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -118,9 +118,11 @@ public class GroupFragment extends Fragment {
                                                     }
                                                     @Override
                                                     public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                                        setLastTimeAndMsg(dataSnapshot, holder);
                                                     }
                                                     @Override
                                                     public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                                                        setLastTimeAndMsg(dataSnapshot, holder);
                                                     }
                                                     @Override
                                                     public void onCancelled(DatabaseError databaseError) {
@@ -168,6 +170,7 @@ public class GroupFragment extends Fragment {
         RetrieveAndDisplayGroups();
     }
 
+
     public static class GroupsViewHolder extends RecyclerView.ViewHolder {
         TextView GroupName, GroupMsg, lastSend;
         CircleImageView image;
@@ -183,7 +186,7 @@ public class GroupFragment extends Fragment {
     }
 
     public void setLastTimeAndMsg(DataSnapshot dataSnapshot, GroupsViewHolder holder){
-        if(dataSnapshot.hasChild("type")){
+        if(dataSnapshot.hasChild("type") && dataSnapshot.hasChild("time") && dataSnapshot.hasChild("date")){
             String last_time = dataSnapshot.child("time").getValue().toString();
             String last_date = dataSnapshot.child("date").getValue().toString();
             if (last_date.equals(sToday)) {
@@ -193,7 +196,7 @@ public class GroupFragment extends Fragment {
             }
 
             String type = dataSnapshot.child("type").getValue().toString();
-            if (type.equals("normal")) { //text type
+            if (type.equals("normal") || type.equals("delay")) { //text type
                 String text_msg = dataSnapshot.child("message").getValue().toString();
                 holder.GroupMsg.setText(text_msg);
             } else if (type.equals("image")) {

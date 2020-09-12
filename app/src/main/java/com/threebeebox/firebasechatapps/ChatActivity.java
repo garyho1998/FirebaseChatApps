@@ -341,7 +341,7 @@ public class ChatActivity extends AppCompatActivity {
         });
 
 //        messagesList.clear();
-        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Chat").orderByChild("displayTimestamp")
+        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Chat").orderByChild("timestamp")
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -432,7 +432,6 @@ public class ChatActivity extends AppCompatActivity {
             messageObject.put("type", "text");
             messageObject.put("messageID", id);
 
-
             Map<String, Object> childUpdates = new HashMap<>();
             Map<String, Object> childDelete = new HashMap<>();
             childUpdates.put(id, messageObject);
@@ -442,9 +441,8 @@ public class ChatActivity extends AppCompatActivity {
             childDelete.put(id, null);
             RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("Delay").updateChildren(childDelete);
             RootRef.child("Messages").child(messageReceiverID).child(messageSenderID).child("Delay").updateChildren(childDelete);
-
         } else {
-            alarmController.addAlarm(this, id, displayTimestamp, messageSenderID);
+            alarmController.addAlarm(this, id, displayTimestamp, messageSenderID, messageReceiverID);
         }
     }
 
@@ -485,9 +483,6 @@ public class ChatActivity extends AppCompatActivity {
 
             if (calendar==null) {
                 Map messageBodyDetails = new HashMap();
-                messageTextBody.put("displayDate", currentDate);
-                messageTextBody.put("displayTime", currentTime);
-                messageTextBody.put("displayTimestamp", now.getTimeInMillis());
                 messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
                 messageBodyDetails.put( messageReceiverRef + "/" + messagePushID, messageTextBody);
 

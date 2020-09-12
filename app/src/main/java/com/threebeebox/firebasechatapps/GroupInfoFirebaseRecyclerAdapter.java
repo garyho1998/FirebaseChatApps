@@ -72,8 +72,6 @@ public class GroupInfoFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<St
                                     String userImage = userSnapshot.child("image").getValue().toString();
                                     Picasso.get().load(userImage).placeholder(R.drawable.user_icon).into(holder.profileImage);
                                 }
-
-
                             }else{
                                 dataSnapshot.getRef().removeValue();
                                 System.out.println(userId +" not exist anymore");

@@ -265,7 +265,7 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         });
 
-        GroupNameRef.child("Message").orderByChild("displayTimestamp")
+        GroupNameRef.child("Message").orderByChild("timestamp")
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -394,7 +394,7 @@ public class GroupChatActivity extends AppCompatActivity {
         Long displayTimestamp = (Long) dataSnapshot.child("displayTimestamp").getValue();
 
         if ((displayTimestamp - System.currentTimeMillis()) <= 0) {
-            GroupNameRef.child("DelayMessage").child(messageID).addValueEventListener(new ValueEventListener() {
+            GroupNameRef.child("DelayMessage").child(messageID).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     GroupNameRef.child("Message").child(messageID).setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -448,7 +448,6 @@ public class GroupChatActivity extends AppCompatActivity {
             messageObject.put("date", currentDate);
             messageObject.put("time", currentTime);
             messageObject.put("timestamp", now.getTimeInMillis());
-
             if (calendar == null) {
                 DatabaseReference GroupMessageRef = GroupNameRef.child("Message");
                 String messageKey = GroupMessageRef.push().getKey();
@@ -456,11 +455,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
                 messageObject.put("messageID", messageKey);
                 messageObject.put("type", "normal");
-                messageObject.put("date", currentDate);
-                messageObject.put("time", currentTime);
-                messageObject.put("displayDate", currentDate);
-                messageObject.put("displayTime", currentTime);
-                messageObject.put("displayTimestamp", now.getTimeInMillis());
                 GroupMessageKeyRef.updateChildren(messageObject).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {

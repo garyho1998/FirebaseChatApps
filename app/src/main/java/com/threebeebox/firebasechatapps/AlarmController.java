@@ -22,8 +22,9 @@ public class AlarmController {
             intent.putExtra("groupID", groupID);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 23131+num, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(context.ALARM_SERVICE);
-            Long alarmTime = timestamp;
-            //Long alarmTime = System.currentTimeMillis()+2000;
+            //Long alarmTime = timestamp;
+            Long alarmTime = System.currentTimeMillis()+3000;
+            Toast.makeText(context, num+ ":Alarm ("+messageID+") set in " + (alarmTime - System.currentTimeMillis())/1000 + " seconds",Toast.LENGTH_SHORT).show();
             alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);
             num++;
             alarmIDlist.add(messageID);

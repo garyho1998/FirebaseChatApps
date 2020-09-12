@@ -6,8 +6,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
+import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,36 +25,36 @@ import java.util.Map;
 
 public class IndAlarmReceiver extends BroadcastReceiver {
     private FirebaseAuth mAuth;
-    private DatabaseReference ChatRef, SndChatRef, RcvChatRef;
+    private DatabaseReference ChatRef, SndChatRef, RcvChatRef, NotificationRef;
     final String TAG = "IndAlarmReceiver";
     @Override
     public void onReceive(Context context, Intent intent)
     {
+        Log.i(TAG, "onReceive");
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "myapp:mywakelocktag");
         wl.acquire();
 
-        String id = intent.getStringExtra("id");
+        String messageID = intent.getStringExtra("messageID");
         String senderID = intent.getStringExtra("senderID");
+        String receiverID = intent.getStringExtra("receiverID");
 
         mAuth = FirebaseAuth.getInstance();
         ChatRef = FirebaseDatabase.getInstance().getReference().child("Messages");
-        Toast.makeText(context, "in IndAlarmReceiver",Toast.LENGTH_SHORT).show();
-
-        ChatRef.child(senderID).child("Delay").child(id).addValueEventListener(new ValueEventListener() {
+        NotificationRef = FirebaseDatabase.getInstance().getReference().child("Notifications");
+        ChatRef.child(senderID).child(receiverID).child("Delay").child(messageID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i(TAG, "onDataChange");
                 UpdateFirebaseFromAlarm(dataSnapshot);
             }
             @Override
             public void onCancelled(DatabaseError error) {
-                // Failed to read value
-//                Log.w(TAG, "Failed to read value.", error.toException());
             }
         });
         wl.release();
     }
-    private void UpdateFirebaseFromAlarm(DataSnapshot dataSnapshot) {
+    private void UpdateFirebaseFromAlarm(final DataSnapshot dataSnapshot) {
         String id = dataSnapshot.getKey();
         String date = (String) dataSnapshot.child("displayDate").getValue();
         String message = (String) dataSnapshot.child("message").getValue();
@@ -80,6 +85,16 @@ public class IndAlarmReceiver extends BroadcastReceiver {
             childDelete.put(id, null);
             SndChatRef.child("Delay").updateChildren(childDelete);
             RcvChatRef.child("Delay").updateChildren(childDelete);
+
+            HashMap<String, String> chatNotification = new HashMap<>();
+            chatNotification.put("from", from);
+            chatNotification.put("type", "chat");
+            NotificationRef.child(to).push().setValue(chatNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    dataSnapshot.getRef().removeValue();
+                }
+            });
         }
     }
 

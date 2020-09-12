@@ -45,6 +45,7 @@
             android:parentActivityName="com.threebeebox.firebasechatapps.GroupChatActivity" />
 
         <receiver android:name="com.threebeebox.firebasechatapps.AlarmReceiver" />
+        <receiver android:name="com.threebeebox.firebasechatapps.IndAlarmReceiver" />
 
         <activity
             android:name="com.threebeebox.firebasechatapps.MainActivity"
@@ -56,6 +57,7 @@
         </activity>
         <activity
             android:name="com.threebeebox.firebasechatapps.ChatActivity"
+            android:launchMode="singleTop"
             android:parentActivityName="com.threebeebox.firebasechatapps.MainActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
