@@ -272,7 +272,7 @@ public class GroupInfoActivity extends AppCompatActivity implements GroupInfoRec
     public void removeUser() {
         new AlertDialog.Builder(this)
                 .setTitle("Alert")
-                .setMessage("Do you really want to remove this user?")
+                .setMessage("Do you really want to quit this group?")
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
